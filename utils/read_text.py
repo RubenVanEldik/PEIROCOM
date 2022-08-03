@@ -8,7 +8,7 @@ def read_text(filepath):
     """
     Read a text file
     """
-    assert validate.is_filepath(filepath, suffix=".txt", existing=True)
+    assert validate.is_filepath(filepath, existing=True)
 
     with open(filepath) as f:
         text = f.read()
