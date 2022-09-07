@@ -119,6 +119,7 @@ def countries(output_directory, resolution):
     if data is not None:
         # Get the label for the color bar
         label = st.sidebar.text_input("Label")
+        format_percentage = st.sidebar.checkbox("Show as percentage")
 
         # If data is still a DataFrame, convert the single column DataFrame to a series (only applicable when the 'mode' aggregator has been used)
         if validate.is_dataframe(data):
@@ -129,5 +130,5 @@ def countries(output_directory, resolution):
         unit = st.sidebar.select_slider("Format units", units.keys(), value=1, format_func=lambda key: units[key])
 
         # Create and show the map
-        map = chart.Map(data / unit, label=label)
+        map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
         st.pyplot(map.fig)
