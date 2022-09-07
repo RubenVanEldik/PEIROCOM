@@ -114,7 +114,8 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 previous_production_capacity = utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", index_col=0)
                 capacities = model.addVars(climate_zones, lb=config["time_discretization"]["capacity_propagation"] * previous_production_capacity[production_technology].dropna(), ub=production_potential)
             else:
-                capacities = model.addVars(climate_zones, ub=production_potential)
+                current_capacity = utils.get_current_production_capacity_in_climate_zone(bidding_zone, production_technology, config=config)
+                capacities = model.addVars(climate_zones, lb=current_capacity, ub=production_potential)
 
             # Add the capacities to the production_capacity DataFrame and calculate the temporal production for a specific technology
             temporal_production = 0

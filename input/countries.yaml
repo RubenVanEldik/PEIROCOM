@@ -4,6 +4,10 @@
   flag: 🇦🇱
   bidding_zones: [AL00]
   included_geographic_units: [ALB]
+  current:
+    pv: 0
+    onshore: 0
+    offshore: 0
   potential:
     onshore: 16368.52499
     offshore: 0
@@ -14,6 +18,10 @@
   flag: 🇦🇹
   bidding_zones: [AT00]
   included_geographic_units: [AUT]
+  current:
+    pv: 2500
+    onshore: 3500
+    offshore: 0
   potential:
     onshore: 111695.2452
     hydrogen: 0
@@ -23,6 +31,10 @@
   flag: 🇧🇦
   bidding_zones: [BA00]
   included_geographic_units: [BHF, BIS, BHB]
+  current:
+    pv: 0
+    onshore: 135
+    offshore: 0
   potential:
     onshore: 92454.61278
     hydrogen: 800000000
@@ -32,6 +44,10 @@
   flag: 🇧🇪
   bidding_zones: [BE00]
   included_geographic_units: [BFR, BWR, BCR]
+  current:
+    pv: 4788
+    onshore: 2787
+    offshore: 2254
   potential:
     onshore: 13548.88149
     offshore: 4720
@@ -42,6 +58,10 @@
   flag: 🇧🇬
   bidding_zones: [BG00]
   included_geographic_units: [BGR]
+  current:
+    pv: 1313
+    onshore: 705
+    offshore: 0
   potential:
     onshore: 8487.873066
     offshore: 0
@@ -52,6 +72,10 @@
   flag: 🇨🇭
   bidding_zones: [CH00]
   included_geographic_units: [CHE]
+  current:
+    pv: 0
+    onshore: 0
+    offshore: 0
   potential:
     onshore: 13684.3703
     hydrogen: 0
@@ -61,6 +85,10 @@
   flag: 🇨🇾
   bidding_zones: [CY00]
   included_geographic_units: [CYP]
+  current:
+    pv: 0
+    onshore: 0
+    offshore: 0
   potential:
     hydrogen: 0
 - name: Czech Republic
@@ -69,6 +97,10 @@
   flag: 🇨🇿
   bidding_zones: [CZ00]
   included_geographic_units: [CZE]
+  current:
+    pv: 2053
+    onshore: 339
+    offshore: 0
   potential:
     onshore: 40886.12328
     hydrogen: 0
@@ -78,6 +110,10 @@
   flag: 🇩🇪
   bidding_zones: [DE00]
   included_geographic_units: [DEU]
+  current:
+    pv: 56347
+    onshore: 55560
+    offshore: 7787
   potential:
     onshore: 117392.8253
     offshore: 40980
@@ -88,6 +124,10 @@
   flag: 🇩🇰
   bidding_zones: [DKE1, DKW1]
   included_geographic_units: [DNK]
+  current:
+    pv: 1536
+    onshore: 4644
+    offshore: 2305
   potential:
     onshore: 150548.3151
     offshore: 172350
@@ -98,6 +138,10 @@
   flag: 🇪🇪
   bidding_zones: [EE00]
   included_geographic_units: [EST]
+  current:
+    pv: 370
+    onshore: 326
+    offshore: 0
   potential:
     onshore: 144673.9717
     offshore: 81810
@@ -109,6 +153,10 @@
   bidding_zones: [ES00]
   included_geographic_units: [ESP]
   excluded_geographic_subunits: [ESC]
+  current:
+    pv: 14640
+    onshore: 27735
+    offshore: 0
   potential:
     onshore: 391316.1594
     offshore: 25710
@@ -119,6 +167,10 @@
   flag: 🇫🇮
   bidding_zones: [FI00]
   included_geographic_units: [FIN, ALD]
+  current:
+    pv: 7
+    onshore: 3184
+    offshore: 0
   potential:
     onshore: 777503.8953
     offshore: 46920
@@ -129,6 +181,10 @@
   flag: 🇫🇷
   bidding_zones: [FR00, FR15]
   included_geographic_units: [FXX]
+  current:
+    pv: 14298
+    onshore: 0
+    offshore: 10
   potential:
     onshore: 1079711.951
     offshore: 177110
@@ -139,6 +195,10 @@
   flag: 🇬🇷
   bidding_zones: [GR00, GR03]
   included_geographic_units: [GRC]
+  current:
+    pv: 3820
+    onshore: 4150
+    offshore: 0
   potential:
     onshore: 72093.18945
     offshore: 9500
@@ -149,6 +209,10 @@
   flag: 🇭🇷
   bidding_zones: [HR00]
   included_geographic_units: [HRV]
+  current:
+    pv: 96
+    onshore: 925
+    offshore: 0
   potential:
     onshore: 34181.50698
     offshore: 0
@@ -159,6 +223,10 @@
   flag: 🇭🇺
   bidding_zones: [HU00]
   included_geographic_units: [HUN]
+  current:
+    pv: 2210
+    onshore: 323
+    offshore: 0
   potential:
     onshore: 17033.15274
     hydrogen: 0
@@ -168,6 +236,10 @@
   flag: 🇮🇪
   bidding_zones: [IE00]
   included_geographic_units: [IRL]
+  current:
+    pv: 0
+    onshore: 1919
+    offshore: 0
   potential:
     onshore: 317525.7372
     offshore: 648740
@@ -178,6 +250,10 @@
   flag: 🇮🇹
   bidding_zones: [ITCA, ITCN, ITCS, ITN1, ITS1, ITSA, ITSI]
   included_geographic_units: [ITA]
+  current:
+    pv: 5137
+    onshore: 10658
+    offshore: 0
   potential:
     onshore: 109494.4076
     offshore: 0
@@ -188,6 +264,10 @@
   flag: 🇱🇹
   bidding_zones: [LT00]
   included_geographic_units: [LTU]
+  current:
+    pv: 259
+    onshore: 671
+    offshore: 0
   potential:
     onshore: 221926.6599
     offshore: 14090
@@ -198,8 +278,12 @@
   flag: 🇱🇺
   bidding_zones: [LUB1, LUF1, LUG1]
   included_geographic_units: [LUX]
+  current:
+    pv: 258
+    onshore: 167
+    offshore: 0
   potential:
-    onshore: 0
+    onshore: 167
     hydrogen: 0
 - name: Latvia
   nuts_2: LV
@@ -207,6 +291,10 @@
   flag: 🇱🇻
   bidding_zones: [LV00]
   included_geographic_units: [LVA]
+  current:
+    pv: 14
+    onshore: 87
+    offshore: 0
   potential:
     onshore: 155110.0796
     offshore: 85160
@@ -217,6 +305,10 @@
   flag: 🇲🇪
   bidding_zones: [ME00]
   included_geographic_units: [MNE]
+  current:
+    pv: 0
+    onshore: 118
+    offshore: 0
   potential:
     onshore: 28013.26503
     offshore: 0
@@ -227,6 +319,10 @@
   flag: 🇲🇰
   bidding_zones: [MK00]
   included_geographic_units: [MKD]
+  current:
+    pv: 22
+    onshore: 37
+    offshore: 0
   potential:
     onshore: 5757.915653
     hydrogen: 0
@@ -236,6 +332,10 @@
   flag: 🇲🇹
   bidding_zones: [MT00]
   included_geographic_units: [MLT]
+  current:
+    pv: 0
+    onshore: 0
+    offshore: 0
   potential:
     hydrogen: 0
 - name: Netherlands
@@ -244,6 +344,10 @@
   flag: 🇳🇱
   bidding_zones: [NL00]
   included_geographic_units: [NLX]
+  current:
+    pv: 16074
+    onshore: 7303
+    offshore: 3757
   potential:
     onshore: 78847.25957
     offshore: 77070
@@ -254,6 +358,10 @@
   flag: 🇳🇴
   bidding_zones: [NOM1, NON1, NOS0]
   included_geographic_units: [NOW]
+  current:
+    pv: 0
+    onshore: 5105
+    offshore: 0
   potential:
     onshore: 747165.9611
     offshore: 641030
@@ -264,6 +372,10 @@
   flag: 🇵🇱
   bidding_zones: [PL00]
   included_geographic_units: [POL]
+  current:
+    pv: 6036
+    onshore: 7886
+    offshore: 0
   potential:
     onshore: 419543.8884
     offshore: 79680
@@ -274,6 +386,10 @@
   flag: 🇵🇹
   bidding_zones: [PT00]
   included_geographic_units: [PRX]
+  current:
+    pv: 1032
+    onshore: 5328
+    offshore: 25
   potential:
     onshore: 59674.41051
     offshore: 2830
@@ -284,6 +400,10 @@
   flag: 🇷🇴
   bidding_zones: [RO00]
   included_geographic_units: [ROU]
+  current:
+    pv: 1160
+    onshore: 2957
+    offshore: 0
   potential:
     onshore: 38135.22537
     offshore: 0
@@ -294,6 +414,10 @@
   flag: 🇷🇸
   bidding_zones: [RS00]
   included_geographic_units: [SRV, SRS]
+  current:
+    pv: 3
+    onshore: 533
+    offshore: 0
   potential:
     onshore: 23653.77034
     hydrogen: 0
@@ -303,6 +427,10 @@
   flag: 🇸🇪
   bidding_zones: [SE01, SE02, SE03, SE04]
   included_geographic_units: [SWE]
+  current:
+    pv: 0
+    onshore: 12100
+    offshore: 0
   potential:
     onshore: 841925.3066
     offshore: 166650
@@ -313,6 +441,10 @@
   flag: 🇸🇮
   bidding_zones: [SI00]
   included_geographic_units: [SVN]
+  current:
+    pv: 286
+    onshore: 2
+    offshore: 0
   potential:
     onshore: 4580.086726
     offshore: 0
@@ -323,6 +455,10 @@
   flag: 🇸🇰
   bidding_zones: [SK00]
   included_geographic_units: [SVK]
+  current:
+    pv: 0
+    onshore: 0
+    offshore: 0
   potential:
     onshore: 17375.51911
     hydrogen: 0
@@ -332,6 +468,10 @@
   flag: 🇹🇷
   bidding_zones: [TR00]
   included_geographic_units: [TUR]
+  current:
+    pv: 0
+    onshore: 0
+    offshore: 0
   potential:
     onshore: 468071.8363
     offshore: 460
@@ -342,6 +482,10 @@
   flag: 🇺🇦
   bidding_zones: [UA01]
   included_geographic_units: [UKR]
+  current:
+    pv: 5363
+    onshore: 1111
+    offshore: 0
   potential:
     hydrogen: 0
 - name: United Kingdom
@@ -350,6 +494,10 @@
   flag: 🇬🇧
   bidding_zones: [UK00, UKNI]
   included_geographic_units: [ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS]
+  current:
+    pv: 13470
+    onshore: 13932
+    offshore: 12160
   potential:
     onshore: 689995.2295
     offshore: 1028930
