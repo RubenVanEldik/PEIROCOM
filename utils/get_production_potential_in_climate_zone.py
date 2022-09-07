@@ -1,11 +1,10 @@
-import streamlit as st
 import utils
 import validate
 
 
 def get_production_potential_in_climate_zone(bidding_zone, production_technology, *, config):
     """
-    Calculate the production capacity per climate zone for a specific bidding zone and production technology
+    Calculate the maximum production capacity per climate zone for a specific bidding zone and production technology
     """
     assert validate.is_bidding_zone(bidding_zone)
     assert validate.is_technology(production_technology)
@@ -16,7 +15,7 @@ def get_production_potential_in_climate_zone(bidding_zone, production_technology
 
     # Return infinite if the production technology has no potential specified for this country
     production_potential = utils.get_country_property(country_code, "potential").get(production_technology)
-    if not production_potential:
+    if production_potential is None:
         return float("inf")
 
     # Calculate the number of climate zones in the country
