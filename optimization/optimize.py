@@ -144,13 +144,16 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
             timestep_hours = pd.Timedelta(resolution).total_seconds() / 3600
 
+            # Get the storage energy potential
+            storage_potential = utils.get_storage_potential_in_bidding_zone(bidding_zone, storage_technology, config=config)
+
             # Create a variable for the energy and power storage capacity
             if previous_resolution:
                 previous_storage_capacity = utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
-                storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"])
+                storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "power"])
             else:
-                storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar()
+                storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(ub=storage_potential)
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar()
 
             # Create the inflow and outflow variables
