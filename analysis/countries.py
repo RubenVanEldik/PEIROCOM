@@ -21,6 +21,9 @@ def _select_data(output_directory, resolution, *, name):
     data_source_options = ["Statistics", "Temporal results", "Technology potential", "Production capacity", "Storage capacity (energy)", "Storage capacity (power)"]
     data_source = col1.selectbox(name.capitalize(), data_source_options)
 
+    # Read the config file
+    config = utils.read_yaml(output_directory / "config.yaml")
+
     if data_source == "Statistics":
         # Get the type of statistic
         statistic_type_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment", "self_sufficiency"]
@@ -28,8 +31,7 @@ def _select_data(output_directory, resolution, *, name):
         statistic_method = getattr(stats, statistic_type)
 
         # Calculate the statistics for each country and convert them into a Series
-        country_codes = utils.read_yaml(output_directory / "config.yaml")["country_codes"]
-        return pd.Series({country_code: statistic_method(output_directory, resolution, country_codes=[country_code]) for country_code in country_codes})
+        return pd.Series({country_code: statistic_method(output_directory, resolution, country_codes=[country_code]) for country_code in config["country_codes"]})
 
     if data_source == "Temporal results":
         # Get the temporal results
@@ -52,7 +54,7 @@ def _select_data(output_directory, resolution, *, name):
         technology = col2.selectbox("Technology", technologies_with_potential, format_func=utils.format_technology, key=name)
 
         # Return a Series with the potential per country for the selected technology
-        data = pd.Series({country["nuts_2"]: country["potential"].get(technology) for country in country_info})
+        data = pd.Series({country["nuts_2"]: country["potential"].get(technology) for country in country_info if country["nuts_2"] in config["country_codes"]})
         data[data == 0] = None
         return data
 
