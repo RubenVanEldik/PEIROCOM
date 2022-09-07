@@ -6,6 +6,7 @@
   included_geographic_units: [ALB]
   potential:
     onshore: 16368.52499
+    offshore: 0
 - name: Austria
   nuts_2: AT
   alpha_3: AUT
@@ -30,6 +31,7 @@
   included_geographic_units: [BFR, BWR, BCR]
   potential:
     onshore: 13548.88149
+    offshore: 4720
 - name: Bulgaria
   nuts_2: BG
   alpha_3: BGR
@@ -38,6 +40,7 @@
   included_geographic_units: [BGR]
   potential:
     onshore: 8487.873066
+    offshore: 0
 - name: Switzerland
   nuts_2: CH
   alpha_3: CHE
@@ -69,6 +72,7 @@
   included_geographic_units: [DEU]
   potential:
     onshore: 117392.8253
+    offshore: 40980
 - name: Denmark
   nuts_2: DK
   alpha_3: DNK
@@ -77,6 +81,7 @@
   included_geographic_units: [DNK]
   potential:
     onshore: 150548.3151
+    offshore: 172350
 - name: Estonia
   nuts_2: EE
   alpha_3: EST
@@ -85,6 +90,7 @@
   included_geographic_units: [EST]
   potential:
     onshore: 144673.9717
+    offshore: 81810
 - name: Spain
   nuts_2: ES
   alpha_3: ESP
@@ -94,6 +100,7 @@
   excluded_geographic_subunits: [ESC]
   potential:
     onshore: 391316.1594
+    offshore: 25710
 - name: Finland
   nuts_2: FI
   alpha_3: FIN
@@ -102,6 +109,7 @@
   included_geographic_units: [FIN, ALD]
   potential:
     onshore: 777503.8953
+    offshore: 46920
 - name: France
   nuts_2: FR
   alpha_3: FRA
@@ -110,6 +118,7 @@
   included_geographic_units: [FXX]
   potential:
     onshore: 1079711.951
+    offshore: 177110
 - name: Greece
   nuts_2: GR
   alpha_3: GRC
@@ -118,6 +127,7 @@
   included_geographic_units: [GRC]
   potential:
     onshore: 72093.18945
+    offshore: 9500
 - name: Croatia
   nuts_2: HR
   alpha_3: HRV
@@ -126,6 +136,7 @@
   included_geographic_units: [HRV]
   potential:
     onshore: 34181.50698
+    offshore: 0
 - name: Hungary
   nuts_2: HU
   alpha_3: HUN
@@ -142,6 +153,7 @@
   included_geographic_units: [IRL]
   potential:
     onshore: 317525.7372
+    offshore: 648740
 - name: Italy
   nuts_2: IT
   alpha_3: ITA
@@ -150,6 +162,7 @@
   included_geographic_units: [ITA]
   potential:
     onshore: 109494.4076
+    offshore: 0
 - name: Lithuania
   nuts_2: LT
   alpha_3: LTU
@@ -158,6 +171,7 @@
   included_geographic_units: [LTU]
   potential:
     onshore: 221926.6599
+    offshore: 14090
 - name: Luxembourg
   nuts_2: LU
   alpha_3: LUX
@@ -174,6 +188,7 @@
   included_geographic_units: [LVA]
   potential:
     onshore: 155110.0796
+    offshore: 85160
 - name: Montenegro
   nuts_2: ME
   alpha_3: MNE
@@ -182,6 +197,7 @@
   included_geographic_units: [MNE]
   potential:
     onshore: 28013.26503
+    offshore: 0
 - name: FYR of Macedonia
   nuts_2: MK
   alpha_3: MKD
@@ -205,6 +221,7 @@
   included_geographic_units: [NLX]
   potential:
     onshore: 78847.25957
+    offshore: 77070
 - name: Norway
   nuts_2: "NO" # Strings are required, otherwise the YAML parser will parse it as a boolean False value
   alpha_3: NOR
@@ -213,6 +230,7 @@
   included_geographic_units: [NOW]
   potential:
     onshore: 747165.9611
+    offshore: 641030
 - name: Poland
   nuts_2: PL
   alpha_3: POL
@@ -221,6 +239,7 @@
   included_geographic_units: [POL]
   potential:
     onshore: 419543.8884
+    offshore: 79680
 - name: Portugal
   nuts_2: PT
   alpha_3: PRT
@@ -229,6 +248,7 @@
   included_geographic_units: [PRX]
   potential:
     onshore: 59674.41051
+    offshore: 2830
 - name: Romania
   nuts_2: RO
   alpha_3: ROU
@@ -237,6 +257,7 @@
   included_geographic_units: [ROU]
   potential:
     onshore: 38135.22537
+    offshore: 0
 - name: Serbia
   nuts_2: RS
   alpha_3: SRB
@@ -253,6 +274,7 @@
   included_geographic_units: [SWE]
   potential:
     onshore: 841925.3066
+    offshore: 166650
 - name: Slovenia
   nuts_2: SI
   alpha_3: SVN
@@ -261,6 +283,7 @@
   included_geographic_units: [SVN]
   potential:
     onshore: 4580.086726
+    offshore: 0
 - name: Slovak Republic
   nuts_2: SK
   alpha_3: SVK
@@ -277,6 +300,7 @@
   included_geographic_units: [TUR]
   potential:
     onshore: 468071.8363
+    offshore: 460
 - name: Ukraine
   nuts_2: UA
   alpha_3: UKR
@@ -292,3 +316,4 @@
   included_geographic_units: [ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS]
   potential:
     onshore: 689995.2295
+    offshore: 1028930
