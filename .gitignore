@@ -3,6 +3,7 @@ __pycache__/
 
 .env
 gurobi.lic
+todo.txt
 
 env/
 input/eraa/
