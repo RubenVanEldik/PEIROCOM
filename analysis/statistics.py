@@ -96,12 +96,12 @@ def statistics(output_directory, resolution):
                 if show_relative_storage_capacity:
                     metric_value = f"{storage_capacity[technology] / mean_demand:.1%}"
                 else:
-                    metric_value = f"{storage_capacity[technology] / 1000:,.0f}MW"
+                    metric_value = f"{storage_capacity[technology] / 1000:,.0f}GW"
             else:
                 if show_relative_storage_capacity:
                     metric_value = f"{storage_capacity[technology] / mean_demand:.2f}H"
                 else:
-                    metric_value = f"{storage_capacity[technology] / 1000:,.0f}MWh"
+                    metric_value = f"{storage_capacity[technology] / 1000:,.0f}GWh"
 
             # Set the metric
             cols[index].metric(f"{utils.format_technology(technology)} {storage_type}", metric_value)
