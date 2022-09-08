@@ -3,7 +3,7 @@ import yaml
 import validate
 
 
-def write_yaml(filepath, data, *, exist_ok=False, sort_keys=True):
+def write_yaml(filepath, data, *, exist_ok=False, sort_keys=False):
     """
     Store a dictionary or list as .yaml file
     """
