@@ -15,7 +15,6 @@ lion:
     energy_capex: 57
     power_capex: 104
 hydrogen:
-  soc0: 0.0
   soc_min: 0.0
   soc_max: 1
   roundtrip_efficiency: 0.33
