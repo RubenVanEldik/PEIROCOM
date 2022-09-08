@@ -101,19 +101,19 @@ with st.sidebar.expander("Sensitivity analysis"):
             sensitivity_config["steps"] = {str(step): step for step in range(1, number_of_climate_years + 1, step_size)}
     elif sensitivity_analysis_type == "baseload":
         sensitivity_start, sensitivity_stop = st.slider("Relative baseload range", value=(0.0, 0.95), min_value=0.0, max_value=0.95, step=0.05)
-        number_steps = st.slider("Number of steps", value=10, min_value=5, max_value=50)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
     elif sensitivity_analysis_type == "technology_scenario":
         st.warning("The technology scenario sensitivity analysis has not yet been implemented")
     elif sensitivity_analysis_type == "interconnection_capacity":
         sensitivity_start, sensitivity_stop = st.slider("Interconnection capacity range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
-        number_steps = st.slider("Number of steps", value=10, min_value=5, max_value=50)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
     elif sensitivity_analysis_type == "self_sufficiency":
         sensitivity_start, sensitivity_stop = st.slider("Self sufficiency range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
-        number_steps = st.slider("Number of steps", value=10, min_value=5, max_value=50)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
 
