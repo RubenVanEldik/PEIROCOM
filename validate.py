@@ -151,7 +151,7 @@ def is_country_obj_list(value, *, required=True):
     if value is None:
         return not required
 
-    if not is_list_like(value) or not len(value) > 0:
+    if not is_list_like(value) or len(value) == 0:
         return False
 
     return all(is_country_obj(x) for x in value)
@@ -420,6 +420,16 @@ def is_technology(value, *, required=True):
     production_technologies = ["pv", "onshore", "offshore"]
     storage_technologies = ["lion", "hydrogen"]
     return value in production_technologies or value in storage_technologies
+
+
+def is_technology_list(value, *, required=True):
+    if value is None:
+        return not required
+
+    if not is_list_like(value) or len(value) == 0:
+        return False
+
+    return all(is_technology(x) for x in value)
 
 
 def is_technology_scenario(value, *, required=True):
