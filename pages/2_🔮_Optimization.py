@@ -105,7 +105,13 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
     elif sensitivity_analysis_type == "technology_scenario":
-        st.warning("The technology scenario sensitivity analysis has not yet been implemented")
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitity_steps = np.linspace(start=-1, stop=1, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        # Select the technologies
+        technology_names = {technology_name: technology_type for technology_type in ["production", "storage"] for technology_name in config["technologies"][technology_type]}
+        selected_technologies = st.multiselect("Technologies", technology_names, format_func=utils.format_technology)
+        sensitivity_config["technologies"] = {technology_name: technology_names[technology_name] for technology_name in selected_technologies}
     elif sensitivity_analysis_type == "interconnection_capacity":
         sensitivity_start, sensitivity_stop = st.slider("Interconnection capacity range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)

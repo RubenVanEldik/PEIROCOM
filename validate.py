@@ -6,6 +6,7 @@ import pathlib
 import re
 import shapely
 
+import chart
 import colors
 
 
@@ -33,13 +34,6 @@ def is_bool(value, *, required=True):
     return type(value) is bool
 
 
-def is_climate_zone(value, *, required=True):
-    if value is None:
-        return not required
-
-    return bool(re.search("^[a-z]+_[0-9A-Z]{2,3}_cf$", value))
-
-
 def is_bidding_zone_dict(value, *, required=True):
     if value is None:
         return not required
@@ -55,6 +49,27 @@ def is_breakdown_level(value, *, required=True):
         return not required
 
     return is_integer(value, min_value=0, max_value=2)
+
+
+def is_chart(value, *, required=True):
+    if value is None:
+        return not required
+
+    return isinstance(value, chart.Chart)
+
+
+def is_climate_zone(value, *, required=True):
+    if value is None:
+        return not required
+
+    return bool(re.search("^[a-z]+_[0-9A-Z]{2,3}_cf$", value))
+
+
+def is_color(value, *, required=True):
+    if value is None:
+        return not required
+
+    return bool(re.search("^#([A-F0-9]{6}|[A-F0-9]{8})$", value))
 
 
 def is_color_name(value, *, required=True):
