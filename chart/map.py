@@ -17,7 +17,7 @@ class Map:
         # Create the figure
         self.fig, self.ax = plt.subplots(figsize=(7, 5))
         self.ax.axis("off")
-        self.ax.margins(0.02)
+        self.ax.margins(0)
 
         # Create the color bar
         colormap = colors.colormap("blue")
