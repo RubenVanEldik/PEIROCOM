@@ -22,23 +22,13 @@ class Chart:
         self.ax.set_xscale(xscale)
         self.ax.set_yscale(yscale)
 
-    def set_x_limits(self, x_min, x_max):
-        self.ax.set_xlim([x_min, x_max])
-
-    def set_y_limits(self, y_min, y_max):
-        self.ax.set_ylim([y_min, y_max])
-
     def format_xticklabels(self, label):
-        ticks_loc = self.ax.get_xticks().tolist()
-        self.ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
-        xticks = self.ax.get_xticks()
-        self.ax.set_xticklabels([label.format(tick) for tick in xticks])
+        self.ax.xaxis.set_major_locator(mticker.FixedLocator(self.ax.get_xticks().tolist()))
+        self.ax.set_xticklabels([label.format(tick) for tick in self.ax.get_xticks()])
 
     def format_yticklabels(self, label):
-        ticks_loc = self.ax.get_yticks().tolist()
-        self.ax.yaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
-        yticks = self.ax.get_yticks()
-        self.ax.set_yticklabels([label.format(tick) for tick in yticks])
+        self.ax.yaxis.set_major_locator(mticker.FixedLocator(self.ax.get_yticks().tolist()))
+        self.ax.set_yticklabels([label.format(tick) for tick in self.ax.get_yticks()])
 
     def display(self):
         st.pyplot(self.fig)

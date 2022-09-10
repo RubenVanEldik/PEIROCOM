@@ -124,13 +124,13 @@ def sensitivity(output_directory, resolution):
     default_y_limits = sensitivity_plot.ax.get_ylim()
     y_min = col1.number_input("Min y-axis", value=default_y_limits[0])
     y_max = col2.number_input("Max y-axis", value=default_y_limits[1])
-    sensitivity_plot.set_y_limits(y_min=y_min, y_max=y_max)
+    sensitivity_plot.ax.set_ylim([y_min, y_max])
 
     # Format the axes
     if sensitivity_config["analysis_type"] == "curtailment":
         sensitivity_plot.ax.set_xlabel("Curtailment (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
-        sensitivity_plot.set_x_limits(x_min=0, x_max=1)
+        sensitivity_plot.ax.set_xlim([0, 1])
     elif sensitivity_config["analysis_type"] == "climate_years":
         sensitivity_plot.ax.set_xlabel("Number of climate years")
     elif sensitivity_config["analysis_type"] == "technology_scenario":
@@ -140,7 +140,7 @@ def sensitivity(output_directory, resolution):
     elif sensitivity_config["analysis_type"] == "baseload":
         sensitivity_plot.ax.set_xlabel("Relative baseload (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
-        sensitivity_plot.set_x_limits(x_min=0, x_max=1)
+        sensitivity_plot.ax.set_xlim([0, 1])
     elif sensitivity_config["analysis_type"] == "interconnection_capacity":
         sensitivity_plot.ax.set_xlabel("Relative interconnection capacity (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")

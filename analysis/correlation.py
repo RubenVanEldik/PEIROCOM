@@ -46,7 +46,7 @@ def correlation(output_directory, resolution):
 
     # Create a scatter plot
     correlation_plot = chart.Chart(xlabel="Distance (km)", ylabel="Coefficient of determination")
-    correlation_plot.set_y_limits(0, 1)
+    correlation_plot.ax.set_ylim([0, 1])
     correlation_plot.format_yticklabels("{:,.0%}")
     correlation_plot.ax.scatter(correlations.distance, correlations.r_squared, color=colors.primary(alpha=0.5), linewidths=0)
 

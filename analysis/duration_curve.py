@@ -89,7 +89,7 @@ def duration_curve(output_directory, resolution):
         waterfall_plot.ax.axhline(y=1, color=colors.get("red", 600), linewidth=1)
 
     # Set the x-axis limits. Use round() to ensure that the labels on either end are included
-    waterfall_plot.set_x_limits(x_min=round(waterfall_df.index.min(), 2), x_max=round(waterfall_df.index.max(), 2))
+    waterfall_plot.ax.set_xlim([round(waterfall_df.index.min(), 2), round(waterfall_df.index.max(), 2)])
 
     # Format the axes to be percentages
     waterfall_plot.format_xticklabels("{:,.0%}")
