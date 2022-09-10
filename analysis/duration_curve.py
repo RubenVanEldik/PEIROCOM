@@ -97,3 +97,4 @@ def duration_curve(output_directory, resolution):
 
     # Plot the figure
     waterfall_plot.display()
+    waterfall_plot.download_button("duration_curve.png")

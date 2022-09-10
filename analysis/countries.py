@@ -134,3 +134,4 @@ def countries(output_directory, resolution):
         # Create and show the map
         map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
         map.display()
+        map.download_button("countries.png")

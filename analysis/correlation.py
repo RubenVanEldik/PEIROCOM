@@ -58,3 +58,4 @@ def correlation(output_directory, resolution):
 
     # Show the plot
     correlation_plot.display()
+    correlation_plot.download_button("correlation.png")

@@ -1,3 +1,4 @@
+import io
 from matplotlib import pyplot as plt
 import numpy as np
 import streamlit as st
@@ -38,5 +39,7 @@ class Map:
     def display(self):
         st.pyplot(self.fig)
 
-    def save(self, filepath):
-        plt.savefig(filepath, dpi=2500, bbox_inches="tight", pad_inches=0.2)
+    def download_button(self, file_name):
+        buf = io.BytesIO()
+        plt.savefig(buf, dpi=400, bbox_inches="tight")
+        st.download_button("Download figure", buf, file_name=file_name, mime="image/png")

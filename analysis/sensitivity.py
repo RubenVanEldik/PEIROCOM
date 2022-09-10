@@ -150,3 +150,4 @@ def sensitivity(output_directory, resolution):
 
     # Plot the sensitivity plot
     sensitivity_plot.display()
+    sensitivity_plot.download_button("sensitivity.png")

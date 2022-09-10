@@ -65,6 +65,7 @@ def run():
     plot.ax.xaxis.set_major_formatter(date_format)
     plot.ax.legend()
     plot.display()
+    plot.download_button("variability.png")
 
 
 run()

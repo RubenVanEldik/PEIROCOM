@@ -1,3 +1,4 @@
+import io
 from matplotlib import pyplot as plt
 from matplotlib import ticker as mticker
 import streamlit as st
@@ -39,8 +40,10 @@ class Chart:
         yticks = self.ax.get_yticks()
         self.ax.set_yticklabels([label.format(tick) for tick in yticks])
 
-    def save(self, filepath):
-        plt.savefig(filepath, dpi=250, bbox_inches="tight", pad_inches=0.2)
-
     def display(self):
         st.pyplot(self.fig)
+
+    def download_button(self, file_name):
+        buf = io.BytesIO()
+        plt.savefig(buf, dpi=400, bbox_inches="tight")
+        st.download_button("Download figure", buf, file_name=file_name, mime="image/png")
