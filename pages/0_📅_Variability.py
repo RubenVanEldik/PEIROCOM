@@ -64,7 +64,7 @@ def run():
     date_format = matplotlib.dates.DateFormatter("%H:%M" if variability_type == "day" else "%b")
     plot.ax.xaxis.set_major_formatter(date_format)
     plot.ax.legend()
-    st.pyplot(plot.fig)
+    plot.display()
 
 
 run()

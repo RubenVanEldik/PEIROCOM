@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import streamlit as st
 
 import colors
 import utils
@@ -33,6 +34,9 @@ class Map:
 
         # Plot the data
         map_df.to_crs("EPSG:3035").plot(column="data", cmap=colormap, linewidth=0.5, ax=self.ax, edgecolor=colors.get("gray", 600), missing_kwds={"color": "white"})
+
+    def display(self):
+        st.pyplot(self.fig)
 
     def save(self, filepath):
         plt.savefig(filepath, dpi=2500, bbox_inches="tight", pad_inches=0.2)

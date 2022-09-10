@@ -41,3 +41,6 @@ class Chart:
 
     def save(self, filepath):
         plt.savefig(filepath, dpi=250, bbox_inches="tight", pad_inches=0.2)
+
+    def display(self):
+        st.pyplot(self.fig)

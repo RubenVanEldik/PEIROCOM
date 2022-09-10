@@ -96,4 +96,4 @@ def duration_curve(output_directory, resolution):
     waterfall_plot.format_yticklabels("{:,.0%}" if denominator else "{:,.0f}")
 
     # Plot the figure
-    st.pyplot(waterfall_plot.fig)
+    waterfall_plot.display()

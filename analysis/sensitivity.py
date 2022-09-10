@@ -149,4 +149,4 @@ def sensitivity(output_directory, resolution):
         sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot
-    st.pyplot(sensitivity_plot.fig)
+    sensitivity_plot.display()

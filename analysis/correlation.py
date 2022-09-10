@@ -57,4 +57,4 @@ def correlation(output_directory, resolution):
         correlation_plot.ax.plot(trendline_x, trendline_y, color=colors.get("red", 600))
 
     # Show the plot
-    st.pyplot(correlation_plot.fig)
+    correlation_plot.display()
