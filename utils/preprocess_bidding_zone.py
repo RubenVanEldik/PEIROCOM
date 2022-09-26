@@ -89,7 +89,7 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
         for year_column in sheet.columns:
             data_year = sheet[year_column]
             data_year.index = utils.create_datetime_index(sheet.index, year_column)
-            new_column = new_column.append(data_year)
+            new_column = pd.concat([new_column, data_year])
 
         # Don't include the column if it contains NaN values (only applicable to DEKF)
         if new_column.isna().any():
