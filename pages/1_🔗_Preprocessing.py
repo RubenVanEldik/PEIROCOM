@@ -62,9 +62,9 @@ def _validate_and_import_bidding_zone_data():
                 if has_missing_timestamps:
                     is_valid_file = False
 
-            if not is_valid_file:
-                with st.spinner(f"Preprocessing {bidding_zone} ({year})"):
-                    utils.preprocess_bidding_zone(bidding_zone, year)
+                if not is_valid_file:
+                    with st.spinner(f"Preprocessing {bidding_zone} ({year})"):
+                        utils.preprocess_bidding_zone(bidding_zone, year)
 
     bidding_zone_progress.empty()
     bidding_zone_placeholder.success("The data for all bidding zones is succesfully preprocessed")
@@ -101,9 +101,9 @@ def _validate_and_import_interconnection_data():
                 if has_missing_timestamps:
                     is_valid_file = False
 
-            if not is_valid_file:
-                with st.spinner(f"Preprocessing {utils.format_str(interconnection_type)} interconnections ({year})"):
-                    utils.preprocess_interconnections(interconnection_type, year)
+                if not is_valid_file:
+                    with st.spinner(f"Preprocessing {utils.format_str(interconnection_type)} interconnections ({year})"):
+                        utils.preprocess_interconnections(interconnection_type, year)
 
     interconnection_progress.empty()
     interconnection_placeholder.success("The data for all interconnections is succesfully preprocessed")
