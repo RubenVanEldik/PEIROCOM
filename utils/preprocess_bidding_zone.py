@@ -91,6 +91,10 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
             data_year.index = utils.create_datetime_index(sheet.index, year_column)
             new_column = pd.concat([new_column, data_year])
 
+        # Remove any rows that are not included in the data DataFrame
+        if data is not None:
+            new_column = new_column[data.index]
+
         # Don't include the column if it contains NaN values (only applicable to DEKF)
         if new_column.isna().any():
             print(f"  - Column {formatted_column_name} contains NaN values and is not included")
@@ -99,6 +103,10 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
         # Don't include the column if it only contains zeroes (only applicable to offshore wind in land-locked countries)
         if new_column.max() == 0.0:
             print(f"  - Column {formatted_column_name} contains only zeroes and is not included")
+            continue
+
+        if column_name != "demand_MW" and any(new_column.equals(data[data_column_name]) for data_column_name in data):
+            print(f"  - Column {formatted_column_name} is exactly equal to another column and is not included")
             continue
 
         # Add the new column to the DataFrame or create a new data DataFrame if it doesn't exist yet
