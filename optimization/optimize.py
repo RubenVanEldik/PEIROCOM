@@ -77,6 +77,8 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         if previous_resolution:
             # Get the temporal results from the previous run
             previous_temporal_results = utils.read_csv(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv", parse_dates=True, index_col=0)
+            # Multiply the previous temporal results witht the propagation factor
+            previous_temporal_results = config["time_discretization"]["soc_propagation"] * previous_temporal_results
             # Resample the previous results so it has the same timestamps as the current step
             previous_temporal_results = previous_temporal_results.resample(resolution).mean()
             # Find and add the rows that are missing in the previous results (the resample method does not add rows after the last timestamp)
@@ -111,8 +113,8 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             climate_zones = [re.match(f"{production_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{production_technology}_")]
             production_potential = utils.get_production_potential_in_climate_zone(bidding_zone, production_technology, config=config)
             if previous_resolution:
-                previous_production_capacity = utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", index_col=0)
-                capacities = model.addVars(climate_zones, lb=config["time_discretization"]["capacity_propagation"] * previous_production_capacity[production_technology].dropna(), ub=production_potential)
+                previous_production_capacity = config["time_discretization"]["capacity_propagation"] * utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", index_col=0)
+                capacities = model.addVars(climate_zones, lb=previous_production_capacity[production_technology].dropna(), ub=production_potential)
             else:
                 current_capacity = utils.get_current_production_capacity_in_climate_zone(bidding_zone, production_technology, config=config)
                 capacities = model.addVars(climate_zones, lb=current_capacity, ub=production_potential)
@@ -153,12 +155,12 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = 0
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = 0
             elif previous_resolution:
-                previous_storage_capacity = utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
-                if config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"] == storage_potential:
+                previous_storage_capacity = config["time_discretization"]["capacity_propagation"] * utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
+                if previous_storage_capacity.loc[storage_technology, "energy"] == storage_potential:
                     storage_capacity[bidding_zone].loc[storage_technology, "energy"] = storage_potential
                 else:
-                    storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
-                storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "power"])
+                    storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
+                storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar(lb=previous_storage_capacity.loc[storage_technology, "power"])
             else:
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(ub=storage_potential)
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar()
@@ -168,8 +170,9 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 inflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
                 outflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
             elif previous_resolution:
-                inflow = model.addVars(temporal_data[bidding_zone].index, lb=config["time_discretization"]["soc_propagation"] * previous_temporal_results[f"net_storage_flow_{storage_technology}_MW"].clip(lower=0))
-                outflow = model.addVars(temporal_data[bidding_zone].index, lb=config["time_discretization"]["soc_propagation"] * -previous_temporal_results[f"net_storage_flow_{storage_technology}_MW"].clip(upper=0))
+                previous_storage_flow = previous_temporal_results[f"net_storage_flow_{storage_technology}_MW"]
+                inflow = model.addVars(temporal_data[bidding_zone].index, lb=previous_storage_flow.clip(lower=0))
+                outflow = model.addVars(temporal_data[bidding_zone].index, lb=-previous_storage_flow.clip(upper=0))
             else:
                 inflow = model.addVars(temporal_data[bidding_zone].index)
                 outflow = model.addVars(temporal_data[bidding_zone].index)
@@ -195,7 +198,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 for timestamp in temporal_data[bidding_zone].index:
                     # Create the state of charge variables
                     if previous_resolution:
-                        energy_stored_current = model.addVar(lb=config["time_discretization"]["soc_propagation"] * previous_temporal_results.loc[timestamp, f"energy_stored_{storage_technology}_MWh"])
+                        energy_stored_current = model.addVar(lb=previous_temporal_results.loc[timestamp, f"energy_stored_{storage_technology}_MWh"])
                     else:
                         energy_stored_current = model.addVar()
 
