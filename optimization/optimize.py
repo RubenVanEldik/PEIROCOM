@@ -113,8 +113,14 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             climate_zones = [re.match(f"{production_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{production_technology}_")]
             production_potential = utils.get_production_potential_in_climate_zone(bidding_zone, production_technology, config=config)
             if previous_resolution:
-                previous_production_capacity = config["time_discretization"]["capacity_propagation"] * utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", index_col=0)
-                capacities = model.addVars(climate_zones, lb=previous_production_capacity[production_technology].dropna(), ub=production_potential)
+                previous_production_capacity = config["time_discretization"]["capacity_propagation"] * utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", dtype={"Unnamed: 0": str}).set_index("Unnamed: 0")
+                capacities = {}
+                for climate_zone in climate_zones:
+                    previous_production_capacity_climate_zone = previous_production_capacity.loc[climate_zone, production_technology]
+                    if previous_production_capacity_climate_zone == production_potential:
+                        capacities[climate_zone] = production_potential
+                    else:
+                        capacities[climate_zone] = model.addVar(lb=previous_production_capacity_climate_zone, ub=production_potential)
             else:
                 current_capacity = utils.get_current_production_capacity_in_climate_zone(bidding_zone, production_technology, config=config)
                 capacities = model.addVars(climate_zones, lb=current_capacity, ub=production_potential)
