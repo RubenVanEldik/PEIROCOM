@@ -78,7 +78,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             # Get the temporal results from the previous run
             previous_temporal_results = utils.read_csv(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv", parse_dates=True, index_col=0)
             # Multiply the previous temporal results witht the propagation factor
-            previous_temporal_results = config["time_discretization"]["soc_propagation"] * previous_temporal_results
+            previous_temporal_results = config["time_discretization"]["temporal_propagation"] * previous_temporal_results
             # Resample the previous results so it has the same timestamps as the current step
             previous_temporal_results = previous_temporal_results.resample(resolution).mean()
             # Find and add the rows that are missing in the previous results (the resample method does not add rows after the last timestamp)
