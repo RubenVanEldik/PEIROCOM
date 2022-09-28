@@ -154,7 +154,10 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = 0
             elif previous_resolution:
                 previous_storage_capacity = utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
-                storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
+                if config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"] == storage_potential:
+                    storage_capacity[bidding_zone].loc[storage_technology, "energy"] = storage_potential
+                else:
+                    storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "power"])
             else:
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(ub=storage_potential)
