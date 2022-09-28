@@ -149,7 +149,10 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             storage_potential = utils.get_storage_potential_in_bidding_zone(bidding_zone, storage_technology, config=config)
 
             # Create a variable for the energy and power storage capacity
-            if previous_resolution:
+            if storage_potential == 0:
+                storage_capacity[bidding_zone].loc[storage_technology, "energy"] = 0
+                storage_capacity[bidding_zone].loc[storage_technology, "power"] = 0
+            elif previous_resolution:
                 previous_storage_capacity = utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar(lb=config["time_discretization"]["capacity_propagation"] * previous_storage_capacity.loc[storage_technology, "power"])
@@ -158,7 +161,10 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar()
 
             # Create the inflow and outflow variables
-            if previous_resolution:
+            if storage_potential == 0:
+                inflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
+                outflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
+            elif previous_resolution:
                 inflow = model.addVars(temporal_data[bidding_zone].index, lb=config["time_discretization"]["soc_propagation"] * previous_temporal_results[f"net_storage_flow_{storage_technology}_MW"].clip(lower=0))
                 outflow = model.addVars(temporal_data[bidding_zone].index, lb=config["time_discretization"]["soc_propagation"] * -previous_temporal_results[f"net_storage_flow_{storage_technology}_MW"].clip(upper=0))
             else:
@@ -177,39 +183,42 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             energy_capacity = storage_capacity[bidding_zone].loc[storage_technology, "energy"]
             power_capacity = storage_capacity[bidding_zone].loc[storage_technology, "power"]
 
-            # Loop over all hours
-            energy_stored_previous = None
-            temporal_energy_stored_dict = {}
-            for timestamp in temporal_data[bidding_zone].index:
-                # Create the state of charge variables
-                if previous_resolution:
-                    energy_stored_current = model.addVar(lb=config["time_discretization"]["soc_propagation"] * previous_temporal_results.loc[timestamp, f"energy_stored_{storage_technology}_MWh"])
-                else:
-                    energy_stored_current = model.addVar()
+            if storage_potential == 0:
+                temporal_energy_stored = pd.Series(0, index=temporal_data[bidding_zone].index)
+            else:
+                # Loop over all hours
+                energy_stored_previous = None
+                temporal_energy_stored_dict = {}
+                for timestamp in temporal_data[bidding_zone].index:
+                    # Create the state of charge variables
+                    if previous_resolution:
+                        energy_stored_current = model.addVar(lb=config["time_discretization"]["soc_propagation"] * previous_temporal_results.loc[timestamp, f"energy_stored_{storage_technology}_MWh"])
+                    else:
+                        energy_stored_current = model.addVar()
 
-                # Add the SOC constraint with regard to the previous timestamp
-                if energy_stored_previous:
-                    model.addConstr(energy_stored_current == energy_stored_previous + (inflow[timestamp] * efficiency - outflow[timestamp] / efficiency) * timestep_hours)
+                    # Add the SOC constraint with regard to the previous timestamp
+                    if energy_stored_previous:
+                        model.addConstr(energy_stored_current == energy_stored_previous + (inflow[timestamp] * efficiency - outflow[timestamp] / efficiency) * timestep_hours)
 
-                # Add the energy capacity constraints (can't be added when the flow variables are defined because it's a gurobipy.Var)
-                model.addConstr(energy_stored_current >= storage_assumptions["soc_min"] * energy_capacity)
-                model.addConstr(energy_stored_current <= storage_assumptions["soc_max"] * energy_capacity)
+                    # Add the energy capacity constraints (can't be added when the flow variables are defined because it's a gurobipy.Var)
+                    model.addConstr(energy_stored_current >= storage_assumptions["soc_min"] * energy_capacity)
+                    model.addConstr(energy_stored_current <= storage_assumptions["soc_max"] * energy_capacity)
 
-                # Add the power capacity constraints (can't be added when the flow variables are defined because it's a gurobipy.Var)
-                model.addConstr(inflow[timestamp] <= power_capacity)
-                model.addConstr(outflow[timestamp] <= power_capacity)
+                    # Add the power capacity constraints (can't be added when the flow variables are defined because it's a gurobipy.Var)
+                    model.addConstr(inflow[timestamp] <= power_capacity)
+                    model.addConstr(outflow[timestamp] <= power_capacity)
 
-                # Add the current energy stored to temporal_energy_stored_dict
-                temporal_energy_stored_dict[timestamp] = energy_stored_current
+                    # Add the current energy stored to temporal_energy_stored_dict
+                    temporal_energy_stored_dict[timestamp] = energy_stored_current
 
-                # Update energy_stored_previous
-                energy_stored_previous = energy_stored_current
+                    # Update energy_stored_previous
+                    energy_stored_previous = energy_stored_current
 
-            # Convert the temporal_energy_stored_dict to a Series
-            temporal_energy_stored = pd.Series(data=temporal_energy_stored_dict)
+                # Convert the temporal_energy_stored_dict to a Series
+                temporal_energy_stored = pd.Series(data=temporal_energy_stored_dict)
 
-            # Ensure that the SOC of the first timestep equals the SOC of the last timestep
-            model.addConstr(temporal_energy_stored.head(1).item() == temporal_energy_stored.tail(1).item())
+                # Ensure that the SOC of the first timestep equals the SOC of the last timestep
+                model.addConstr(temporal_energy_stored.head(1).item() == temporal_energy_stored.tail(1).item())
 
             # Add the temporal energy stored to the temporal_results DataFrame
             temporal_results[bidding_zone][f"energy_stored_{storage_technology}_MWh"] = temporal_energy_stored
