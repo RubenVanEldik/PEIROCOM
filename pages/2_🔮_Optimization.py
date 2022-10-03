@@ -87,7 +87,7 @@ with st.sidebar.expander("Sensitivity analysis"):
     # Show the relevant input parameters for each sensitivity analysis type
     if sensitivity_analysis_type == "curtailment":
         sensitivity_config["step_factor"] = st.number_input("Step factor", value=1.2, min_value=1.05, step=0.05)
-        sensitivity_config["curtailment_range"] = list(st.slider("Curtailment range", value=(0.05, 0.95), min_value=0.01, max_value=0.99))
+        sensitivity_config["max_lcoe"] = st.number_input("Maximum LCOE (€/MWh)", value=800, min_value=1, max_value=2000)
     elif sensitivity_analysis_type == "climate_years":
         number_of_climate_years = config["climate_years"]["end"] - config["climate_years"]["start"] + 1
         if number_of_climate_years < 3:

@@ -109,9 +109,9 @@ def run_sensitivity(config, sensitivity_config):
                 if config["send_notification"]:
                     utils.send_notification(f"Optimization {step_key} of '{config['name']}' has finished ({current_curtailment:.2%} curtailment)")
 
-                # Break the while loop if the curtailment is out of bounds
-                curtailment_range = sensitivity_config["curtailment_range"]
-                if current_curtailment <= min(curtailment_range) or current_curtailment >= max(curtailment_range):
+                # Break the while loop if the premium exceeds the maximum premium
+                firm_lcoe = stats.firm_lcoe(output_directory_step, highest_resolution)
+                if firm_lcoe >= sensitivity_config["max_lcoe"]:
                     break
 
                 # Update the relative storage capacity for the next pass
