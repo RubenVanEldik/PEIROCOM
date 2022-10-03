@@ -40,6 +40,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     model.setParam("BarHomogeneous", 1)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Aggregate", 0)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Presolve", 2)  # Use an aggressive presolver
+    model.setParam("NumericFocus", 1)
 
     """
     Step 2: Initialize each bidding zone
@@ -393,14 +394,32 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             # Show the log message in the UI or console
             info.code("".join(log_messages))
 
-    # Run the model
-    for numeric_focus in range(0, 4):
-        model.setParam("NumericFocus", numeric_focus)
+    def run_optimization(model):
+        """
+        Run the optimization model recursively
+        """
+        # Reset the model if there is already a solution
+        if model.status != 1:
+            model.reset()
+
+        # Run the model
         model.optimize(optimization_callback)
 
-        # Break the loop when no numerical issues were found
-        if model.status != gp.GRB.NUMERIC:
-            break
+        # Rerun the model with DualReductions disabled if the model is infeasible or unbound
+        if model.status == gp.GRB.INF_OR_UNBD:
+            model.setParam("DualReductions", 0)
+            return run_optimization(model)
+
+        # Rerun the model with an increased numeric focus if there are numeric issues
+        if model.status in [gp.GRB.INF_OR_UNBD, gp.GRB.NUMERIC]:
+            current_numeric_focus = model.getParamInfo("NumericFocus")[2]
+            max_numeric_focus = model.getParamInfo("NumericFocus")[4]
+            if current_numeric_focus < max_numeric_focus:
+                model.setParam("NumericFocus", current_numeric_focus + 1)
+                return run_optimization(model)
+
+    # Run the optimization
+    run_optimization(model)
 
     # Store the LP model and optimization log
     (output_directory / resolution).mkdir(parents=True)
