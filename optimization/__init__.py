@@ -39,7 +39,7 @@ def run(config, *, status=None, output_directory):
             status.update(error_message, status_type="error")
             if config["send_notification"]:
                 utils.send_notification(error_message)
-            return
+            return error_message
 
         previous_resolution = resolution
 
@@ -79,16 +79,13 @@ def run_sensitivity(config, sensitivity_config):
         sensitivity_config["steps"] = {"1.000": 1.0}
 
         # Run the sensitivity analysis incrementally for storage cost values both larger and smaller than the optimal
-        for step_factor in [sensitivity_config["step_factor"], 1 / sensitivity_config["step_factor"]]:
+        for step_factor in [1 / sensitivity_config["step_factor"], sensitivity_config["step_factor"]]:
             # Set the first relative_storage_costs to the step factor
             relative_storage_costs = step_factor
 
             while True:
                 step_key = f"{relative_storage_costs:.3f}"
                 st.subheader(f"Sensitivity run {step_key}")
-
-                # Add the step to the sensitivity config
-                sensitivity_config["steps"][step_key] = relative_storage_costs
 
                 # Set the total storage costs for this step
                 step_config = deepcopy(config)
@@ -99,15 +96,22 @@ def run_sensitivity(config, sensitivity_config):
 
                 # Run the optimization
                 output_directory_step = output_directory / step_key
-                run(step_config, status=status, output_directory=output_directory_step)
+                error_message = run(step_config, status=status, output_directory=output_directory_step)
+
+                # Send the notification
+                if config["send_notification"]:
+                    utils.send_notification(f"Optimization {step_key} of '{config['name']}' has finished")
+
+                # Break the while loop if the model was infeasible
+                if error_message == "The model was infeasible":
+                    break
+
+                # Add the step to the sensitivity config
+                sensitivity_config["steps"][step_key] = relative_storage_costs
 
                 # Calculate the curtailment
                 current_temporal_results = utils.get_temporal_results(output_directory_step, highest_resolution, group="all")
                 current_curtailment = current_temporal_results.curtailed_MW.sum() / current_temporal_results.production_total_MW.sum()
-
-                # Send the notification
-                if config["send_notification"]:
-                    utils.send_notification(f"Optimization {step_key} of '{config['name']}' has finished ({current_curtailment:.2%} curtailment)")
 
                 # Break the while loop if the premium exceeds the maximum premium
                 firm_lcoe = stats.firm_lcoe(output_directory_step, highest_resolution)
