@@ -41,7 +41,7 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
             sensitivity_plot.ax.set_ylabel("Unconstrained LCOE (€/MWh)")
             data = steps.apply(lambda step: stats.unconstrained_lcoe(output_directory / step, resolution, breakdown_level=breakdown_level))
         if statistic_name == "premium":
-            sensitivity_plot.ax.set_ylabel("Premium (%)")
+            sensitivity_plot.ax.set_ylabel("Premium")
             data = steps.apply(lambda step: stats.premium(output_directory / step, resolution, breakdown_level=breakdown_level))
 
         # Plot the data depending on the breakdown level
