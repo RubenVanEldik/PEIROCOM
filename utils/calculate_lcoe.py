@@ -112,12 +112,9 @@ def calculate_lcoe(production_capacities, storage_capacities, demand_per_bidding
     annual_electricity_demand = 0
 
     for bidding_zone in demand_per_bidding_zone.columns:
-        # Add the annualized production costs
+        # Add the annualized production and storage costs
         annualized_production_costs += _calculate_annualized_production_costs(config["technologies"]["production"], production_capacities[bidding_zone])
-
-        # Add the annualized storage costs if there is any storage
-        if storage_capacities is not None:
-            annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacities[bidding_zone])
+        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacities[bidding_zone])
 
         # Add the annual electricity demand
         annual_electricity_demand += _calculate_annual_demand(demand_per_bidding_zone[bidding_zone])

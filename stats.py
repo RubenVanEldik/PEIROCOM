@@ -43,6 +43,10 @@ def unconstrained_lcoe(output_directory, resolution, *, country_codes=None, brea
     temporal_demand = utils.merge_dataframes_on_column(temporal_results, "production_total_MW")
     config = utils.read_yaml(output_directory / "config.yaml")
 
+    # Set the storage capacity to zero
+    for bidding_zone in storage_capacity:
+        storage_capacity[bidding_zone] = 0 * storage_capacity[bidding_zone]
+
     # Return the LCOE
     return utils.calculate_lcoe(production_capacity, storage_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
 
