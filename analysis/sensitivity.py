@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -129,8 +130,9 @@ def sensitivity(output_directory, resolution):
     # Format the axes
     if sensitivity_config["analysis_type"] == "curtailment":
         sensitivity_plot.ax.set_xlabel("Curtailment (%)")
+        xticks = np.arange(0, 1.2, 0.2)
+        sensitivity_plot.ax.set_xticks(xticks, xticks)
         sensitivity_plot.format_xticklabels("{:,.0%}")
-        sensitivity_plot.ax.set_xlim([0, 1])
     elif sensitivity_config["analysis_type"] == "climate_years":
         sensitivity_plot.ax.set_xlabel("Number of climate years")
     elif sensitivity_config["analysis_type"] == "technology_scenario":
