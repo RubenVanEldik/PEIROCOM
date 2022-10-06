@@ -1,4 +1,4 @@
 cd ..
-docker rm thesis-model-container
-docker create --name thesis-model-container thesis-model
-docker export thesis-model-container | gzip > thesis-model.tar.gz
+docker rm peirocom-container
+docker create --name peirocom-container thesis-model
+docker export peirocom-container | gzip > thesis-model.tar.gz
