@@ -4,7 +4,7 @@ The Pan-European Intermittent Renewable Overbuilding and Curtailment Optimizatio
 
 The demand and climate data used in this model are from ENTSO-E's 2021 European Resource Adequacy Assessment (ERAA) and can be downloaded [here](https://www.entsoe.eu/outlooks/eraa/2021/eraa-downloads/). The techno-economic data is from NREL's Annual Technology Baseline and can be found [here](https://atb.nrel.gov/).
 
-The source code of the model can be found on [Github](https://github.com/RubenVanEldik/thesis-model). It consists out of three parts, the preprocessing, optimization, and analysis.
+The source code of the model can be found on [Github](https://github.com/RubenVanEldik/PEIROCOM). It consists out of three parts, the preprocessing, optimization, and analysis.
 
 ### Variability
 The variability page is not part of the model, but is a quick tool to create a plot with the daily/yearly variability of demand and IRES production.
