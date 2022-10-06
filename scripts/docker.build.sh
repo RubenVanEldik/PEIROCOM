@@ -1,3 +1,3 @@
 cd ..
-docker image rm thesis-model
-docker build . -t thesis-model
+docker image rm peirocom
+docker build . -t peirocom
