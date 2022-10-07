@@ -500,11 +500,6 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         temporal_export_connection_type = utils.convert_variables_recursively(temporal_export[connection_type])
         temporal_export_connection_type.to_csv(output_directory / resolution / "temporal_export" / f"{connection_type}.csv")
 
-    # Upload the output to Dropbox
-    if config["upload_results"]:
-        status.update(f"Uploading the results to Dropbox")
-        utils.upload_to_dropbox(output_directory / resolution, output_directory)
-
     # Add the storing duration to the dictionary
     storing_end = datetime.now()
     duration["storing"] = round((storing_end - storing_start).total_seconds())

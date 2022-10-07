@@ -46,6 +46,11 @@ def run(config, *, status=None, output_directory):
     # Store the config as a .YAML file
     utils.write_yaml(output_directory / "config.yaml", config)
 
+    # Upload the output directory to Dropbox
+    if config["upload_results"]:
+        status.update(f"Uploading the results to Dropbox")
+        utils.upload_to_dropbox(output_directory, output_directory)
+
     # Set the final status and send a message
     if is_standalone_run:
         status.update(f"Optimization has finished and results are stored", status_type="success")
@@ -171,6 +176,10 @@ def run_sensitivity(config, sensitivity_config):
 
     # Store the sensitivity config file
     utils.write_yaml(output_directory / "sensitivity.yaml", sensitivity_config)
+
+    # Upload the sensitivity config to Dropbox
+    if config["upload_results"]:
+        utils.upload_to_dropbox(output_directory / "sensitivity.yaml", output_directory)
 
     # Set the final status
     status.update(f"Sensitivity analysis has finished and results are stored", status_type="success")
