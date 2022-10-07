@@ -313,11 +313,11 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
                 # Calculate the total demand and non-curtailed production in this country
                 sum_demand += temporal_results[bidding_zone].demand_MW.sum()
-                sum_baseload += temporal_results[bidding_zone].baseload_MW.sum()
-                sum_production += temporal_results[bidding_zone].production_total_MW.sum()
-                sum_curtailed += temporal_results[bidding_zone].curtailed_MW.sum()
-                sum_storage_flow += temporal_results[bidding_zone].net_storage_flow_total_MW.sum()
-
+                # The Gurobi .quicksum method is significantly faster than Panda's .sum method
+                sum_baseload += gp.quicksum(temporal_results[bidding_zone].baseload_MW)
+                sum_production += gp.quicksum(temporal_results[bidding_zone].production_total_MW)
+                sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
+                sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
             # Add the self-sufficiency constraint
             min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
             model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
