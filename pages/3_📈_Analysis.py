@@ -18,6 +18,10 @@ def run():
     output_directory = utils.path("output", selected_run)
     is_sensitivity_analysis = (output_directory / "sensitivity.yaml").is_file()
 
+    # Unzip all ZIP files in the output directory
+    for zip_filename in output_directory.glob("**/*.zip"):
+        utils.unzip(zip_filename, remove_zip_file=True)
+
     # Get the config
     if is_sensitivity_analysis:
         # Get the config for the first step
