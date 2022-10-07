@@ -1,5 +1,4 @@
 import dropbox
-import shutil
 
 import utils
 import validate
@@ -25,7 +24,7 @@ def upload_to_dropbox(path, dropbox_path):
 
     # If the path is a directory upload the files as a ZIP file
     if path.is_dir():
-        shutil.make_archive(str(path), "zip", str(path))
+        utils.zip(path)
         client.files_upload(open(f"{path}.zip", "rb").read(), f"/{dropbox_path / path.name}.zip", mute=True)
     else:
         client.files_upload(open(path, "rb").read(), f"/{dropbox_path / path.name}", mute=True)
