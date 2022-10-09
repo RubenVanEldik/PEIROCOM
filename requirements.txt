@@ -73,7 +73,7 @@ Pillow==9.2.0
 ply==3.11
 prometheus-client==0.14.1
 prompt-toolkit==3.0.30
-protobuf==3.20.2
+protobuf==3.20.3
 psutil==5.9.1
 ptyprocess==0.7.0
 pure-eval==0.2.2
@@ -113,7 +113,7 @@ soupsieve==2.3.2.post1
 stack-data==0.3.0
 stdlib-list==0.8.0
 stone==3.3.1
-streamlit==1.12.2
+streamlit==1.13.0
 terminado==0.15.0
 texttable==1.6.4
 threadpoolctl==3.1.0
