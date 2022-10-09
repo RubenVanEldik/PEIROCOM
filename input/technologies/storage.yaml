@@ -17,7 +17,7 @@ lion:
 hydrogen:
   soc_min: 0.0
   soc_max: 1
-  roundtrip_efficiency: 0.33
+  roundtrip_efficiency: 0.40
   economic_lifetime: 18
   wacc: 0.05
   fixed_om: 0.025
