@@ -479,9 +479,8 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     for bidding_zone in bidding_zones:
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
         status.update(f"{country_flag} Converting and storing the results")
-        # Convert the temporal results variables and calculate the actual curtailed energy
+        # Convert the temporal results variables
         temporal_results_bidding_zone = utils.convert_variables_recursively(temporal_results[bidding_zone])
-        temporal_results_bidding_zone.curtailed_MW = temporal_results_bidding_zone.apply(utils.calculate_curtailed_energy_post_hoc, config=config, axis=1)
 
         # Store the temporal results to a CSV file
         temporal_results_bidding_zone.to_csv(output_directory / resolution / "temporal_results" / f"{bidding_zone}.csv")
