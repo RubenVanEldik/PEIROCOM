@@ -1,4 +1,5 @@
-import dropbox
+from dropbox import Dropbox
+from dropbox.files import UploadSessionCursor, CommitInfo
 
 import utils
 import validate
@@ -8,7 +9,7 @@ dropbox_app_key = utils.getenv("DROPBOX_APP_KEY")
 dropbox_app_secret = utils.getenv("DROPBOX_APP_SECRET")
 dropbox_refresh_token = utils.getenv("DROPBOX_REFRESH_TOKEN")
 if dropbox_app_key and dropbox_app_secret and dropbox_refresh_token:
-    client = dropbox.Dropbox(app_key=dropbox_app_key, app_secret=dropbox_app_secret, oauth2_refresh_token=dropbox_refresh_token)
+    client = Dropbox(app_key=dropbox_app_key, app_secret=dropbox_app_secret, oauth2_refresh_token=dropbox_refresh_token)
 
 
 def _upload_file(filepath, dropbox_directory_path):
@@ -23,8 +24,8 @@ def _upload_file(filepath, dropbox_directory_path):
 
     with open(filepath, "rb") as f:
         upload_session_start_result = client.files_upload_session_start(f.read(chunk_size))
-        cursor = dropbox.files.UploadSessionCursor(session_id=upload_session_start_result.session_id, offset=f.tell())
-        commit = dropbox.files.CommitInfo(path=f"/{dropbox_directory_path / filepath.name}", mute=True)
+        cursor = UploadSessionCursor(session_id=upload_session_start_result.session_id, offset=f.tell())
+        commit = CommitInfo(path=f"/{dropbox_directory_path / filepath.name}", mute=True)
         while f.tell() < file_size:
             if (file_size - f.tell()) <= chunk_size:
                 client.files_upload_session_finish(f.read(chunk_size), cursor, commit)
