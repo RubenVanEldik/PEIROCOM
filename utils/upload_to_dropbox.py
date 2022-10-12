@@ -23,15 +23,18 @@ def _upload_file(filepath, dropbox_directory_path):
     chunk_size = 4 * 1024 * 1024
 
     with open(filepath, "rb") as f:
-        upload_session_start_result = client.files_upload_session_start(f.read(chunk_size))
-        cursor = UploadSessionCursor(session_id=upload_session_start_result.session_id, offset=f.tell())
-        commit = CommitInfo(path=f"/{dropbox_directory_path / filepath.name}", mute=True)
-        while f.tell() < file_size:
-            if (file_size - f.tell()) <= chunk_size:
-                client.files_upload_session_finish(f.read(chunk_size), cursor, commit)
-            else:
-                client.files_upload_session_append(f.read(chunk_size), cursor.session_id, cursor.offset)
-                cursor.offset = f.tell()
+        if file_size <= chunk_size:
+            client.files_upload(f.read(), f"/{dropbox_directory_path / filepath.name}")
+        else:
+            upload_session_start_result = client.files_upload_session_start(f.read(chunk_size))
+            cursor = UploadSessionCursor(session_id=upload_session_start_result.session_id, offset=f.tell())
+            commit = CommitInfo(path=f"/{dropbox_directory_path / filepath.name}", mute=True)
+            while f.tell() < file_size:
+                if (file_size - f.tell()) <= chunk_size:
+                    client.files_upload_session_finish(f.read(chunk_size), cursor, commit)
+                else:
+                    client.files_upload_session_append(f.read(chunk_size), cursor.session_id, cursor.offset)
+                    cursor.offset = f.tell()
 
 
 def upload_to_dropbox(path, dropbox_directory_path):
