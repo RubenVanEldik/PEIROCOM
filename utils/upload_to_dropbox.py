@@ -51,6 +51,6 @@ def upload_to_dropbox(path, dropbox_directory_path):
     # If the path is a directory upload the files as a ZIP file
     if path.is_dir():
         utils.zip(path)
-        _upload_file(path.parent / f"{path.name}.zip", dropbox_directory_path)
+        _upload_file(path.parent / f"{path.name}.zip", dropbox_directory_path.parent)
     else:
         _upload_file(path, dropbox_directory_path)
