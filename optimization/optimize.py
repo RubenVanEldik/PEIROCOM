@@ -247,7 +247,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             # Multiply the export limits with the relative capacity factor
             temporal_export_limits *= config["interconnections"]["relative_capacity"]
             # Create the variables for the export variables
-            temporal_export[connection_type] = temporal_export_limits.apply(lambda column: pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_export_limits[column.name])))
+            temporal_export[connection_type][temporal_export_limits.columns] = temporal_export_limits.apply(lambda column: pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_export_limits[column.name])))
 
     """
     Step 3: Define demand constraints
