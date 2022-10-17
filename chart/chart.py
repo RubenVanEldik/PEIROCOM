@@ -31,9 +31,10 @@ class Chart:
         self.ax.set_yticklabels([label.format(tick) for tick in self.ax.get_yticks()])
 
     def display(self):
-        st.pyplot(self.fig)
+        # Transparent is required for Streamlit because the background is not white
+        st.pyplot(self.fig, transparent=True)
 
     def download_button(self, file_name):
         buf = io.BytesIO()
-        plt.savefig(buf, dpi=400, bbox_inches="tight")
+        plt.savefig(buf, dpi=400, bbox_inches="tight", transparent=True)
         st.download_button("Download figure", buf, file_name=file_name, mime="image/png")

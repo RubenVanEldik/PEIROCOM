@@ -37,9 +37,10 @@ class Map:
         map_df.to_crs("EPSG:3035").plot(column="data", cmap=colormap, linewidth=0.5, ax=self.ax, edgecolor=colors.get("gray", 600), missing_kwds={"color": "white"})
 
     def display(self):
-        st.pyplot(self.fig)
+        # Transparent is required for Streamlit because the background is not white
+        st.pyplot(self.fig, transparent=True)
 
     def download_button(self, file_name):
         buf = io.BytesIO()
-        plt.savefig(buf, dpi=400, bbox_inches="tight")
+        plt.savefig(buf, dpi=400, bbox_inches="tight", transparent=True)
         st.download_button("Download figure", buf, file_name=file_name, mime="image/png")
