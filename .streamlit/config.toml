@@ -1,2 +1,12 @@
 [server]
-runOnSave=true
+runOnSave = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#dc2626"
+backgroundColor = "#f9fafb"
+secondaryBackgroundColor = "#f3f4f6"
+textColor = "#1e293b"
+font = "serif"
