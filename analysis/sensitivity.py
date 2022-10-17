@@ -9,6 +9,41 @@ import utils
 import validate
 
 
+@st.experimental_memo(show_spinner=False)
+def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
+    """
+    Retrieve the statistics for all steps
+    """
+    assert validate.is_series(steps)
+    assert validate.is_string(method)
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_resolution(resolution)
+
+    # Initialize the progress bar
+    progress_bar = st.progress(0.0)
+
+    # Create a 1-item list so the index can be updated from within the function
+    index = [0]
+
+    def _apply_step(step):
+        # Retrieve the statistic for this step
+        step_data = getattr(stats, method)(output_directory / step, resolution, **kwargs)
+        # Update the index
+        index[0] += 1
+        progress_bar.progress(index[0] / len(steps))
+        # Return the data
+        return step_data
+
+    # Get the statistics for each step
+    data = steps.apply(_apply_step)
+
+    # Remove the progress bar
+    progress_bar.empty()
+
+    # Return the data
+    return data
+
+
 def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, show_cumulative_results, *, label=None, line_color=colors.primary()):
     """
     Analyze the sensitivity
@@ -36,13 +71,13 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
             sensitivity_plot.ax.set_ylabel("Firm LCOE (€/MWh)")
-            data = steps.apply(lambda step: stats.firm_lcoe(output_directory / step, resolution, breakdown_level=breakdown_level))
+            data = _retrieve_statistics(steps, "firm_lcoe", output_directory, resolution, breakdown_level=breakdown_level)
         if statistic_name == "unconstrained_lcoe":
             sensitivity_plot.ax.set_ylabel("Unconstrained LCOE (€/MWh)")
-            data = steps.apply(lambda step: stats.unconstrained_lcoe(output_directory / step, resolution, breakdown_level=breakdown_level))
+            data = _retrieve_statistics(steps, "unconstrained_lcoe", output_directory, resolution, breakdown_level=breakdown_level)
         if statistic_name == "premium":
             sensitivity_plot.ax.set_ylabel("Premium")
-            data = steps.apply(lambda step: stats.premium(output_directory / step, resolution, breakdown_level=breakdown_level))
+            data = _retrieve_statistics(steps, "premium", output_directory, resolution, breakdown_level=breakdown_level)
 
         # Plot the data depending on the breakdown level
         if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
@@ -60,12 +95,12 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
                 sensitivity_plot.ax.plot(data[technology], color=colors.technology(technology), label=utils.format_technology(technology))
             sensitivity_plot.ax.legend()
     if statistic_name == "relative_curtailment":
-        data = steps.apply(lambda step: stats.relative_curtailment(output_directory / step, resolution))
+        data = _retrieve_statistics(steps, "relative_curtailment", output_directory, resolution)
         sensitivity_plot.ax.set_ylabel("Relative curtailment (%)")
         sensitivity_plot.ax.plot(data, label=label, color=line_color)
         sensitivity_plot.format_yticklabels("{:,.0%}")
     if statistic_name == "production_capacity":
-        data = steps.apply(lambda step: pd.Series(stats.production_capacity(output_directory / step, resolution))) / 1000
+        data = _retrieve_statistics(steps, "production_capacity", output_directory, resolution) / 1000
         for production_technology in data:
             sensitivity_plot.ax.plot(data[production_technology], color=colors.technology(production_technology), label=utils.format_technology(production_technology))
         sensitivity_plot.ax.set_ylabel("Production capacity (GW)")
