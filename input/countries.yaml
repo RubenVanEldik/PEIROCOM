@@ -105,7 +105,7 @@
     offshore: 0
   potential:
     hydrogen: 0
-- name: Czech Republic
+- name: Czechia
   nuts_2: CZ
   alpha_3: CZE
   flag: 🇨🇿
@@ -359,7 +359,7 @@
     onshore: 28013.26503
     offshore: 0
     hydrogen: 0
-- name: FYR of Macedonia
+- name: North Macedonia
   nuts_2: MK
   alpha_3: MKD
   flag: 🇲🇰
@@ -515,7 +515,7 @@
     onshore: 4580.086726
     offshore: 0
     hydrogen: 0
-- name: Slovak Republic
+- name: Slovakia
   nuts_2: SK
   alpha_3: SVK
   flag: 🇸🇰
@@ -530,7 +530,7 @@
   potential:
     onshore: 17375.51911
     hydrogen: 0
-- name: Republic of Turkey
+- name: Turkey
   nuts_2: TR
   alpha_3: TUR
   flag: 🇹🇷
