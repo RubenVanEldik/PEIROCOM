@@ -26,6 +26,7 @@ from .get_sorted_resolution_stages import get_sorted_resolution_stages
 from .get_storage_capacity import get_storage_capacity
 from .get_storage_potential_in_bidding_zone import get_storage_potential_in_bidding_zone
 from .get_temporal_results import get_temporal_results
+from .is_demo import is_demo
 from .merge_dataframes_on_column import merge_dataframes_on_column
 from .path import path
 from .preprocess_bidding_zone import preprocess_bidding_zone

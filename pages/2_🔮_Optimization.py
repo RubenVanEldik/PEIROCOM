@@ -7,6 +7,8 @@ import optimization
 import utils
 import validate
 
+# Set a help message if it's deployed as a demo
+demo_disabled_message = "This feature is not available in the online demo" if utils.is_demo else None
 
 # Settings dictionary for the new run
 config = {}
@@ -16,6 +18,10 @@ config["name"] = st.sidebar.text_input("Name", value=utils.get_next_run_name(), 
 
 # Set the scope options
 with st.sidebar.expander("Scope"):
+    # Show a warning message if it's deployed as a demo
+    if utils.is_demo:
+        st.warning("**This is a demo**\n\nA maximum of 3 countries and 1 year can be modeled simultaneously. Download the model from Github to run larger simulations.")
+
     # Select the model year
     config["model_year"] = st.selectbox("Model year", [2025, 2030], index=1)
 
@@ -35,6 +41,9 @@ with st.sidebar.expander("Scope"):
     col1, col2 = st.columns(2)
     config["climate_years"]["start"] = col1.selectbox("Start year", climate_years, index=climate_years.index(2016))
     config["climate_years"]["end"] = col2.selectbox("End year", climate_years, index=climate_years.index(2016))
+
+    # Check if the config exceeds the demo bounds
+    exceeds_demo = utils.is_demo and (config["climate_years"]["end"] > config["climate_years"]["start"] or len(config["country_codes"]) > 3)
 
 # Set the technology options
 with st.sidebar.expander("Technologies"):
@@ -76,7 +85,7 @@ with st.sidebar.expander("Interconnections"):
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
     sensitivity_analysis_types = {None: "-", "curtailment": "Curtailment", "climate_years": "Climate years", "technology_scenario": "Technology scenario", "baseload": "Baseload", "interconnection_capacity": "Interconnection capacity", "self_sufficiency": "Self sufficiency"}
-    sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types.keys(), format_func=lambda key: sensitivity_analysis_types[key])
+    sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types.keys(), format_func=lambda key: sensitivity_analysis_types[key], disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
     if sensitivity_analysis_type is None:
@@ -151,19 +160,19 @@ with st.sidebar.expander("Optimization parameters"):
     config["optimization"]["thread_count"] = st.slider("Thread count", value=cpu_count, min_value=1, max_value=cpu_count)
 
     # Check if the optimization data should be stored
-    config["optimization"]["store_model"] = st.checkbox("Store optimization data")
+    config["optimization"]["store_model"] = st.checkbox("Store optimization data", disabled=utils.is_demo, help=demo_disabled_message)
 
 
 # Check if a notification should be send and results uploaded when the model finishes
 dropbox_keys_available = utils.get_env("DROPBOX_APP_KEY") and utils.get_env("DROPBOX_APP_SECRET") and utils.get_env("DROPBOX_REFRESH_TOKEN")
-config["upload_results"] = st.sidebar.checkbox("Upload results to Dropbox", disabled=not dropbox_keys_available)
-config["send_notification"] = st.sidebar.checkbox("Send a notification when finished", disabled=not utils.get_env("PUSHOVER_USER_KEY") or not utils.get_env("PUSHOVER_API_TOKEN"))
+config["upload_results"] = st.sidebar.checkbox("Upload results to Dropbox", disabled=not dropbox_keys_available or utils.is_demo, help=demo_disabled_message)
+config["send_notification"] = st.sidebar.checkbox("Send a notification when finished", disabled=not utils.get_env("PUSHOVER_USER_KEY") or not utils.get_env("PUSHOVER_API_TOKEN") or utils.is_demo, help=demo_disabled_message)
 
 
 # Run the model if the button has been pressed
 invalid_config = not validate.is_config(config)
 invalid_sensitivity_config = bool(sensitivity_config) and not validate.is_sensitivity_config(sensitivity_config)
-if st.sidebar.button("Run model", disabled=invalid_config or invalid_sensitivity_config):
+if st.sidebar.button("Run model", disabled=invalid_config or invalid_sensitivity_config or exceeds_demo):
     if config["name"] in utils.get_previous_runs(include_uncompleted_runs=True):
         st.error(f"There is already a run called '{config['name']}'")
     elif sensitivity_config:
