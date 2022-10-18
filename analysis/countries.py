@@ -18,7 +18,7 @@ def _select_data(output_directory, resolution, *, name):
 
     # Get the source of the data
     col1, col2 = st.sidebar.columns(2)
-    data_source_options = ["Statistics", "Temporal results", "Technology potential", "Production capacity", "Storage capacity (energy)", "Storage capacity (power)"]
+    data_source_options = ["Statistics", "Temporal results", "Country info", "Production capacity", "Storage capacity (energy)", "Storage capacity (power)"]
     data_source = col1.selectbox(name.capitalize(), data_source_options)
 
     # Read the config file
@@ -45,16 +45,17 @@ def _select_data(output_directory, resolution, *, name):
         # Average values of the selected temporal column
         return temporal_results.mean()
 
-    if data_source == "Technology potential":
+    if data_source == "Country info":
         # Get the country information
         country_info = utils.read_yaml(utils.path("input", "countries.yaml"))
 
-        # Select the technology for which the potential should be shown
-        technologies_with_potential = set([technology for country in country_info for technology in country["potential"]])
-        technology = col2.selectbox("Technology", technologies_with_potential, format_func=utils.format_technology, key=name)
+        # Select the numeric parameter that should be shown
+        country_parameters = list(set([parameter for country in country_info for parameter in country if isinstance(country[parameter], (int, float))]))
+        country_parameters += list(set([f"potential.{technology}" for country in country_info for technology in country["potential"]]))
+        selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace(".", " ")), key=name)
 
         # Return a Series with the potential per country for the selected technology
-        data = pd.Series({country["nuts_2"]: country["potential"].get(technology) for country in country_info if country["nuts_2"] in config["country_codes"]})
+        data = pd.Series({country["nuts_2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts_2"] in config["country_codes"]})
         data[data == 0] = None
         return data
 
