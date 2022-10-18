@@ -24,6 +24,7 @@ decorator==5.1.1
 defusedxml==0.7.1
 dropbox==11.34.0
 entrypoints==0.4
+entsoe-py==0.5.4
 et-xmlfile==1.1.0
 executing==0.8.3
 fastjsonschema==2.16.1
