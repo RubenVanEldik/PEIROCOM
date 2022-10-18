@@ -4,6 +4,7 @@
   flag: 🇦🇱
   bidding_zones: [AL00]
   included_geographic_units: [ALB]
+  population: 2811666
   current:
     pv: 0
     onshore: 0
@@ -18,6 +19,7 @@
   flag: 🇦🇹
   bidding_zones: [AT00]
   included_geographic_units: [AUT]
+  population: 8956279
   current:
     pv: 2500
     onshore: 3500
@@ -31,6 +33,7 @@
   flag: 🇧🇦
   bidding_zones: [BA00]
   included_geographic_units: [BHF, BIS, BHB]
+  population: 3263459
   current:
     pv: 0
     onshore: 135
@@ -44,6 +47,7 @@
   flag: 🇧🇪
   bidding_zones: [BE00]
   included_geographic_units: [BFR, BWR, BCR]
+  population: 11587882
   current:
     pv: 4788
     onshore: 2787
@@ -58,6 +62,7 @@
   flag: 🇧🇬
   bidding_zones: [BG00]
   included_geographic_units: [BGR]
+  population: 6899125
   current:
     pv: 1313
     onshore: 705
@@ -72,6 +77,7 @@
   flag: 🇨🇭
   bidding_zones: [CH00]
   included_geographic_units: [CHE]
+  population: 8697723
   current:
     pv: 0
     onshore: 0
@@ -85,6 +91,7 @@
   flag: 🇨🇾
   bidding_zones: [CY00]
   included_geographic_units: [CYP]
+  population: 1215588
   current:
     pv: 0
     onshore: 0
@@ -97,6 +104,7 @@
   flag: 🇨🇿
   bidding_zones: [CZ00]
   included_geographic_units: [CZE]
+  population: 10703446
   current:
     pv: 2053
     onshore: 339
@@ -110,6 +118,7 @@
   flag: 🇩🇪
   bidding_zones: [DE00]
   included_geographic_units: [DEU]
+  population: 83129285
   current:
     pv: 56347
     onshore: 55560
@@ -124,6 +133,7 @@
   flag: 🇩🇰
   bidding_zones: [DKE1, DKW1]
   included_geographic_units: [DNK]
+  population: 5856733
   current:
     pv: 1536
     onshore: 4644
@@ -138,6 +148,7 @@
   flag: 🇪🇪
   bidding_zones: [EE00]
   included_geographic_units: [EST]
+  population: 1329254
   current:
     pv: 370
     onshore: 326
@@ -153,6 +164,7 @@
   bidding_zones: [ES00]
   included_geographic_units: [ESP]
   excluded_geographic_subunits: [ESC]
+  population: 47326687
   current:
     pv: 14640
     onshore: 27735
@@ -167,6 +179,7 @@
   flag: 🇫🇮
   bidding_zones: [FI00]
   included_geographic_units: [FIN, ALD]
+  population: 5541696
   current:
     pv: 7
     onshore: 3184
@@ -181,6 +194,7 @@
   flag: 🇫🇷
   bidding_zones: [FR00, FR15]
   included_geographic_units: [FXX]
+  population: 67499343
   current:
     pv: 14298
     onshore: 0
@@ -195,6 +209,7 @@
   flag: 🇬🇷
   bidding_zones: [GR00, GR03]
   included_geographic_units: [GRC]
+  population: 10664568
   current:
     pv: 3820
     onshore: 4150
@@ -209,6 +224,7 @@
   flag: 🇭🇷
   bidding_zones: [HR00]
   included_geographic_units: [HRV]
+  population: 3899000
   current:
     pv: 96
     onshore: 925
@@ -223,6 +239,7 @@
   flag: 🇭🇺
   bidding_zones: [HU00]
   included_geographic_units: [HUN]
+  population: 9709886
   current:
     pv: 2210
     onshore: 323
@@ -236,6 +253,7 @@
   flag: 🇮🇪
   bidding_zones: [IE00]
   included_geographic_units: [IRL]
+  population: 5028230
   current:
     pv: 0
     onshore: 1919
@@ -250,6 +268,7 @@
   flag: 🇮🇹
   bidding_zones: [ITCA, ITCN, ITCS, ITN1, ITS1, ITSA, ITSI]
   included_geographic_units: [ITA]
+  population: 59066225
   current:
     pv: 5137
     onshore: 10658
@@ -264,6 +283,7 @@
   flag: 🇱🇹
   bidding_zones: [LT00]
   included_geographic_units: [LTU]
+  population: 2795321
   current:
     pv: 259
     onshore: 671
@@ -278,6 +298,7 @@
   flag: 🇱🇺
   bidding_zones: [LUB1, LUF1, LUG1]
   included_geographic_units: [LUX]
+  population: 639070
   current:
     pv: 258
     onshore: 167
@@ -291,6 +312,7 @@
   flag: 🇱🇻
   bidding_zones: [LV00]
   included_geographic_units: [LVA]
+  population: 1883162
   current:
     pv: 14
     onshore: 87
@@ -305,6 +327,7 @@
   flag: 🇲🇪
   bidding_zones: [ME00]
   included_geographic_units: [MNE]
+  population: 620173
   current:
     pv: 0
     onshore: 118
@@ -319,6 +342,7 @@
   flag: 🇲🇰
   bidding_zones: [MK00]
   included_geographic_units: [MKD]
+  population: 2065092
   current:
     pv: 22
     onshore: 37
@@ -332,6 +356,7 @@
   flag: 🇲🇹
   bidding_zones: [MT00]
   included_geographic_units: [MLT]
+  population: 516869
   current:
     pv: 0
     onshore: 0
@@ -344,6 +369,7 @@
   flag: 🇳🇱
   bidding_zones: [NL00]
   included_geographic_units: [NLX]
+  population: 17533405
   current:
     pv: 16074
     onshore: 7303
@@ -358,6 +384,7 @@
   flag: 🇳🇴
   bidding_zones: [NOM1, NON1, NOS0]
   included_geographic_units: [NOW]
+  population: 5408320
   current:
     pv: 0
     onshore: 5105
@@ -372,6 +399,7 @@
   flag: 🇵🇱
   bidding_zones: [PL00]
   included_geographic_units: [POL]
+  population: 37781024
   current:
     pv: 6036
     onshore: 7886
@@ -386,6 +414,7 @@
   flag: 🇵🇹
   bidding_zones: [PT00]
   included_geographic_units: [PRX]
+  population: 10299423
   current:
     pv: 1032
     onshore: 5328
@@ -400,6 +429,7 @@
   flag: 🇷🇴
   bidding_zones: [RO00]
   included_geographic_units: [ROU]
+  population: 19115146
   current:
     pv: 1160
     onshore: 2957
@@ -414,6 +444,7 @@
   flag: 🇷🇸
   bidding_zones: [RS00]
   included_geographic_units: [SRV, SRS]
+  population: 6844078
   current:
     pv: 3
     onshore: 533
@@ -427,6 +458,7 @@
   flag: 🇸🇪
   bidding_zones: [SE01, SE02, SE03, SE04]
   included_geographic_units: [SWE]
+  population: 10415811
   current:
     pv: 0
     onshore: 12100
@@ -441,6 +473,7 @@
   flag: 🇸🇮
   bidding_zones: [SI00]
   included_geographic_units: [SVN]
+  population: 2107007
   current:
     pv: 286
     onshore: 2
@@ -455,6 +488,7 @@
   flag: 🇸🇰
   bidding_zones: [SK00]
   included_geographic_units: [SVK]
+  population: 5447247
   current:
     pv: 0
     onshore: 0
@@ -468,6 +502,7 @@
   flag: 🇹🇷
   bidding_zones: [TR00]
   included_geographic_units: [TUR]
+  population: 85042736
   current:
     pv: 0
     onshore: 0
@@ -482,6 +517,7 @@
   flag: 🇺🇦
   bidding_zones: [UA01]
   included_geographic_units: [UKR]
+  population: 43814581
   current:
     pv: 5363
     onshore: 1111
@@ -494,6 +530,7 @@
   flag: 🇬🇧
   bidding_zones: [UK00, UKNI]
   included_geographic_units: [ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS]
+  population: 67326569
   current:
     pv: 13470
     onshore: 13932
