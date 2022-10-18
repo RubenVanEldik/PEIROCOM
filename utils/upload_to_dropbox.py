@@ -5,9 +5,9 @@ import utils
 import validate
 
 # Initialize the Dropbox client
-dropbox_app_key = utils.getenv("DROPBOX_APP_KEY")
-dropbox_app_secret = utils.getenv("DROPBOX_APP_SECRET")
-dropbox_refresh_token = utils.getenv("DROPBOX_REFRESH_TOKEN")
+dropbox_app_key = utils.get_env("DROPBOX_APP_KEY")
+dropbox_app_secret = utils.get_env("DROPBOX_APP_SECRET")
+dropbox_refresh_token = utils.get_env("DROPBOX_REFRESH_TOKEN")
 if dropbox_app_key and dropbox_app_secret and dropbox_refresh_token:
     client = Dropbox(app_key=dropbox_app_key, app_secret=dropbox_app_secret, oauth2_refresh_token=dropbox_refresh_token)
 

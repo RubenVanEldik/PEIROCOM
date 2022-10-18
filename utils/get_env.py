@@ -8,7 +8,7 @@ import validate
 dotenv.load_dotenv(".env")
 
 
-def getenv(env_name):
+def get_env(env_name):
     """
     Get the value for a specific environment variable
     """
