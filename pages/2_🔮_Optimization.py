@@ -155,6 +155,9 @@ with st.sidebar.expander("Optimization parameters"):
     method_options = {-1: "Automatic", 0: "Primal simplex", 1: "Dual simplex", 2: "Barrier", 3: "Concurrent", 4: "Deterministic concurrent", 5: "Deterministic concurrent simplex"}
     config["optimization"]["method"] = st.selectbox("Method", method_options.keys(), index=3, format_func=lambda key: method_options[key])
 
+    # Select the barrier convergence tolerance
+    config["optimization"]["barrier_convergence_tolerance"] = st.number_input("Barrier convergence tolerance", value=0.1, min_value=0.01, max_value=1.0, disabled=config["optimization"]["method"] != 2)
+
     # Select the thread count
     cpu_count = os.cpu_count()
     config["optimization"]["thread_count"] = st.slider("Thread count", value=cpu_count, min_value=1, max_value=cpu_count)
