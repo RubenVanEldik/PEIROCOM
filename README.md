@@ -43,10 +43,6 @@ bash docker.run.sh
 
 PEIROCOM consists out of three sections, preprocessing, optimization, and analysis.
 
-### Variability
-
-The variability page is not part of the model, but is a quick tool to create a plot with the daily/yearly variability of demand and IRES production. The data is imported via the ENTSO-E Transparency API.
-
 ### Preprocessing
 
 The preprocessor only needs to be run once. It converts the hourly ERAA data in Excel to a single CSV file per bidding zone.

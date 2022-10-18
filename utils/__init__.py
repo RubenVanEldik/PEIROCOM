@@ -5,7 +5,6 @@ from .calculate_regression_line import calculate_regression_line
 from .convert_variables_recursively import convert_variables_recursively
 from .create_datetime_index import create_datetime_index
 from .download_file import download_file
-from .entsoe import entsoe
 from .find_common_columns import find_common_columns
 from .format_column_name import format_column_name
 from .format_resolution import format_resolution
