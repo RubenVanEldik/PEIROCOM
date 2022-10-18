@@ -36,7 +36,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     objective_scale_factor = 10 ** 6
     is_last_resolution = resolution == utils.get_sorted_resolution_stages(config, descending=True)[-1]
     model.setParam("Crossover", 0 if is_last_resolution else -1)
-    model.setParam("BarConvTol", 1 - 0.99 / (1 + config["climate_years"]["end"] - config["climate_years"]["start"]) ** 2 if is_last_resolution else 10 ** -8)
+    model.setParam("BarConvTol", config["optimization"]["barrier_convergence_tolerance"] if is_last_resolution else 10 ** -8)
     model.setParam("BarHomogeneous", 1)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Aggregate", 0)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Presolve", 2)  # Use an aggressive presolver

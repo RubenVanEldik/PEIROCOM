@@ -5,8 +5,8 @@ import validate
 
 
 # Initialize the Pushover client if the keys are available
-user_key = utils.getenv("PUSHOVER_USER_KEY")
-api_token = utils.getenv("PUSHOVER_API_TOKEN")
+user_key = utils.get_env("PUSHOVER_USER_KEY")
+api_token = utils.get_env("PUSHOVER_API_TOKEN")
 if user_key and api_token:
     client = pushover.Client(user_key, api_token=api_token)
 
