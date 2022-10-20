@@ -76,7 +76,7 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
             sensitivity_plot.ax.set_ylabel("Unconstrained LCOE (€/MWh)")
             data = _retrieve_statistics(steps, "unconstrained_lcoe", output_directory, resolution, breakdown_level=breakdown_level)
         if statistic_name == "premium":
-            sensitivity_plot.ax.set_ylabel("Premium")
+            sensitivity_plot.ax.set_ylabel("Firm kWh premium")
             data = _retrieve_statistics(steps, "premium", output_directory, resolution, breakdown_level=breakdown_level)
 
         # Plot the data depending on the breakdown level
