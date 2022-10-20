@@ -14,7 +14,7 @@ class Chart:
 
     def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear"):
         # Create the figure
-        self.fig, self.ax = plt.subplots(figsize=(7, 5))
+        self.fig, self.ax = plt.subplots(figsize=(6, 4))
 
         # Set the axes' labels and scale and remove the top and right spine
         self.ax.set(xlabel=xlabel)
