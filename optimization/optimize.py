@@ -428,6 +428,14 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         model.write(f"{output_directory}/{resolution}/model.mps")
         model.write(f"{output_directory}/{resolution}/parameters.prm")
 
+    # Store the quality attributes
+    quality = {}
+    for column_name, appendix in [("value", ""), ("sum", "Sum"), ("index", "Index")]:
+        quality[column_name] = {}
+        for quality_attribute in ["BoundVio", "ConstrVio", "ConstrResidual", "DualVio", "DualResidual", "ComplVio"]:
+            quality[column_name][quality_attribute] = model.getAttr(f"{quality_attribute}{appendix}")
+    pd.DataFrame(quality).to_csv(output_directory / resolution / "quality.csv")
+
     # Add the optimizing duration to the dictionary
     optimizing_end = datetime.now()
     duration["optimizing"] = round((optimizing_end - optimizing_start).total_seconds())
