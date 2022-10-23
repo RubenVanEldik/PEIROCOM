@@ -128,6 +128,10 @@ def countries(output_directory, resolution):
         if validate.is_dataframe(data):
             data = data[data.columns[0]]
 
+        # Remove excluded countries from the data
+        excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts_2: utils.get_country_property(nuts_2, "name"))
+        data = data[~data.index.isin(excluded_country_codes)]
+
         # Get the units for the color bar
         units = {10 ** -9: "Billionth", 10 ** -6: "Millionth", 10 ** -3: "Thousandth", 1: "One", 10 ** 3: "Thousand", 10 ** 6: "Million", 10 ** 9: "Billion"}
         unit = st.sidebar.select_slider("Format units", units.keys(), value=1, format_func=lambda key: units[key])
