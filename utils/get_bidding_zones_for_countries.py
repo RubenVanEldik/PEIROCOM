@@ -4,7 +4,7 @@ import utils
 import validate
 
 
-@st.experimental_memo
+@st.experimental_memo(show_spinner=False)
 def get_bidding_zones_for_countries(country_codes):
     """
     Return a flat list with all bidding zones for a given list of countries

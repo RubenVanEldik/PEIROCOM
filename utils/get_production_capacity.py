@@ -5,7 +5,7 @@ import utils
 import validate
 
 
-# @st.experimental_memo
+@st.experimental_memo(show_spinner=False)
 def get_production_capacity(output_directory, resolution, *, group=None, country_codes=None):
     """
     Return the (grouped) production capacity
