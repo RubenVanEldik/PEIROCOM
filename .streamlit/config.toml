@@ -5,6 +5,7 @@ runOnSave = true
 gatherUsageStats = false
 
 [theme]
+base = "light"
 primaryColor = "#dc2626"
 backgroundColor = "#f9fafb"
 secondaryBackgroundColor = "#f3f4f6"
