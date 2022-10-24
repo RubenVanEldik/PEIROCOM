@@ -17,7 +17,7 @@ class Map:
 
     def __init__(self, data, *, label=None, format_percentage=False):
         # Create the figure
-        self.fig, self.ax = plt.subplots(figsize=(7, 5))
+        self.fig, self.ax = plt.subplots(figsize=(6, 4))
         self.ax.axis("off")
         self.ax.margins(0)
 

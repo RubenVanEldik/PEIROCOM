@@ -156,7 +156,7 @@ with st.sidebar.expander("Optimization parameters"):
     config["optimization"]["method"] = st.selectbox("Method", method_options.keys(), index=3, format_func=lambda key: method_options[key])
 
     # Select the barrier convergence tolerance
-    config["optimization"]["barrier_convergence_tolerance"] = st.number_input("Barrier convergence tolerance", value=0.1, min_value=0.01, max_value=1.0, disabled=config["optimization"]["method"] != 2)
+    config["optimization"]["barrier_convergence_tolerance"] = st.select_slider("Barrier convergence tolerance", options=[10 ** i for i in range(-6, 1)], value=0.01, disabled=config["optimization"]["method"] != 2)
 
     # Select the thread count
     cpu_count = os.cpu_count()

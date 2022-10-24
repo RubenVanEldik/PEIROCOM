@@ -76,7 +76,7 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
             sensitivity_plot.ax.set_ylabel("Unconstrained LCOE (€/MWh)")
             data = _retrieve_statistics(steps, "unconstrained_lcoe", output_directory, resolution, breakdown_level=breakdown_level)
         if statistic_name == "premium":
-            sensitivity_plot.ax.set_ylabel("Premium")
+            sensitivity_plot.ax.set_ylabel("Firm kWh premium")
             data = _retrieve_statistics(steps, "premium", output_directory, resolution, breakdown_level=breakdown_level)
 
         # Plot the data depending on the breakdown level
@@ -114,6 +114,17 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
         unit = "TWh" if storage_capacity_type == "energy" else "GW"
         sensitivity_plot.ax.set_ylabel(f"Storage capacity ({unit})")
         sensitivity_plot.ax.legend()
+    if statistic_name == "optimization_duration":
+        data = steps.apply(lambda step: pd.DataFrame(utils.read_yaml(output_directory / step / "duration.yaml")).sum(axis=1)) / 3600
+        cumulative_data = 0
+        for index, column_name in enumerate(data.columns):
+            cumulative_data += data[column_name]
+            line_color = colors.get("blue", (index + 1) * 300)
+            sensitivity_plot.ax.fill_between(data[column_name].index, cumulative_data - data[column_name], cumulative_data, label=utils.format_str(column_name), color=line_color)
+        sensitivity_plot.ax.set_ylabel("Duration (H)")
+        handles, labels = sensitivity_plot.ax.get_legend_handles_labels()
+        sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
+        sensitivity_plot.ax.set_xlim([data.index.min(), data.index.max()])
 
 
 def sensitivity(output_directory, resolution):
@@ -133,7 +144,7 @@ def sensitivity(output_directory, resolution):
     # Select an output variable to run the sensitivity analysis on
     statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment"]
     if sensitivity_config["analysis_type"] != "technology_scenario":
-        statistic_options += ["production_capacity", "storage_capacity"]
+        statistic_options += ["production_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
     # Ask for the breakdown level and if the cumulative results should be shown

@@ -14,13 +14,15 @@ class Chart:
 
     def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear"):
         # Create the figure
-        self.fig, self.ax = plt.subplots(figsize=(7, 5))
+        self.fig, self.ax = plt.subplots(figsize=(6, 4))
 
-        # Set the axes' labels and scale
+        # Set the axes' labels and scale and remove the top and right spine
         self.ax.set(xlabel=xlabel)
         self.ax.set(ylabel=ylabel)
         self.ax.set_xscale(xscale)
         self.ax.set_yscale(yscale)
+        self.ax.spines.right.set_visible(False)
+        self.ax.spines.top.set_visible(False)
 
     def format_xticklabels(self, label):
         self.ax.xaxis.set_major_locator(mticker.FixedLocator(self.ax.get_xticks().tolist()))
