@@ -1,7 +1,7 @@
 from entsoe import EntsoePandasClient
 import streamlit as st
 
-from .getenv import getenv
+from .get_env import get_env
 
 
 class Entsoe:
@@ -11,7 +11,7 @@ class Entsoe:
 
     def __init__(self):
         # Raise an error if the API key has not been set
-        api_key = getenv("ENTSOE_KEY")
+        api_key = get_env("ENTSOE_KEY")
         if not api_key:
             raise KeyError("ENTSOE_KEY variable has not been set")
 
