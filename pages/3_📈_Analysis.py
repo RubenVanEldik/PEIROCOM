@@ -19,8 +19,18 @@ def run():
     is_sensitivity_analysis = (output_directory / "sensitivity.yaml").is_file()
 
     # Unzip all ZIP files in the output directory
-    for zip_filename in output_directory.glob("**/*.zip"):
-        utils.unzip(zip_filename, remove_zip_file=True)
+    zipped_files = list(output_directory.glob("**/*.zip"))
+    if len(zipped_files) > 0:
+        unzip_button = st.sidebar.empty()
+        if unzip_button.button("Unzip files"):
+            progress_bar = st.sidebar.progress(0.0)
+            for index, zip_filename in enumerate(zipped_files):
+                utils.unzip(zip_filename, remove_zip_file=True)
+                progress_bar.progress((index + 1) / len(zipped_files))
+            progress_bar.empty()
+            unzip_button.empty()
+        else:
+            return
 
     # Get the config
     if is_sensitivity_analysis:
