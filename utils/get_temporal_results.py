@@ -4,7 +4,7 @@ import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+# Don't cache this, since the data is also cached when reading the CSV file and it's a lot of data
 def get_temporal_results(output_directory, resolution, *, group=None, country_codes=None):
     """
     Return the (grouped) production capacity
