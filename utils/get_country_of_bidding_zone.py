@@ -1,10 +1,8 @@
-import streamlit as st
-
 import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def get_country_of_bidding_zone(bidding_zone):
     """
     Find to which country a bidding zone belongs to

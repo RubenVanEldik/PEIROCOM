@@ -1,10 +1,10 @@
 import geopandas as gpd
-import streamlit as st
 
+import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def read_shapefile(filepath):
     """
     Returns the content of a .shp file as a geopandas DataFrame

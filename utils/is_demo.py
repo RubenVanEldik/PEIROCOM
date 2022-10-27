@@ -1,4 +1,4 @@
-import utils
+from .get_env import get_env
 
 
-is_demo = utils.get_env("ENVIRONMENT") == "DEMO"
+is_demo = get_env("ENVIRONMENT") == "DEMO"

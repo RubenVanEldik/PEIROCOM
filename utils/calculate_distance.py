@@ -1,10 +1,10 @@
 import pyproj
-import streamlit as st
 
+import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def calculate_distance(point1, point2):
     """
     Return the distance in meters between two points

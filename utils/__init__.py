@@ -1,3 +1,4 @@
+from .cache import cache
 from .calculate_distance import calculate_distance
 from .calculate_lcoe import calculate_lcoe
 from .calculate_r_squared import calculate_r_squared

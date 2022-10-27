@@ -9,7 +9,7 @@ import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
     """
     Retrieve the statistics for all steps

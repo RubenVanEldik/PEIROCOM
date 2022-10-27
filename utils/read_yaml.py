@@ -1,10 +1,10 @@
-import streamlit as st
 import yaml
 
+import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def read_yaml(filepath):
     """
     Returns the content of a .yaml file as python list or dictionary
