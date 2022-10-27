@@ -44,7 +44,7 @@ def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
     return data
 
 
-def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, show_cumulative_results, *, label=None, line_color=colors.primary()):
+def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, *, label=None, line_color=colors.primary()):
     """
     Analyze the sensitivity
     """
@@ -54,7 +54,6 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
     assert validate.is_chart(sensitivity_plot)
     assert validate.is_string(statistic_name)
     assert validate.is_integer(breakdown_level, min_value=0, max_value=2)
-    assert validate.is_bool(show_cumulative_results)
     assert validate.is_string(label, required=False)
     assert validate.is_color(line_color)
 
@@ -83,8 +82,7 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
         if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
             sensitivity_plot.ax.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
-            if show_cumulative_results:
-                sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
+            sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
             sensitivity_plot.ax.plot(data["production"], color=colors.technology_type("production"), label="Production")
             sensitivity_plot.ax.plot(data["storage"], color=colors.technology_type("storage"), label="Storage")
             sensitivity_plot.ax.legend()
@@ -149,12 +147,9 @@ def sensitivity(output_directory, resolution):
 
     # Ask for the breakdown level and if the cumulative results should be shown
     breakdown_level = 0
-    show_cumulative_results = False
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"] and sensitivity_config["analysis_type"] != "technology_scenario":
         breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
         breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
-        if breakdown_level == 1:
-            show_cumulative_results = st.sidebar.checkbox("Show cumulative results")
 
     # Plot the data
     sensitivity_plot = chart.Chart(xlabel=None, ylabel=None)
@@ -162,9 +157,9 @@ def sensitivity(output_directory, resolution):
         for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
             label = utils.format_technology(technology_name)
             line_color = colors.technology(technology_name)
-            _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, show_cumulative_results, label=label, line_color=line_color)
+            _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, label=label, line_color=line_color)
     else:
-        _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, show_cumulative_results)
+        _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)
