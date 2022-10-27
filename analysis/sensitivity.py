@@ -89,10 +89,10 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
             sensitivity_plot.ax.plot(data["storage"], color=colors.technology_type("storage"), label="Storage")
             sensitivity_plot.ax.legend()
         else:
-            if show_cumulative_results:
-                sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
+            cumulative_data = 0
             for technology in data:
-                sensitivity_plot.ax.plot(data[technology], color=colors.technology(technology), label=utils.format_technology(technology))
+                cumulative_data += data[technology]
+                sensitivity_plot.ax.fill_between(data[technology].index, cumulative_data - data[technology], cumulative_data, label=utils.format_technology(technology), facecolor=colors.technology(technology))
             sensitivity_plot.ax.legend()
     if statistic_name == "relative_curtailment":
         data = _retrieve_statistics(steps, "relative_curtailment", output_directory, resolution)
@@ -153,7 +153,7 @@ def sensitivity(output_directory, resolution):
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"] and sensitivity_config["analysis_type"] != "technology_scenario":
         breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
         breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
-        if breakdown_level in [1, 2]:
+        if breakdown_level == 1:
             show_cumulative_results = st.sidebar.checkbox("Show cumulative results")
 
     # Plot the data
