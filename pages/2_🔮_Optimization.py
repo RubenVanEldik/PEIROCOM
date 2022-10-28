@@ -28,7 +28,7 @@ with st.sidebar.expander("Scope"):
     # Select the countries
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
     country_codes = [country["nuts_2"] for country in countries]
-    if st.checkbox("Include all countries", value=True):
+    if not utils.is_demo and st.checkbox("Include all countries", value=True):
         config["country_codes"] = country_codes
     else:
         default_countries = ["NL", "BE", "DE"]
@@ -160,7 +160,8 @@ with st.sidebar.expander("Optimization parameters"):
 
     # Select the thread count
     cpu_count = os.cpu_count()
-    config["optimization"]["thread_count"] = st.slider("Thread count", value=cpu_count, min_value=1, max_value=cpu_count)
+    default_thread_count = 1 if utils.is_demo else cpu_count
+    config["optimization"]["thread_count"] = st.slider("Thread count", value=default_thread_count, min_value=1, max_value=cpu_count, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Check if the optimization data should be stored
     config["optimization"]["store_model"] = st.checkbox("Store optimization data", disabled=utils.is_demo, help=demo_disabled_message)
