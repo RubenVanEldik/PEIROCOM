@@ -23,7 +23,9 @@ def run():
 
     # Calculate the start and end date and time
     if variability_type == "day":
-        date = st.sidebar.date_input("Date", max_value=datetime.now())
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        date = st.sidebar.date_input("Date", value=yesterday, max_value=today)
         start = pd.Timestamp(datetime(date.year, date.month, date.day, 0, 0, tzinfo=timezone.utc))
         date_after = date + timedelta(days=1)
         end = pd.Timestamp(datetime(date_after.year, date_after.month, date_after.day, 0, 0, tzinfo=timezone.utc))
