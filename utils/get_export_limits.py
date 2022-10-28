@@ -1,10 +1,8 @@
-import streamlit as st
-
 import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def _read_and_map_export_limits(*, model_year, connection_type, timestamps):
     """
     Read the export limits and map them to the given timestamps

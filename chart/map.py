@@ -38,7 +38,7 @@ class Map:
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white
-        st.pyplot(self.fig, transparent=True)
+        st.pyplot(self.fig, dpi=400, bbox_inches="tight", transparent=True)
 
     def download_button(self, file_name):
         buf = io.BytesIO()

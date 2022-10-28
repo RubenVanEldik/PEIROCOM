@@ -1,11 +1,10 @@
 import re
-import streamlit as st
 
 import utils
 import validate
 
 
-@st.experimental_memo(show_spinner=False)
+@utils.cache
 def format_column_name(str):
     """
     Properly format any column name
