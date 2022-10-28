@@ -422,7 +422,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     run_optimization(model)
 
     # Store the LP model and optimization log
-    (output_directory / resolution).mkdir(parents=True)
+    (output_directory / resolution).mkdir()
     utils.write_text(output_directory / resolution / "log.txt", "".join(log_messages))
     if config["optimization"]["store_model"]:
         model.write(f"{output_directory}/{resolution}/model.mps")

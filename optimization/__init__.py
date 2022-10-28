@@ -17,6 +17,9 @@ def run(config, *, status=None, output_directory):
     assert validate.is_config(config)
     assert validate.is_directory_path(output_directory)
 
+    # Initialize the run directory, so other runs will already increment their ID (parents=True is required for sensitivity analyses)
+    output_directory.mkdir(parents=True)
+
     # Check if this run is not part of a sensitivity analysis
     is_standalone_run = status is None
 
