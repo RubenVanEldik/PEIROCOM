@@ -48,9 +48,10 @@ def upload_to_dropbox(path, dropbox_directory_path):
         print("Could not upload to Dropbox because DROPBOX_ACCESS_TOKEN was not set")
         return
 
-    # If the path is a directory upload the files as a ZIP file
+    # If the path is a directory upload the files as a ZIP file and remove the ZIP file immediately after
     if path.is_dir():
-        utils.zip(path)
-        _upload_file(path.parent / f"{path.name}.zip", dropbox_directory_path.parent)
+        zip_path = utils.zip(path)
+        _upload_file(zip_path, dropbox_directory_path.parent)
+        zip_path.unlink()
     else:
         _upload_file(path, dropbox_directory_path)
