@@ -187,6 +187,9 @@ def sensitivity(output_directory, resolution):
     elif sensitivity_config["analysis_type"] == "interconnection_capacity":
         sensitivity_plot.ax.set_xlabel("Relative interconnection capacity (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "interconnection_efficiency":
+        sensitivity_plot.ax.set_xlabel("Interconnection efficiency (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "self_sufficiency":
         sensitivity_plot.ax.set_xlabel("Minimum self sufficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
