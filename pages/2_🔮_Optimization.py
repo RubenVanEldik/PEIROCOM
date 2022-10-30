@@ -84,11 +84,11 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = {None: "-", "curtailment": "Curtailment", "climate_years": "Climate years", "technology_scenario": "Technology scenario", "baseload": "Baseload", "interconnection_capacity": "Interconnection capacity", "self_sufficiency": "Self sufficiency"}
-    sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types.keys(), format_func=lambda key: sensitivity_analysis_types[key], disabled=utils.is_demo, help=demo_disabled_message)
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "self_sufficiency"]
+    sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
-    if sensitivity_analysis_type is None:
+    if sensitivity_analysis_type is "-":
         sensitivity_config = None
     else:
         sensitivity_config = {"analysis_type": sensitivity_analysis_type}
