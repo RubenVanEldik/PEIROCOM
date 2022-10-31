@@ -433,7 +433,10 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     for column_name, appendix in [("value", ""), ("sum", "Sum"), ("index", "Index")]:
         quality[column_name] = {}
         for quality_attribute in ["BoundVio", "ConstrVio", "ConstrResidual", "DualVio", "DualResidual", "ComplVio"]:
-            quality[column_name][quality_attribute] = model.getAttr(f"{quality_attribute}{appendix}")
+            try:
+                quality[column_name][quality_attribute] = model.getAttr(f"{quality_attribute}{appendix}")
+            except AttributeError:
+                quality[column_name][quality_attribute] = None
     pd.DataFrame(quality).to_csv(output_directory / resolution / "quality.csv")
 
     # Add the optimizing duration to the dictionary

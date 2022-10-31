@@ -84,11 +84,11 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = {None: "-", "curtailment": "Curtailment", "climate_years": "Climate years", "technology_scenario": "Technology scenario", "baseload": "Baseload", "interconnection_capacity": "Interconnection capacity", "self_sufficiency": "Self sufficiency"}
-    sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types.keys(), format_func=lambda key: sensitivity_analysis_types[key], disabled=utils.is_demo, help=demo_disabled_message)
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency"]
+    sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
-    if sensitivity_analysis_type is None:
+    if sensitivity_analysis_type is "-":
         sensitivity_config = None
     else:
         sensitivity_config = {"analysis_type": sensitivity_analysis_type}
@@ -123,6 +123,11 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitivity_config["technologies"] = {technology_name: technology_names[technology_name] for technology_name in selected_technologies}
     elif sensitivity_analysis_type == "interconnection_capacity":
         sensitivity_start, sensitivity_stop = st.slider("Interconnection capacity range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+    elif sensitivity_analysis_type == "interconnection_efficiency":
+        sensitivity_start, sensitivity_stop = st.slider("Interconnection efficiency range", value=(0.8, 1.0), min_value=0.05, max_value=1.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}

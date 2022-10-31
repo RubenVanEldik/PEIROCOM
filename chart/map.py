@@ -26,7 +26,7 @@ class Map:
         vmin = data.min()
         vmax = data[data < np.Inf].max()
         scalar_mappable = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
-        format = lambda x, pos: f"{x:.0%}" if format_percentage else f"{x:.4}"
+        format = lambda x, pos: f"{x:.0%}" if format_percentage else f"{x:.3g}"
         self.fig.colorbar(scalar_mappable, shrink=0.7, aspect=20, label=label, format=format)
 
         # Get the geopandas DataFrame and map the data to it

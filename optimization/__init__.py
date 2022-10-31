@@ -167,6 +167,9 @@ def run_sensitivity(config, sensitivity_config):
                 utils.set_nested_key(step_config, "technologies.relative_baseload", step_value)
             elif sensitivity_config["analysis_type"] == "interconnection_capacity":
                 utils.set_nested_key(step_config, "interconnections.relative_capacity", step_value)
+            elif sensitivity_config["analysis_type"] == "interconnection_efficiency":
+                utils.set_nested_key(step_config, "interconnections.efficiency.hvac", step_value)
+                utils.set_nested_key(step_config, "interconnections.efficiency.hvdc", step_value)
             elif sensitivity_config["analysis_type"] == "self_sufficiency":
                 utils.set_nested_key(step_config, "interconnections.min_self_sufficiency", step_value)
 
