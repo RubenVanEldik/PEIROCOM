@@ -181,7 +181,7 @@ config["send_notification"] = st.sidebar.checkbox("Send a notification when fini
 # Run the model if the button has been pressed
 invalid_config = not validate.is_config(config)
 invalid_sensitivity_config = bool(sensitivity_config) and not validate.is_sensitivity_config(sensitivity_config)
-if st.sidebar.button("Run model", disabled=invalid_config or invalid_sensitivity_config or exceeds_demo):
+if st.sidebar.button("Run model", type="primary", disabled=invalid_config or invalid_sensitivity_config or exceeds_demo):
     if config["name"] in utils.get_previous_runs(include_uncompleted_runs=True):
         st.error(f"There is already a run called '{config['name']}'")
     elif sensitivity_config:
