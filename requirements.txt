@@ -114,7 +114,7 @@ soupsieve==2.3.2.post1
 stack-data==0.3.0
 stdlib-list==0.8.0
 stone==3.3.1
-streamlit==1.13.0
+streamlit==1.14.0
 terminado==0.15.0
 texttable==1.6.4
 threadpoolctl==3.1.0
