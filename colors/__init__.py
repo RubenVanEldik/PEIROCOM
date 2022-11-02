@@ -1,4 +1,3 @@
-import streamlit as st
 from matplotlib.colors import LinearSegmentedColormap
 
 import validate

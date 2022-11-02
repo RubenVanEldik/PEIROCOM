@@ -2,7 +2,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
 import validate
-import streamlit as st
 
 
 def calculate_regression_line(col1, col2, *, degree):
