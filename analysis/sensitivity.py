@@ -44,7 +44,7 @@ def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
     return data
 
 
-def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, *, label=None, line_color=colors.primary()):
+def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, *, label=None, line_color=colors.primary()):
     """
     Analyze the sensitivity
     """
@@ -53,7 +53,6 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
     assert validate.is_sensitivity_config(sensitivity_config)
     assert validate.is_chart(sensitivity_plot)
     assert validate.is_string(statistic_name)
-    assert validate.is_integer(breakdown_level, min_value=0, max_value=2)
     assert validate.is_string(label, required=False)
     assert validate.is_color(line_color)
 
@@ -67,6 +66,13 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
 
     # Add the output for the sensitivity steps to the sensitivity plot
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"]:
+        # Ask for the breakdown level
+        if sensitivity_config["analysis_type"] == "technology_scenario":
+            breakdown_level = 0
+        else:
+            breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
+            breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
+
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
             sensitivity_plot.ax.set_ylabel("Firm LCOE (€/MWh)")
@@ -148,12 +154,6 @@ def sensitivity(output_directory, resolution):
         statistic_options += ["production_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
-    # Ask for the breakdown level and if the cumulative results should be shown
-    breakdown_level = 0
-    if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"] and sensitivity_config["analysis_type"] != "technology_scenario":
-        breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
-        breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
-
     # Plot the data
     sensitivity_plot = chart.Chart(xlabel=None, ylabel=None)
     if sensitivity_config["analysis_type"] == "technology_scenario":
@@ -161,9 +161,9 @@ def sensitivity(output_directory, resolution):
         for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
             label = utils.format_technology(technology_name)
             line_color = colors.technology(technology_name)
-            sensitivity_data[technology_name] = _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, label=label, line_color=line_color)
+            sensitivity_data[technology_name] = _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, label=label, line_color=line_color)
     else:
-        sensitivity_data = _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level)
+        sensitivity_data = _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)
