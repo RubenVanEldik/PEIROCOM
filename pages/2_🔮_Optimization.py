@@ -7,6 +7,9 @@ import optimization
 import utils
 import validate
 
+# Set the page config
+st.set_page_config(page_title="Optimization - PEIROCOM", page_icon="🔮")
+
 # Set a help message if it's deployed as a demo
 demo_disabled_message = "This feature is not available in the online demo" if utils.is_demo else None
 

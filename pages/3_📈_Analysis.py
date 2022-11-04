@@ -3,6 +3,9 @@ import streamlit as st
 import analysis
 import utils
 
+# Set the page config
+st.set_page_config(page_title="Analysis - PEIROCOM", page_icon="📈")
+
 
 def run():
     # Get the previous runs
