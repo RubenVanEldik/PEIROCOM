@@ -52,9 +52,13 @@ def correlation(output_directory, resolution):
 
     # Add a regression line if the checkbox is checked
     if st.sidebar.checkbox("Show regression line"):
-        degree = st.sidebar.slider("Degrees", min_value=1, value=2, max_value=5)
-        trendline_x, trendline_y = utils.calculate_regression_line(correlations.distance, correlations.r_squared, degree=degree)
-        correlation_plot.ax.plot(trendline_x, trendline_y, color=colors.get("red", 600))
+        regression_function_string = st.sidebar.text_input("Curve formula", value="a + b * x", help="Use a, b, and c as variables and use x for the x-value")
+        regression_function = eval(f"lambda x, a, b, c: {regression_function_string}")
+        try:
+            regression_line = utils.fit_curve(correlations.distance, correlations.r_squared, function=regression_function)
+            correlation_plot.ax.plot(regression_line, color=colors.get("red", 600))
+        except:
+            st.sidebar.error("The function is not valid")
 
     # Show the plot
     correlation_plot.display()

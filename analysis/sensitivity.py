@@ -86,7 +86,28 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
 
         # Plot the data depending on the breakdown level
         if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
-            sensitivity_plot.ax.plot(data, label=label, color=line_color)
+            if st.sidebar.checkbox("Fit a curve on the data"):
+                sensitivity_plot.ax.scatter(data.index, data, label=label, color=colors.primary(alpha=0.5), linewidths=0)
+                try:
+                    # Get the regression function as a string and make it a lambda function
+                    regression_function_string = st.sidebar.text_input("Curve formula", value="a + b * x", help="Use a, b, and c as variables and use x for the x-value")
+                    regression_function = eval(f"lambda x, a, b, c: {regression_function_string}")
+
+                    # Fit the curve
+                    regression_line, parameters = utils.fit_curve(pd.Series(data.index), data, function=regression_function, return_parameters=True)
+
+                    # Format the regression string
+                    regression_function_string_formatted = f"${regression_function_string}$"
+                    for old_substring, new_substring in [("a ", f"{parameters[0]:.2f} "), (" b ", f" {parameters[1]:.2f} "), (" c ", f" {parameters[2]:.2f} "), (" * ", " \cdot ")]:
+                        regression_function_string_formatted = regression_function_string_formatted.replace(old_substring, new_substring)
+
+                    # Plot the regression line
+                    sensitivity_plot.ax.plot(regression_line, color=colors.get("red", 600), label=regression_function_string_formatted)
+                    sensitivity_plot.ax.legend()
+                except:
+                    st.sidebar.error("The function is not valid")
+            else:
+                sensitivity_plot.ax.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
             sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
             sensitivity_plot.ax.plot(data["production"], color=colors.technology_type("production"), label="Production")

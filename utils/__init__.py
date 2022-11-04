@@ -2,11 +2,11 @@ from .cache import cache
 from .calculate_distance import calculate_distance
 from .calculate_lcoe import calculate_lcoe
 from .calculate_r_squared import calculate_r_squared
-from .calculate_regression_line import calculate_regression_line
 from .convert_variables_recursively import convert_variables_recursively
 from .create_datetime_index import create_datetime_index
 from .download_file import download_file
 from .find_common_columns import find_common_columns
+from .fit_curve import fit_curve
 from .format_column_name import format_column_name
 from .format_resolution import format_resolution
 from .format_str import format_str
