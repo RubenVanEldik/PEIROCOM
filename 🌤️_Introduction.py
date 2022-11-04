@@ -2,6 +2,9 @@ import streamlit as st
 
 import utils
 
+# Set the page config
+st.set_page_config(page_title="PEIROCOM", page_icon="🌤")
+
 # Show Utrecht University logo
 st.image("./images/logo.png")
 

@@ -124,6 +124,9 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
         sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
         sensitivity_plot.ax.set_xlim([data.index.min(), data.index.max()])
 
+    # Return the data so it can be shown in a table
+    return data
+
 
 def sensitivity(output_directory, resolution):
     """
@@ -154,12 +157,13 @@ def sensitivity(output_directory, resolution):
     # Plot the data
     sensitivity_plot = chart.Chart(xlabel=None, ylabel=None)
     if sensitivity_config["analysis_type"] == "technology_scenario":
+        sensitivity_data = pd.DataFrame()
         for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
             label = utils.format_technology(technology_name)
             line_color = colors.technology(technology_name)
-            _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, label=label, line_color=line_color)
+            sensitivity_data[technology_name] = _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, label=label, line_color=line_color)
     else:
-        _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level)
+        sensitivity_data = _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)
@@ -197,3 +201,7 @@ def sensitivity(output_directory, resolution):
     # Plot the sensitivity plot
     sensitivity_plot.display()
     sensitivity_plot.download_button("sensitivity.png")
+
+    # Show the sensitivity data as a table
+    with st.expander("Data points"):
+        st.table(sensitivity_data)

@@ -6,6 +6,9 @@ import streamlit as st
 import utils
 import validate
 
+# Set the page config
+st.set_page_config(page_title="Preprocessing - PEIROCOM", page_icon="🔗")
+
 
 def _download_data(url, filepath, excel_filenames):
     """
