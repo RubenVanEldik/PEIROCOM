@@ -9,6 +9,10 @@ import colors
 import utils
 
 
+# Set the page config
+st.set_page_config(page_title="Variability - PEIROCOM", page_icon="📅")
+
+
 def run():
     """
     Show the variability plot
