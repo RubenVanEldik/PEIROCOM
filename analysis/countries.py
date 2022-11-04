@@ -122,6 +122,12 @@ def countries(output_directory, resolution):
     if data is not None:
         # Get the label for the color bar
         label = st.sidebar.text_input("Label")
+
+        # Show zero values as white areas
+        if st.sidebar.checkbox("Exclude zero values"):
+            data.loc[data == 0] = None
+
+        # Format the data as a percentage
         format_percentage = st.sidebar.checkbox("Show as percentage")
 
         # If data is still a DataFrame, convert the single column DataFrame to a series (only applicable when the 'mode' aggregator has been used)
