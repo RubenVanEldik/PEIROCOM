@@ -151,8 +151,7 @@ with st.sidebar.expander("Time discretization"):
 
     # Select the relative boundary propagation
     multiple_stages = len(config["time_discretization"]["resolution_stages"]) > 1
-    config["time_discretization"]["capacity_propagation"] = st.slider("Capacity propagation", value=1.0, disabled=not multiple_stages)
-    config["time_discretization"]["temporal_propagation"] = st.slider("Temporal propagation", value=1.0, disabled=not multiple_stages)
+    config["time_discretization"]["value_propagation"] = st.slider("Value propagation", value=1.0, disabled=not multiple_stages)
 
 
 # Set the optimization parameters
