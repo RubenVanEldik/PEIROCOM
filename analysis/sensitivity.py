@@ -218,6 +218,9 @@ def sensitivity(output_directory, resolution):
     elif sensitivity_config["analysis_type"] == "self_sufficiency":
         sensitivity_plot.ax.set_xlabel("Minimum self sufficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "value_propagation":
+        sensitivity_plot.ax.set_xlabel("Value propagation (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot
     sensitivity_plot.display()

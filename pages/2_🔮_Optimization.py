@@ -87,7 +87,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency", "value_propagation"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -139,7 +139,11 @@ with st.sidebar.expander("Sensitivity analysis"):
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
-
+    elif sensitivity_analysis_type == "value_propagation":
+        sensitivity_start, sensitivity_stop = st.slider("Value propagation range range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
 
 # Set the time discretization parameters
 with st.sidebar.expander("Time discretization"):
