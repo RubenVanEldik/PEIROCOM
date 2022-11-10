@@ -5,12 +5,11 @@ import validate
 
 
 @utils.cache
-def get_production_capacity(output_directory, resolution, *, group=None, country_codes=None):
+def get_production_capacity(output_directory, *, group=None, country_codes=None):
     """
     Return the (grouped) production capacity
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
     assert validate.is_aggregation_level(group, required=False)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
@@ -22,7 +21,7 @@ def get_production_capacity(output_directory, resolution, *, group=None, country
     # Get the production capacity for each bidding zone
     production_capacity = {}
     for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / resolution / "production_capacities" / f"{bidding_zone}.csv"
+        filepath = output_directory / "production_capacities" / f"{bidding_zone}.csv"
         production_capacity[bidding_zone] = utils.read_csv(filepath, index_col=0)
 
     # Return a dictionary with the production capacity per bidding zone DataFrame if not grouped

@@ -9,13 +9,11 @@ import utils
 import validate
 
 
-def optimize(config, *, resolution, previous_resolution, status, output_directory):
+def optimize(config, *, status, output_directory):
     """
     Create and run the model
     """
     assert validate.is_config(config)
-    assert validate.is_resolution(resolution)
-    assert validate.is_resolution(previous_resolution, required=False)
     assert validate.is_directory_path(output_directory)
 
     # Create a dictionary to store the run duration of the different phases
@@ -35,11 +33,10 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     model.setParam("Threads", config["optimization"]["thread_count"])
     model.setParam("Method", config["optimization"]["method"])
 
-    # Disable crossover for the last resolution and set BarHomogeneous and Aggregate
+    # Disable crossover and set BarHomogeneous and Aggregate
     objective_scale_factor = 10 ** 6
-    is_last_resolution = resolution == utils.get_sorted_resolution_stages(config, descending=True)[-1]
-    model.setParam("Crossover", 0 if is_last_resolution else -1)
-    model.setParam("BarConvTol", config["optimization"]["barrier_convergence_tolerance"] if is_last_resolution else 10 ** -8)
+    model.setParam("Crossover", 0)
+    model.setParam("BarConvTol", config["optimization"]["barrier_convergence_tolerance"])
     model.setParam("BarHomogeneous", 1)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Aggregate", 0)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Presolve", 2)  # Use an aggressive presolver
@@ -68,7 +65,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         start_year = config["climate_years"]["start"]
         end_year = config["climate_years"]["end"]
         # Get the temporal data and resample to the required resolution
-        temporal_data[bidding_zone] = utils.read_temporal_data(filepath, start_year=start_year, end_year=end_year).resample(resolution).mean()
+        temporal_data[bidding_zone] = utils.read_temporal_data(filepath, start_year=start_year, end_year=end_year).resample(config["resolution"]).mean()
         # Remove the leap days from the dataset that could have been introduced by the resample method
         temporal_data[bidding_zone] = temporal_data[bidding_zone][~((temporal_data[bidding_zone].index.month == 2) & (temporal_data[bidding_zone].index.day == 29))]
         # Create an temporal_results DataFrame with the demand_MW column
@@ -78,28 +75,6 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
 
         # Create a DataFrame for the production capacities
         production_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["production"])
-
-        if previous_resolution:
-            # Get the temporal results from the previous run
-            previous_temporal_results = utils.read_temporal_data(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv")
-            # Multiply the previous temporal results witht the propagation factor
-            previous_temporal_results = config["time_discretization"]["value_propagation"] * previous_temporal_results
-            # Resample the previous results so it has the same timestamps as the current step
-            previous_temporal_results = previous_temporal_results.resample(resolution).mean()
-            # Find and add the rows that are missing in the previous results (the resample method does not add rows after the last timestamp)
-            for timestamp in temporal_results[bidding_zone].index.difference(previous_temporal_results.index):
-                previous_temporal_results.loc[timestamp] = pd.Series([], dtype="float64")  # Sets None to all columns in the new row
-            # Remove all rows that are in previous_temporal_results but not in the new temporal_results DataFrame (don't know why this happens, but it happens sometimes)
-            previous_temporal_results = previous_temporal_results[previous_temporal_results.index.isin(temporal_results[bidding_zone].index)]
-            # Interpolate the empty rows for the energy stored columns created by the resample method
-            previous_energy_stored_columns = previous_temporal_results.filter(regex="energy_stored_.+_MWh", axis=1)
-            relative_resolution = math.ceil(pd.Timedelta(previous_resolution) / pd.Timedelta(resolution))
-            previous_energy_stored_columns = previous_energy_stored_columns.interpolate().shift(relative_resolution - 1, axis=0).fillna(0)
-            previous_temporal_results[previous_energy_stored_columns.columns] = previous_energy_stored_columns
-            # Fill the empty rows created by the resample method by the value from the previous rows
-            previous_temporal_results = previous_temporal_results.ffill()
-            # Remove the leap days from the dataset that could have been introduced by the resample method
-            previous_temporal_results = previous_temporal_results[~((previous_temporal_results.index.month == 2) & (previous_temporal_results.index.day == 29))]
 
         # Create empty DataFrames for the interconnections, if they don't exist yet
         if not len(temporal_export):
@@ -123,18 +98,8 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             # Create a capacity variable for each climate zone
             climate_zones = [re.match(f"{production_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{production_technology}_")]
             production_potential = utils.get_production_potential_in_climate_zone(bidding_zone, production_technology, config=config)
-            if previous_resolution:
-                previous_production_capacity = config["time_discretization"]["value_propagation"] * utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", dtype={"Unnamed: 0": str}).set_index("Unnamed: 0")
-                capacities = {}
-                for climate_zone in climate_zones:
-                    previous_production_capacity_climate_zone = previous_production_capacity.loc[climate_zone, production_technology]
-                    if previous_production_capacity_climate_zone == production_potential:
-                        capacities[climate_zone] = production_potential
-                    else:
-                        capacities[climate_zone] = model.addVar(lb=previous_production_capacity_climate_zone, ub=production_potential)
-            else:
-                current_capacity = utils.get_current_production_capacity_in_climate_zone(bidding_zone, production_technology, config=config)
-                capacities = model.addVars(climate_zones, lb=current_capacity, ub=production_potential)
+            current_capacity = utils.get_current_production_capacity_in_climate_zone(bidding_zone, production_technology, config=config)
+            capacities = model.addVars(climate_zones, lb=current_capacity, ub=production_potential)
 
             # Add the capacities to the production_capacity DataFrame and calculate the temporal production for a specific technology
             temporal_production = 0
@@ -162,7 +127,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             # Get the specific storage assumptions
             storage_assumptions = utils.get_technologies(technology_type="storage")[storage_technology]
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
-            timestep_hours = pd.Timedelta(resolution).total_seconds() / 3600
+            timestep_hours = pd.Timedelta(config["resolution"]).total_seconds() / 3600
 
             # Get the storage energy potential
             storage_potential = utils.get_storage_potential_in_bidding_zone(bidding_zone, storage_technology, config=config)
@@ -171,13 +136,6 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             if storage_potential == 0:
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = 0
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = 0
-            elif previous_resolution:
-                previous_storage_capacity = config["time_discretization"]["value_propagation"] * utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
-                if previous_storage_capacity.loc[storage_technology, "energy"] == storage_potential:
-                    storage_capacity[bidding_zone].loc[storage_technology, "energy"] = storage_potential
-                else:
-                    storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(lb=previous_storage_capacity.loc[storage_technology, "energy"], ub=storage_potential)
-                storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar(lb=previous_storage_capacity.loc[storage_technology, "power"])
             else:
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar(ub=storage_potential)
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar()
@@ -186,10 +144,6 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             if storage_potential == 0:
                 inflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
                 outflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
-            elif previous_resolution:
-                previous_storage_flow = previous_temporal_results[f"net_storage_flow_{storage_technology}_MW"]
-                inflow = model.addVars(temporal_data[bidding_zone].index, lb=previous_storage_flow.clip(lower=0))
-                outflow = model.addVars(temporal_data[bidding_zone].index, lb=-previous_storage_flow.clip(upper=0))
             else:
                 inflow = model.addVars(temporal_data[bidding_zone].index)
                 outflow = model.addVars(temporal_data[bidding_zone].index)
@@ -214,10 +168,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 temporal_energy_stored_dict = {}
                 for timestamp in temporal_data[bidding_zone].index:
                     # Create the state of charge variables
-                    if previous_resolution:
-                        energy_stored_current = model.addVar(lb=previous_temporal_results.loc[timestamp, f"energy_stored_{storage_technology}_MWh"])
-                    else:
-                        energy_stored_current = model.addVar()
+                    energy_stored_current = model.addVar()
 
                     # Add the SOC constraint with regard to the previous timestamp
                     if energy_stored_previous:
@@ -375,7 +326,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         storage_costs = utils.calculate_lcoe(production_capacity, storage_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
-        fixed_storage_costs = config["fixed_storage"]["costs"][resolution]
+        fixed_storage_costs = config["fixed_storage"]["costs"]
         if config["fixed_storage"]["direction"] == "gte":
             model.addConstr(storage_costs >= fixed_storage_costs)
         elif config["fixed_storage"]["direction"] == "lte":
@@ -401,7 +352,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     optimizing_start = datetime.now()
 
     # Create the optimization log expander
-    with st.expander(f"{utils.format_resolution(resolution)} resolution"):
+    with st.expander("Optimization log"):
         # Create three columns for statistics
         col1, col2, col3 = st.columns(3)
         stat1 = col1.empty()
@@ -464,11 +415,10 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     run_optimization(model)
 
     # Store the LP model and optimization log
-    (output_directory / resolution).mkdir()
-    utils.write_text(output_directory / resolution / "log.txt", "".join(log_messages))
+    utils.write_text(output_directory / "log.txt", "".join(log_messages))
     if config["optimization"]["store_model"]:
-        model.write(f"{output_directory}/{resolution}/model.mps")
-        model.write(f"{output_directory}/{resolution}/parameters.prm")
+        model.write(f"{output_directory}/model.mps")
+        model.write(f"{output_directory}/parameters.prm")
 
     # Store the quality attributes
     quality = {}
@@ -479,7 +429,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 quality[column_name][quality_attribute] = model.getAttr(f"{quality_attribute}{appendix}")
             except AttributeError:
                 quality[column_name][quality_attribute] = None
-    pd.DataFrame(quality).to_csv(output_directory / resolution / "quality.csv")
+    pd.DataFrame(quality).to_csv(output_directory / "quality.csv")
 
     # Add the optimizing duration to the dictionary
     optimizing_end = datetime.now()
@@ -526,7 +476,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
 
     # Make a directory for each type of output
     for sub_directory in ["temporal_results", "temporal_export", "production_capacities", "storage_capacities", "interconnection_capacity"]:
-        (output_directory / resolution / sub_directory).mkdir()
+        (output_directory / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
     for bidding_zone in bidding_zones:
@@ -536,25 +486,25 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         temporal_results_bidding_zone = utils.convert_variables_recursively(temporal_results[bidding_zone])
 
         # Store the temporal results to a CSV file
-        temporal_results_bidding_zone.to_csv(output_directory / resolution / "temporal_results" / f"{bidding_zone}.csv")
+        temporal_results_bidding_zone.to_csv(output_directory / "temporal_results" / f"{bidding_zone}.csv")
 
         # Convert and store the production capacity
         production_capacity_bidding_zone = utils.convert_variables_recursively(production_capacity[bidding_zone])
-        production_capacity_bidding_zone.to_csv(output_directory / resolution / "production_capacities" / f"{bidding_zone}.csv")
+        production_capacity_bidding_zone.to_csv(output_directory / "production_capacities" / f"{bidding_zone}.csv")
 
         # Convert and store the storage capacity
         storage_capacity_bidding_zone = utils.convert_variables_recursively(storage_capacity[bidding_zone])
-        storage_capacity_bidding_zone.to_csv(output_directory / resolution / "storage_capacities" / f"{bidding_zone}.csv")
+        storage_capacity_bidding_zone.to_csv(output_directory / "storage_capacities" / f"{bidding_zone}.csv")
 
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:
         status.update(f"Converting and storing the {connection_type.upper()} interconnection results")
         # Convert and store the temporal interconnection flows
         temporal_export_connection_type = utils.convert_variables_recursively(temporal_export[connection_type])
-        temporal_export_connection_type.to_csv(output_directory / resolution / "temporal_export" / f"{connection_type}.csv")
+        temporal_export_connection_type.to_csv(output_directory / "temporal_export" / f"{connection_type}.csv")
         # Convert and store the interconnection capacities
         interconnection_capacity_connection_type = utils.convert_variables_recursively(interconnection_capacity[connection_type])
-        interconnection_capacity_connection_type.to_csv(output_directory / resolution / "interconnection_capacity" / f"{connection_type}.csv")
+        interconnection_capacity_connection_type.to_csv(output_directory / "interconnection_capacity" / f"{connection_type}.csv")
 
     # Add the storing duration to the dictionary
     storing_end = datetime.now()

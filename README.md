@@ -40,7 +40,7 @@ The preprocessor only needs to be run once. It removes some irragularities and c
 
 ### Optimization
 
-The optimization is the core of PEIROCOM. All input parameters are dynamically defined, this makes it possible to select the countries and climate years that should be included in a specific run. The model uses the time-hierarchical solution method (THS) to improve the optimization time.
+The optimization is the core of PEIROCOM. All input parameters are dynamically defined, this makes it possible to select the countries and climate years that should be included in a specific run.
 
 ### Analysis
 

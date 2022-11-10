@@ -6,17 +6,16 @@ import utils
 import validate
 
 
-def sankey_diagram(output_directory, resolution):
+def sankey_diagram(output_directory):
     """
     Show a Sankey diagram of the energy flows
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     st.title("➡️️ Sankey diagram")
 
     # Get temporal results for all countries
-    all_temporal_results = utils.get_temporal_results(output_directory, resolution)
+    all_temporal_results = utils.get_temporal_results(output_directory)
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Show a warning message if the run does not include Li-ion or hydrogen storage

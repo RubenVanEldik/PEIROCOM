@@ -7,17 +7,16 @@ import utils
 import validate
 
 
-def energy_destination(output_directory, resolution):
+def energy_destination(output_directory):
     """
     Show a bar chart with the initial destination of the energy
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     st.title("🧭️ Energy destination")
 
     # Get temporal results for all countries
-    all_temporal_results = utils.get_temporal_results(output_directory, resolution)
+    all_temporal_results = utils.get_temporal_results(output_directory)
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Select the included countries

@@ -5,12 +5,11 @@ import validate
 
 
 # Don't cache this, since the data is also cached when reading the CSV file and it's a lot of data
-def get_temporal_results(output_directory, resolution, *, group=None, country_codes=None):
+def get_temporal_results(output_directory, *, group=None, country_codes=None):
     """
     Return the (grouped) production capacity
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
     assert validate.is_aggregation_level(group, required=False)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
@@ -22,7 +21,7 @@ def get_temporal_results(output_directory, resolution, *, group=None, country_co
     # Get the temporal data for each bidding zone
     temporal_results = {}
     for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / resolution / "temporal_results" / f"{bidding_zone}.csv"
+        filepath = output_directory / "temporal_results" / f"{bidding_zone}.csv"
         temporal_results[bidding_zone] = utils.read_temporal_data(filepath)
 
         if temporal_results[bidding_zone].isnull().values.any():

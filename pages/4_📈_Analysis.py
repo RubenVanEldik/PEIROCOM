@@ -48,10 +48,6 @@ def run():
     else:
         config = utils.read_yaml(output_directory / "config.yaml")
 
-    # Select the resolution to show the data of
-    sorted_resolution_stages = utils.get_sorted_resolution_stages(config)
-    selected_resolution = st.sidebar.selectbox("Resolution", sorted_resolution_stages)
-
     # Set the analysis type options
     analysis_type_options = ["statistics", "temporal_results", "countries", "correlation", "duration_curve", "energy_destination", "sankey_diagram"]
     if is_sensitivity_analysis:
@@ -72,14 +68,14 @@ def run():
                 output_directory /= sensitivity_step_placeholder.selectbox("Step", sensitivity_config["steps"])
 
         # Run the analysis
-        getattr(analysis, analysis_type)(output_directory, selected_resolution)
+        getattr(analysis, analysis_type)(output_directory)
     else:
         analysis_type_options.append("optimization_log")
         # Ask which analysis type should be used
         analysis_type = st.sidebar.radio("Type of analysis", analysis_type_options, format_func=utils.format_str)
 
         # Run the analysis
-        getattr(analysis, analysis_type)(output_directory, selected_resolution)
+        getattr(analysis, analysis_type)(output_directory)
 
 
 run()

@@ -6,19 +6,18 @@ import utils
 import validate
 
 
-def temporal_results(output_directory, resolution):
+def temporal_results(output_directory):
     """
     Show the temporal results in a chart and table
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     st.title("🕰️ Temporal results")
 
     st.sidebar.header("Options")
 
     # Get temporal results for a country
-    all_temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
+    all_temporal_results = utils.get_temporal_results(output_directory, group="country")
     config = utils.read_yaml(output_directory / "config.yaml")
     country_code = st.sidebar.selectbox("Country", config["country_codes"], format_func=lambda country_code: utils.get_country_property(country_code, "name"))
     temporal_results = all_temporal_results[country_code]

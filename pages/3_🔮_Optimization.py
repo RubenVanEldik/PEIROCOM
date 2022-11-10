@@ -47,6 +47,10 @@ with st.sidebar.expander("Scope"):
     config["climate_years"]["start"] = col1.selectbox("Start year", climate_years, index=climate_years.index(2016))
     config["climate_years"]["end"] = col2.selectbox("End year", climate_years, index=climate_years.index(2016))
 
+    # Select the resolution
+    resolutions = [f"{i}H" for i in range(24, 0, -1)]
+    config["resolution"] = st.select_slider("Resolution", resolutions, value="1H", format_func=utils.format_resolution)
+
     # Check if the config exceeds the demo bounds
     exceeds_demo = utils.is_demo and (config["climate_years"]["end"] > config["climate_years"]["start"] or len(config["country_codes"]) > 3)
 
@@ -86,7 +90,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency", "value_propagation"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -138,24 +142,6 @@ with st.sidebar.expander("Sensitivity analysis"):
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
-    elif sensitivity_analysis_type == "value_propagation":
-        sensitivity_start, sensitivity_stop = st.slider("Value propagation range range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
-        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
-
-# Set the time discretization parameters
-with st.sidebar.expander("Time discretization"):
-    config["time_discretization"] = {}
-
-    # Select the resolution steps
-    resolutions = ["1H", "2H", "4H", "6H", "12H", "1D"]
-    config["time_discretization"]["resolution_stages"] = st.multiselect("Resolution stages", resolutions, default=["1D", "1H"], format_func=utils.format_resolution)
-
-    # Select the relative boundary propagation
-    multiple_stages = len(config["time_discretization"]["resolution_stages"]) > 1
-    config["time_discretization"]["value_propagation"] = st.slider("Value propagation", value=1.0, disabled=not multiple_stages)
-
 
 # Set the optimization parameters
 with st.sidebar.expander("Optimization parameters"):

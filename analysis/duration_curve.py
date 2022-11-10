@@ -31,19 +31,18 @@ def _sort(data, *, ascending=False):
     return data_sorted
 
 
-def duration_curve(output_directory, resolution):
+def duration_curve(output_directory):
     """
     Analyze the storage
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     st.title("⌛ Duration curve")
 
     st.sidebar.header("Options")
 
     # Get the storage capacity and temporal results
-    all_temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
+    all_temporal_results = utils.get_temporal_results(output_directory, group="country")
 
     # Select a column as numerator and denominator
     st.sidebar.subheader("Columns")
