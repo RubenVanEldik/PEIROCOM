@@ -27,24 +27,18 @@ def run(config, *, status=None, output_directory):
     if status is None:
         status = Status()
 
-    results = {}
-    previous_resolution = None
-    for resolution in utils.get_sorted_resolution_stages(config, descending=True):
-        results[resolution] = optimize(config, resolution=resolution, previous_resolution=previous_resolution, status=status, output_directory=output_directory)
+    results = optimize(config, status=status, output_directory=output_directory)
 
-        # Store the duration of all resolutions after each optimization
-        duration = {resolution: results[resolution]["duration"] for resolution in results}
-        utils.write_yaml(output_directory / "duration.yaml", duration, exist_ok=True)
+    # Store the duration after the optimization
+    utils.write_yaml(output_directory / "duration.yaml", results["duration"], exist_ok=True)
 
-        # Stop the run if an error occured during the optimization of one of the resolutions
-        error_message = results[resolution].get("error_message")
-        if error_message:
-            status.update(error_message, status_type="error")
-            if config["send_notification"]:
-                utils.send_notification(error_message)
-            return error_message
-
-        previous_resolution = resolution
+    # Stop the run if an error occured during the optimization
+    error_message = results.get("error_message")
+    if error_message:
+        status.update(error_message, status_type="error")
+        if config["send_notification"]:
+            utils.send_notification(error_message)
+        return error_message
 
     # Store the config as a .YAML file
     utils.write_yaml(output_directory / "config.yaml", config)
@@ -75,9 +69,8 @@ def run_sensitivity(config, sensitivity_config):
     if sensitivity_config["analysis_type"] == "curtailment":
         # Calculate the optimal storage costs
         st.subheader(f"Sensitivity run 1.000")
-        highest_resolution = utils.get_sorted_resolution_stages(config)[0]
         run(config, status=status, output_directory=output_directory / "1.000")
-        optimal_storage_costs = {resolution: stats.firm_lcoe(output_directory / "1.000", resolution, breakdown_level=1)["storage"] for resolution in config["time_discretization"]["resolution_stages"]}
+        optimal_storage_costs = stats.firm_lcoe(output_directory / "1.000", breakdown_level=1)["storage"]
 
         # Send the notification
         if config["send_notification"]:
@@ -97,7 +90,7 @@ def run_sensitivity(config, sensitivity_config):
 
                 # Set the total storage costs for this step
                 step_config = deepcopy(config)
-                storage_costs_step = {resolution: float(relative_storage_costs * optimal_storage_costs[resolution]) for resolution in optimal_storage_costs}
+                storage_costs_step = float(relative_storage_costs * optimal_storage_costs)
                 utils.set_nested_key(step_config, "fixed_storage.costs", storage_costs_step)
                 fixed_storage_costs_direction = "gte" if step_factor > 1 else "lte" if step_factor < 1 else None
                 utils.set_nested_key(step_config, "fixed_storage.direction", fixed_storage_costs_direction)
@@ -118,11 +111,11 @@ def run_sensitivity(config, sensitivity_config):
                 sensitivity_config["steps"][step_key] = relative_storage_costs
 
                 # Calculate the curtailment
-                current_temporal_results = utils.get_temporal_results(output_directory_step, highest_resolution, group="all")
+                current_temporal_results = utils.get_temporal_results(output_directory_step, group="all")
                 current_curtailment = current_temporal_results.curtailed_MW.sum() / current_temporal_results.production_total_MW.sum()
 
                 # Break the while loop if the premium exceeds the maximum premium
-                firm_lcoe = stats.firm_lcoe(output_directory_step, highest_resolution)
+                firm_lcoe = stats.firm_lcoe(output_directory_step)
                 if firm_lcoe >= sensitivity_config["max_lcoe"]:
                     break
 
@@ -172,8 +165,6 @@ def run_sensitivity(config, sensitivity_config):
                 utils.set_nested_key(step_config, "interconnections.efficiency.hvdc", step_value)
             elif sensitivity_config["analysis_type"] == "self_sufficiency":
                 utils.set_nested_key(step_config, "interconnections.min_self_sufficiency", step_value)
-            elif sensitivity_config["analysis_type"] == "value_propagation":
-                utils.set_nested_key(step_config, "time_discretization.value_propagation", step_value)
 
             # Run the optimization
             run(step_config, status=status, output_directory=output_directory / step_key)

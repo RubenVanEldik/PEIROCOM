@@ -8,12 +8,11 @@ import utils
 import validate
 
 
-def _select_data(output_directory, resolution, *, name):
+def _select_data(output_directory, *, name):
     """
     Select the source of the data and the specific columns and aggregation type
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
     assert validate.is_string(name)
 
     # Get the source of the data
@@ -31,11 +30,11 @@ def _select_data(output_directory, resolution, *, name):
         statistic_method = getattr(stats, statistic_type)
 
         # Calculate the statistics for each country and convert them into a Series
-        return pd.Series({country_code: statistic_method(output_directory, resolution, country_codes=[country_code]) for country_code in config["country_codes"]})
+        return pd.Series({country_code: statistic_method(output_directory, country_codes=[country_code]) for country_code in config["country_codes"]})
 
     if data_source == "Temporal results":
         # Get the temporal results
-        all_temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
+        all_temporal_results = utils.get_temporal_results(output_directory, group="country")
 
         # Merge the DataFrames on a specific column
         relevant_columns = utils.find_common_columns(all_temporal_results)
@@ -61,7 +60,7 @@ def _select_data(output_directory, resolution, *, name):
 
     if data_source == "Production capacity":
         # Get the production capacity
-        production_capacity = utils.get_production_capacity(output_directory, resolution, group="country")
+        production_capacity = utils.get_production_capacity(output_directory, group="country")
 
         # Get the specific technologies
         selected_production_types = col2.multiselect("Type", production_capacity.columns, format_func=utils.format_technology, key=name)
@@ -75,7 +74,7 @@ def _select_data(output_directory, resolution, *, name):
         energy_or_power = storage_capacity_match.group(1)
 
         # Get the storage capacity
-        storage_capacity = utils.get_storage_capacity(output_directory, resolution, group="country")
+        storage_capacity = utils.get_storage_capacity(output_directory, group="country")
 
         # Create a DataFrame with all storage (energy or power) capacities
         storage_capacity_aggregated = None
@@ -92,12 +91,11 @@ def _select_data(output_directory, resolution, *, name):
             return storage_capacity_aggregated[selected_storage_types].sum(axis=1)
 
 
-def countries(output_directory, resolution):
+def countries(output_directory):
     """
     Show a choropleth map for all countries modeled in a run
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     st.title("🎌 Countries")
 
@@ -105,13 +103,13 @@ def countries(output_directory, resolution):
 
     # Check if the data should be relative and get the numerator data
     relative = st.sidebar.checkbox("Relative")
-    numerator = _select_data(output_directory, resolution, name="numerator")
+    numerator = _select_data(output_directory, name="numerator")
 
     # Set 'data' to the numerator, else get de denominator and divide the numerator with it
     if not relative:
         data = numerator
     else:
-        denominator = _select_data(output_directory, resolution, name="denominator")
+        denominator = _select_data(output_directory, name="denominator")
 
         if numerator is not None and denominator is not None:
             data = numerator / denominator

@@ -107,13 +107,11 @@ def is_config(value, *, required=True):
         return False
     if value["climate_years"]["start"] > value["climate_years"]["end"]:
         return False
+    if not is_resolution(value.get("resolution")):
+        return False
     if len(value.get("technologies").get("production")) == 0:
         return False
     if len(value.get("technologies").get("storage")) == 0:
-        return False
-    if not is_dict(value.get("time_discretization")):
-        return False
-    if not is_resolution_stages(value["time_discretization"].get("resolution_stages")):
         return False
     if not value.get("optimization"):
         return False
@@ -391,16 +389,6 @@ def is_resolution(value, *, required=True):
         return False
 
 
-def is_resolution_stages(value, *, required=True):
-    if value is None:
-        return not required
-
-    if type(value) is not list or len(value) == 0:
-        return False
-
-    return all(is_resolution(resolution) for resolution in value)
-
-
 def is_sensitivity_config(value, *, required=True):
     if value is None:
         return not required
@@ -408,7 +396,7 @@ def is_sensitivity_config(value, *, required=True):
     if not type(value) is dict:
         return False
 
-    return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency", "value_propagation"]
+    return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "baseload", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency"]
 
 
 def is_series(value, *, required=True):

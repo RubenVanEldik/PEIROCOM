@@ -10,14 +10,13 @@ import validate
 
 
 @utils.cache
-def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
+def _retrieve_statistics(steps, method, output_directory, **kwargs):
     """
     Retrieve the statistics for all steps
     """
     assert validate.is_series(steps)
     assert validate.is_string(method)
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     # Initialize the progress bar
     progress_bar = st.progress(0.0)
@@ -27,7 +26,7 @@ def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
 
     def _apply_step(step):
         # Retrieve the statistic for this step
-        step_data = getattr(stats, method)(output_directory / step, resolution, **kwargs)
+        step_data = getattr(stats, method)(output_directory / step, **kwargs)
         # Update the index
         index[0] += 1
         progress_bar.progress(index[0] / len(steps))
@@ -44,12 +43,11 @@ def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
     return data
 
 
-def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, *, label=None, line_color=colors.primary()):
+def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name, *, label=None, line_color=colors.primary()):
     """
     Analyze the sensitivity
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
     assert validate.is_sensitivity_config(sensitivity_config)
     assert validate.is_chart(sensitivity_plot)
     assert validate.is_string(statistic_name)
@@ -59,7 +57,7 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
     # Create a Series with the sensitivity steps as rows
     if sensitivity_config["analysis_type"] == "curtailment":
         # Use the actual curtailment as the index
-        step_index = [stats.relative_curtailment(output_directory / step, resolution) for step in sensitivity_config["steps"].keys()]
+        step_index = [stats.relative_curtailment(output_directory / step) for step in sensitivity_config["steps"].keys()]
     else:
         step_index = sensitivity_config["steps"].values()
     steps = pd.Series(data=sensitivity_config["steps"].keys(), index=step_index).sort_index()
@@ -76,13 +74,13 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
             sensitivity_plot.ax.set_ylabel("Firm LCOE (€/MWh)")
-            data = _retrieve_statistics(steps, "firm_lcoe", output_directory, resolution, breakdown_level=breakdown_level)
+            data = _retrieve_statistics(steps, "firm_lcoe", output_directory, breakdown_level=breakdown_level)
         if statistic_name == "unconstrained_lcoe":
             sensitivity_plot.ax.set_ylabel("Unconstrained LCOE (€/MWh)")
-            data = _retrieve_statistics(steps, "unconstrained_lcoe", output_directory, resolution, breakdown_level=breakdown_level)
+            data = _retrieve_statistics(steps, "unconstrained_lcoe", output_directory, breakdown_level=breakdown_level)
         if statistic_name == "premium":
             sensitivity_plot.ax.set_ylabel("Firm kWh premium")
-            data = _retrieve_statistics(steps, "premium", output_directory, resolution, breakdown_level=breakdown_level)
+            data = _retrieve_statistics(steps, "premium", output_directory, breakdown_level=breakdown_level)
 
         # Plot the data depending on the breakdown level
         if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
@@ -120,19 +118,19 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
                 sensitivity_plot.ax.fill_between(data[technology].index, cumulative_data - data[technology], cumulative_data, label=utils.format_technology(technology), facecolor=colors.technology(technology))
             sensitivity_plot.ax.legend()
     if statistic_name == "relative_curtailment":
-        data = _retrieve_statistics(steps, "relative_curtailment", output_directory, resolution)
+        data = _retrieve_statistics(steps, "relative_curtailment", output_directory)
         sensitivity_plot.ax.set_ylabel("Relative curtailment (%)")
         sensitivity_plot.ax.plot(data, label=label, color=line_color)
         sensitivity_plot.format_yticklabels("{:,.0%}")
     if statistic_name == "production_capacity":
-        data = _retrieve_statistics(steps, "production_capacity", output_directory, resolution) / 1000
+        data = _retrieve_statistics(steps, "production_capacity", output_directory) / 1000
         for production_technology in data:
             sensitivity_plot.ax.plot(data[production_technology], color=colors.technology(production_technology), label=utils.format_technology(production_technology))
         sensitivity_plot.ax.set_ylabel("Production capacity (GW)")
         sensitivity_plot.ax.legend()
     if statistic_name == "storage_capacity":
         storage_capacity_type = st.sidebar.selectbox("Storage capacity type", ["energy", "power"], format_func=utils.format_str)
-        data = steps.apply(lambda step: pd.Series(stats.storage_capacity(output_directory / step, resolution, storage_type=storage_capacity_type)))
+        data = steps.apply(lambda step: pd.Series(stats.storage_capacity(output_directory / step, storage_type=storage_capacity_type)))
         data = data / 10 ** 6 if storage_capacity_type == "energy" else data / 10 ** 3
         for storage_technology in data:
             sensitivity_plot.ax.plot(data[storage_technology], color=colors.technology(storage_technology), label=utils.format_technology(storage_technology))
@@ -155,12 +153,11 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
     return data
 
 
-def sensitivity(output_directory, resolution):
+def sensitivity(output_directory):
     """
     Analyze the sensitivity
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_resolution(resolution)
 
     st.title("⚖️ Sensitivity analysis")
 
@@ -182,9 +179,9 @@ def sensitivity(output_directory, resolution):
         for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
             label = utils.format_technology(technology_name)
             line_color = colors.technology(technology_name)
-            sensitivity_data[technology_name] = _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, label=label, line_color=line_color)
+            sensitivity_data[technology_name] = _plot(output_directory / technology_name, sensitivity_config, sensitivity_plot, statistic_name, label=label, line_color=line_color)
     else:
-        sensitivity_data = _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name)
+        sensitivity_data = _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)
@@ -217,9 +214,6 @@ def sensitivity(output_directory, resolution):
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "self_sufficiency":
         sensitivity_plot.ax.set_xlabel("Minimum self sufficiency (%)")
-        sensitivity_plot.format_xticklabels("{:,.0%}")
-    elif sensitivity_config["analysis_type"] == "value_propagation":
-        sensitivity_plot.ax.set_xlabel("Value propagation (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot

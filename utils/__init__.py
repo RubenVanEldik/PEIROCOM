@@ -23,7 +23,6 @@ from .get_next_run_name import get_next_run_name
 from .get_previous_runs import get_previous_runs
 from .get_production_capacity import get_production_capacity
 from .get_production_potential_in_climate_zone import get_production_potential_in_climate_zone
-from .get_sorted_resolution_stages import get_sorted_resolution_stages
 from .get_storage_capacity import get_storage_capacity
 from .get_storage_potential_in_bidding_zone import get_storage_potential_in_bidding_zone
 from .get_temporal_results import get_temporal_results
