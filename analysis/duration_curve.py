@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 import re
 import streamlit as st
 
@@ -5,6 +7,28 @@ import chart
 import colors
 import utils
 import validate
+
+
+def _sort(data, *, ascending=False):
+    """
+    Sort a DataFrame or Series and give it an index from 0 to 1
+    """
+    assert validate.is_dataframe(data) or validate.is_series(data)
+    assert validate.is_bool(ascending)
+
+    # Create an index from 0 to 1
+    index = np.linspace(start=0, stop=1, num=len(data.index))
+
+    # Return a sorted Series if the data is a Series
+    if validate.is_series(data):
+        return pd.Series(data.sort_values(ascending=ascending).tolist(), index=index)
+
+    # Return a sorted DataFrame if the data is a DataFrame
+    data_sorted = pd.DataFrame(index=index)
+    for column_name in data:
+        data_sorted[column_name] = data[column_name].sort_values(ascending=ascending).tolist()
+
+    return data_sorted
 
 
 def duration_curve(output_directory, resolution):
@@ -54,19 +78,19 @@ def duration_curve(output_directory, resolution):
     ignore_zeroes = st.sidebar.checkbox("Ignore zeroes", value=False)
     unity_line = st.sidebar.checkbox("Unity line", value=False)
 
-    # Create two new DataFrames with only the numerator/denominator column and all values sorted
-    waterfall_df = utils.merge_dataframes_on_column(all_temporal_results, numerator, sorted=True)
+    # Calculate the waterfall DataFrame (for each country) and Series (for all countries combined)
     if denominator:
-        denominator_df = utils.merge_dataframes_on_column(all_temporal_results, denominator, sorted=True)
-        waterfall_df = waterfall_df / denominator_df.max()
+        numerator_df = utils.merge_dataframes_on_column(all_temporal_results, numerator)
+        denominator_df = utils.merge_dataframes_on_column(all_temporal_results, denominator)
+        waterfall_df = _sort(numerator_df / denominator_df)
+        waterfall_df_mean = _sort((numerator_df / denominator_df).mean(axis=1))
+    else:
+        numerator_df = utils.merge_dataframes_on_column(all_temporal_results, numerator)
+        waterfall_df = _sort(numerator_df)
+        waterfall_df_mean = _sort(numerator_df.mean(axis=1))
 
     # Create the chart
     waterfall_plot = chart.Chart(xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
-
-    # Create an index ranging from 0 to 1
-    num_rows = waterfall_df.shape[0]
-    waterfall_df["index"] = [i / num_rows for i in range(num_rows)]
-    waterfall_df = waterfall_df.set_index("index")
 
     # Remove all rows where all values are zero
     if ignore_zeroes:
@@ -82,7 +106,7 @@ def duration_curve(output_directory, resolution):
         waterfall_plot.ax.plot(waterfall_df, color=colors.primary(alpha=0.1), linewidth=1)
 
     # Plot the mean values
-    waterfall_plot.ax.plot(waterfall_df.mean(axis=1), color=colors.primary())
+    waterfall_plot.ax.plot(waterfall_df_mean, color=colors.primary())
 
     # Plot the unity line
     if unity_line:
