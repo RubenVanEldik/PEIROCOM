@@ -67,6 +67,6 @@ def correlation(output_directory, resolution):
     # Show the table in an expander
     with st.expander("Data points"):
         correlations_df.columns = [utils.format_str(column_name) for column_name in correlations_df.columns]
-        correlations_df["index"] = [f"{utils.get_country_property(from_country_code, 'name')} & {utils.get_country_property(to_country_code, 'name')}" for from_country_code, to_country_code in correlations.index]
+        correlations_df["index"] = [f"{utils.get_country_property(from_country_code, 'name')} & {utils.get_country_property(to_country_code, 'name')}" for from_country_code, to_country_code in correlations_df.index]
         correlations_df = correlations_df.set_index("index")
         st.table(correlations_df)
