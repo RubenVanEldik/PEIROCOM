@@ -98,3 +98,7 @@ def duration_curve(output_directory, resolution):
     # Plot the figure
     waterfall_plot.display()
     waterfall_plot.download_button("duration_curve.png")
+
+    # Show the table in an expander
+    with st.expander("Data points"):
+        st.dataframe(waterfall_df)
