@@ -63,3 +63,10 @@ def correlation(output_directory, resolution):
     # Show the plot
     correlation_plot.display()
     correlation_plot.download_button("correlation.png")
+
+    # Show the table in an expander
+    with st.expander("Data points"):
+        correlations.columns = [utils.format_str(column_name) for column_name in correlations.columns]
+        correlations["index"] = [f"{utils.get_country_property(from_country_code, 'name')} & {utils.get_country_property(to_country_code, 'name')}" for from_country_code, to_country_code in correlations.index]
+        correlations = correlations.set_index("index")
+        st.table(correlations)
