@@ -146,3 +146,7 @@ def countries(output_directory, resolution):
         map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
         map.display()
         map.download_button("countries.png")
+
+        # Show the table in an expander
+        with st.expander("Data points"):
+            st.table(data / unit)
