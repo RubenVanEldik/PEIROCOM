@@ -91,7 +91,7 @@ with st.sidebar.expander("Sensitivity analysis"):
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
-    if sensitivity_analysis_type is "-":
+    if sensitivity_analysis_type == "-":
         sensitivity_config = None
     else:
         sensitivity_config = {"analysis_type": sensitivity_analysis_type}
