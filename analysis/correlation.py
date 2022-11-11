@@ -40,22 +40,22 @@ def correlation(output_directory, resolution):
     # Calculate the distance and R-squared for each country pair
     index = [(column_name1, column_name2) for column_name1 in temporal_results for column_name2 in temporal_results if column_name1 < column_name2]
     columns = ["distance", "r_squared"]
-    correlations = pd.DataFrame(index=index, columns=columns)
-    correlations["distance"] = correlations.apply(lambda row: utils.calculate_distance(geometries.loc[row.name[0], "centroid"], geometries.loc[row.name[1], "centroid"]) / 1000, axis=1)
-    correlations["r_squared"] = correlations.apply(lambda row: utils.calculate_r_squared(temporal_results[row.name[0]], temporal_results[row.name[1]]), axis=1)
+    correlations_df = pd.DataFrame(index=index, columns=columns)
+    correlations_df["distance"] = correlations_df.apply(lambda row: utils.calculate_distance(geometries.loc[row.name[0], "centroid"], geometries.loc[row.name[1], "centroid"]) / 1000, axis=1)
+    correlations_df["r_squared"] = correlations_df.apply(lambda row: utils.calculate_r_squared(temporal_results[row.name[0]], temporal_results[row.name[1]]), axis=1)
 
     # Create a scatter plot
     correlation_plot = chart.Chart(xlabel="Distance (km)", ylabel="Coefficient of determination")
     correlation_plot.ax.set_ylim([0, 1])
     correlation_plot.format_yticklabels("{:,.0%}")
-    correlation_plot.ax.scatter(correlations.distance, correlations.r_squared, color=colors.primary(alpha=0.5), linewidths=0)
+    correlation_plot.ax.scatter(correlations_df.distance, correlations_df.r_squared, color=colors.primary(alpha=0.5), linewidths=0)
 
     # Add a regression line if the checkbox is checked
     if st.sidebar.checkbox("Show regression line"):
         regression_function_string = st.sidebar.text_input("Curve formula", value="a + b * x", help="Use a, b, and c as variables and use x for the x-value")
         regression_function = eval(f"lambda x, a, b, c: {regression_function_string}")
         try:
-            regression_line = utils.fit_curve(correlations.distance, correlations.r_squared, function=regression_function)
+            regression_line = utils.fit_curve(correlations_df.distance, correlations_df.r_squared, function=regression_function)
             correlation_plot.ax.plot(regression_line, color=colors.get("red", 600))
         except:
             st.sidebar.error("The function is not valid")
@@ -66,7 +66,7 @@ def correlation(output_directory, resolution):
 
     # Show the table in an expander
     with st.expander("Data points"):
-        correlations.columns = [utils.format_str(column_name) for column_name in correlations.columns]
-        correlations["index"] = [f"{utils.get_country_property(from_country_code, 'name')} & {utils.get_country_property(to_country_code, 'name')}" for from_country_code, to_country_code in correlations.index]
-        correlations = correlations.set_index("index")
-        st.table(correlations)
+        correlations_df.columns = [utils.format_str(column_name) for column_name in correlations_df.columns]
+        correlations_df["index"] = [f"{utils.get_country_property(from_country_code, 'name')} & {utils.get_country_property(to_country_code, 'name')}" for from_country_code, to_country_code in correlations.index]
+        correlations_df = correlations_df.set_index("index")
+        st.table(correlations_df)
