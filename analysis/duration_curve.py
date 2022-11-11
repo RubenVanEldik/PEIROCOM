@@ -76,7 +76,6 @@ def duration_curve(output_directory, resolution):
     st.sidebar.subheader("Options")
     range_area = st.sidebar.checkbox("Range area", value=True)
     individual_lines = st.sidebar.checkbox("Individual lines", value=False)
-    ignore_zeroes = st.sidebar.checkbox("Ignore zeroes", value=False)
     unity_line = st.sidebar.checkbox("Unity line", value=False)
 
     # Calculate the waterfall DataFrame (for each country) and Series (for all countries combined)
@@ -94,11 +93,6 @@ def duration_curve(output_directory, resolution):
 
     # Create the chart
     waterfall_plot = chart.Chart(xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
-
-    # Remove all rows where all values are zero
-    if ignore_zeroes:
-        last_non_zero_row = waterfall_df[waterfall_df.max(axis=1) != 0].iloc[-1].name
-        waterfall_df = waterfall_df[:last_non_zero_row]
 
     # Plot the range fill
     if range_area:
