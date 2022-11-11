@@ -149,4 +149,5 @@ def countries(output_directory, resolution):
 
         # Show the table in an expander
         with st.expander("Data points"):
+            data.index = [utils.get_country_property(country_code, "name") for country_code in data.index]
             st.table(data / unit)
