@@ -55,6 +55,7 @@ def duration_curve(output_directory, resolution):
         col1, col2 = st.sidebar.columns(2)
         numerator = col1.selectbox("Numerator", relevant_columns, format_func=utils.format_column_name)
         denominator = col2.selectbox("Denominator", relevant_columns, format_func=utils.format_column_name)
+        denominator_type = col2.selectbox("Denominator type", ["series", "min", "mean", "max"], format_func=utils.format_str)
     else:
         numerator = st.sidebar.selectbox("Column", relevant_columns, format_func=utils.format_column_name)
         denominator = None
@@ -64,7 +65,7 @@ def duration_curve(output_directory, resolution):
     col1, col2 = st.sidebar.columns(2)
     ylabel_match = re.search("(.+)_(\w+)$", numerator)
     ylabel_text = utils.format_str(ylabel_match.group(1))
-    ylabel_unit = ylabel_match.group(2) if denominator is None else "%"
+    ylabel_unit = ylabel_match.group(2) if denominator is None else "%" if denominator_type == "series" else f"$\%_{{{denominator_type}}}$"
     xlabel = col1.text_input("Label x-axis", value="Time (%)")
     ylabel = col2.text_input("Label y-axis", value=f"{ylabel_text} ({ylabel_unit})")
     axis_scale_options = ["linear", "log", "symlog", "logit"]
@@ -82,6 +83,8 @@ def duration_curve(output_directory, resolution):
     if denominator:
         numerator_df = utils.merge_dataframes_on_column(all_temporal_results, numerator)
         denominator_df = utils.merge_dataframes_on_column(all_temporal_results, denominator)
+        if denominator_type != "series":
+            denominator_df = getattr(denominator_df, denominator_type)()
         waterfall_df = _sort(numerator_df / denominator_df)
         waterfall_df_mean = _sort((numerator_df / denominator_df).mean(axis=1))
     else:
