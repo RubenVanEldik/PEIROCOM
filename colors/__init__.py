@@ -3,6 +3,9 @@ from matplotlib.colors import LinearSegmentedColormap
 import validate
 import utils
 
+# Read the colors file
+all_colors = utils.read_csv(utils.path("colors", "colors.csv"), index_col=0)
+
 
 def get(color, value, *, alpha=1):
     """
@@ -12,9 +15,8 @@ def get(color, value, *, alpha=1):
     assert validate.is_color_value(value)
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    colors = utils.read_csv(utils.path("colors", "colors.csv"), index_col=0)
     alpha_hex = hex(round(alpha * 255))[2:].upper().rjust(2, "0")
-    return f"{colors.loc[value, color]}{alpha_hex}"
+    return f"{all_colors.loc[value, color]}{alpha_hex}"
 
 
 def primary(*, alpha=0.8):
