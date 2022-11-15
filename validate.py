@@ -7,7 +7,6 @@ import re
 import shapely
 
 import chart
-import colors
 
 
 def is_bidding_zone(value, *, required=True):
@@ -76,7 +75,9 @@ def is_color_name(value, *, required=True):
     if value is None:
         return not required
 
-    return value in colors.list()
+    # Don't use utils.read_csv because it might create a circular import
+    colors = ["slate", "gray", "zinc", "neutral", "stone", "red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky", "blue", "indigo", "violet", "purple", "fuchsia", "pink", "rose"]
+    return value in colors
 
 
 def is_color_value(value, *, required=True):

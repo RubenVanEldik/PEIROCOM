@@ -97,14 +97,6 @@ def random(color=None, value=None, alpha=0.8):
     return get(color, value, alpha=alpha)
 
 
-def list():
-    """
-    Return a list of all available colors
-    """
-    colors = utils.read_csv(utils.path("colors", "colors.csv"), index_col=0)
-    return colors.columns.tolist()
-
-
 def colormap(color1, color2=None, *, alpha=1):
     """
     Return a colormap based on one or two colors
