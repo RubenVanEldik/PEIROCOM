@@ -3,6 +3,7 @@ import re
 import streamlit as st
 
 import chart
+import colors
 import stats
 import utils
 import validate
@@ -51,6 +52,7 @@ def _select_data(output_directory, resolution, *, name):
 
         # Select the numeric parameter that should be shown
         country_parameters = list(set([parameter for country in country_info for parameter in country if isinstance(country[parameter], (int, float))]))
+        country_parameters += list(set([f"current.{technology}" for country in country_info for technology in country["current"]]))
         country_parameters += list(set([f"potential.{technology}" for country in country_info for technology in country["potential"]]))
         selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace(".", " ")), key=name)
 
@@ -68,7 +70,7 @@ def _select_data(output_directory, resolution, *, name):
 
         # Return the sum the capacities of all selected technologies
         if selected_production_types:
-            return production_capacity[selected_production_types].sum(axis=1)
+            return production_capacity[selected_production_types]
 
     storage_capacity_match = re.search("Storage capacity \((.+)\)$", data_source)
     if storage_capacity_match:
@@ -89,7 +91,7 @@ def _select_data(output_directory, resolution, *, name):
 
         # Return the sum the capacities of all selected technologies
         if selected_storage_types:
-            return storage_capacity_aggregated[selected_storage_types].sum(axis=1)
+            return storage_capacity_aggregated[selected_storage_types]
 
 
 def countries(output_directory, resolution):
@@ -114,7 +116,11 @@ def countries(output_directory, resolution):
         denominator = _select_data(output_directory, resolution, name="denominator")
 
         if numerator is not None and denominator is not None:
-            data = numerator / denominator
+            # Sum the denominator if its a DataFrame
+            if validate.is_dataframe(denominator):
+                denominator = denominator.sum(axis=1)
+
+            data = numerator.divide(list(denominator), axis=0)
         else:
             data = None
 
@@ -122,11 +128,16 @@ def countries(output_directory, resolution):
     if data is not None:
         # Get the label for the color bar
         label = st.sidebar.text_input("Label")
-        format_percentage = st.sidebar.checkbox("Show as percentage")
 
-        # If data is still a DataFrame, convert the single column DataFrame to a series (only applicable when the 'mode' aggregator has been used)
-        if validate.is_dataframe(data):
-            data = data[data.columns[0]]
+        # Show zero values as white areas
+        if st.sidebar.checkbox("Exclude zero values"):
+            data.loc[data == 0] = None
+
+        # Ask if the data should be shown as a (stacked) bar chart
+        show_stacked_bar_chart = st.sidebar.checkbox("Show as a (stacked) bar chart")
+
+        # Ask if the data should be formatted as a percentage
+        format_percentage = st.sidebar.checkbox("Show as percentage")
 
         # Remove excluded countries from the data
         excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts_2: utils.get_country_property(nuts_2, "name"))
@@ -137,6 +148,40 @@ def countries(output_directory, resolution):
         unit = st.sidebar.select_slider("Format units", units.keys(), value=1, format_func=lambda key: units[key])
 
         # Create and show the map
-        map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
-        map.display()
-        map.download_button("countries.png")
+        if show_stacked_bar_chart:
+            # Initialize bar chart
+            bar_chart = chart.Chart(xlabel="Countries", ylabel=label)
+            bar_width = 0.8
+
+            if validate.is_dataframe(data):
+                bottom = 0
+                for column_name in data:
+                    color = colors.technology(column_name) if validate.is_technology(column_name) else colors.random()
+                    bar_chart.ax.bar(data.index, data[column_name], bar_width, bottom=bottom, label=utils.format_str(column_name), color=color)
+                    bottom += data[column_name]
+                bar_chart.ax.legend()
+            else:
+                bar_chart.ax.bar(data.index, data, bar_width, color=colors.primary())
+
+            if format_percentage:
+                bar_chart.format_yticklabels("{:,.0%}")
+
+            country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
+            bar_chart.ax.set_xticklabels(country_names, fontsize=8, rotation=90)
+            padding = bar_width - (1 - bar_width) / 2
+            bar_chart.ax.set_xlim(-padding, len(data.index) - (1 - padding))
+            bar_chart.display()
+            bar_chart.download_button("countries.png")
+        else:
+            # If data is still a DataFrame, convert the single column DataFrame to a series
+            if validate.is_dataframe(data):
+                data = data.sum(axis=1)
+
+            map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
+            map.display()
+            map.download_button("countries.png")
+
+        # Show the table in an expander
+        with st.expander("Data points"):
+            data.index = [utils.get_country_property(country_code, "name") for country_code in data.index]
+            st.table(data / unit)

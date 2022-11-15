@@ -79,7 +79,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             # Get the temporal results from the previous run
             previous_temporal_results = utils.read_csv(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv", parse_dates=True, index_col=0)
             # Multiply the previous temporal results witht the propagation factor
-            previous_temporal_results = config["time_discretization"]["temporal_propagation"] * previous_temporal_results
+            previous_temporal_results = config["time_discretization"]["value_propagation"] * previous_temporal_results
             # Resample the previous results so it has the same timestamps as the current step
             previous_temporal_results = previous_temporal_results.resample(resolution).mean()
             # Find and add the rows that are missing in the previous results (the resample method does not add rows after the last timestamp)
@@ -114,7 +114,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             climate_zones = [re.match(f"{production_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{production_technology}_")]
             production_potential = utils.get_production_potential_in_climate_zone(bidding_zone, production_technology, config=config)
             if previous_resolution:
-                previous_production_capacity = config["time_discretization"]["capacity_propagation"] * utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", dtype={"Unnamed: 0": str}).set_index("Unnamed: 0")
+                previous_production_capacity = config["time_discretization"]["value_propagation"] * utils.read_csv(output_directory / previous_resolution / "production_capacities" / f"{bidding_zone}.csv", dtype={"Unnamed: 0": str}).set_index("Unnamed: 0")
                 capacities = {}
                 for climate_zone in climate_zones:
                     previous_production_capacity_climate_zone = previous_production_capacity.loc[climate_zone, production_technology]
@@ -162,7 +162,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 storage_capacity[bidding_zone].loc[storage_technology, "energy"] = 0
                 storage_capacity[bidding_zone].loc[storage_technology, "power"] = 0
             elif previous_resolution:
-                previous_storage_capacity = config["time_discretization"]["capacity_propagation"] * utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
+                previous_storage_capacity = config["time_discretization"]["value_propagation"] * utils.read_csv(output_directory / previous_resolution / "storage_capacities" / f"{bidding_zone}.csv", index_col=0)
                 if previous_storage_capacity.loc[storage_technology, "energy"] == storage_potential:
                     storage_capacity[bidding_zone].loc[storage_technology, "energy"] = storage_potential
                 else:

@@ -44,7 +44,7 @@ def _retrieve_statistics(steps, method, output_directory, resolution, **kwargs):
     return data
 
 
-def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, *, label=None, line_color=colors.primary()):
+def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, *, label=None, line_color=colors.primary()):
     """
     Analyze the sensitivity
     """
@@ -53,7 +53,6 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
     assert validate.is_sensitivity_config(sensitivity_config)
     assert validate.is_chart(sensitivity_plot)
     assert validate.is_string(statistic_name)
-    assert validate.is_integer(breakdown_level, min_value=0, max_value=2)
     assert validate.is_string(label, required=False)
     assert validate.is_color(line_color)
 
@@ -67,6 +66,13 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
 
     # Add the output for the sensitivity steps to the sensitivity plot
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"]:
+        # Ask for the breakdown level
+        if sensitivity_config["analysis_type"] == "technology_scenario":
+            breakdown_level = 0
+        else:
+            breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
+            breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
+
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
             sensitivity_plot.ax.set_ylabel("Firm LCOE (€/MWh)")
@@ -80,7 +86,28 @@ def _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, st
 
         # Plot the data depending on the breakdown level
         if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
-            sensitivity_plot.ax.plot(data, label=label, color=line_color)
+            if st.sidebar.checkbox("Fit a curve on the data"):
+                sensitivity_plot.ax.scatter(data.index, data, label=label, color=colors.primary(alpha=0.5), linewidths=0)
+                try:
+                    # Get the regression function as a string and make it a lambda function
+                    regression_function_string = st.sidebar.text_input("Curve formula", value="a + b * x", help="Use a, b, and c as variables and use x for the x-value")
+                    regression_function = eval(f"lambda x, a, b, c: {regression_function_string}")
+
+                    # Fit the curve
+                    regression_line, parameters = utils.fit_curve(pd.Series(data.index), data, function=regression_function, return_parameters=True)
+
+                    # Format the regression string
+                    regression_function_string_formatted = f"${regression_function_string}$"
+                    for old_substring, new_substring in [("a ", f"{parameters[0]:.2f} "), (" b ", f" {parameters[1]:.2f} "), (" c ", f" {parameters[2]:.2f} "), (" * ", " \cdot ")]:
+                        regression_function_string_formatted = regression_function_string_formatted.replace(old_substring, new_substring)
+
+                    # Plot the regression line
+                    sensitivity_plot.ax.plot(regression_line, color=colors.get("red", 600), label=regression_function_string_formatted)
+                    sensitivity_plot.ax.legend()
+                except:
+                    st.sidebar.error("The function is not valid")
+            else:
+                sensitivity_plot.ax.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
             sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
             sensitivity_plot.ax.plot(data["production"], color=colors.technology_type("production"), label="Production")
@@ -148,12 +175,6 @@ def sensitivity(output_directory, resolution):
         statistic_options += ["production_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
-    # Ask for the breakdown level and if the cumulative results should be shown
-    breakdown_level = 0
-    if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"] and sensitivity_config["analysis_type"] != "technology_scenario":
-        breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
-        breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
-
     # Plot the data
     sensitivity_plot = chart.Chart(xlabel=None, ylabel=None)
     if sensitivity_config["analysis_type"] == "technology_scenario":
@@ -161,9 +182,9 @@ def sensitivity(output_directory, resolution):
         for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
             label = utils.format_technology(technology_name)
             line_color = colors.technology(technology_name)
-            sensitivity_data[technology_name] = _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level, label=label, line_color=line_color)
+            sensitivity_data[technology_name] = _plot(output_directory / technology_name, resolution, sensitivity_config, sensitivity_plot, statistic_name, label=label, line_color=line_color)
     else:
-        sensitivity_data = _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name, breakdown_level)
+        sensitivity_data = _plot(output_directory, resolution, sensitivity_config, sensitivity_plot, statistic_name)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)
@@ -196,6 +217,9 @@ def sensitivity(output_directory, resolution):
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "self_sufficiency":
         sensitivity_plot.ax.set_xlabel("Minimum self sufficiency (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "value_propagation":
+        sensitivity_plot.ax.set_xlabel("Value propagation (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot

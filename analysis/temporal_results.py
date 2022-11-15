@@ -43,5 +43,5 @@ def temporal_results(output_directory, resolution):
         st.line_chart(temporal_results)
 
         # Show the table in an expander
-        with st.expander("Raw data"):
+        with st.expander("Data points"):
             st.dataframe(temporal_results)

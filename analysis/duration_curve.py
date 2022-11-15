@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 import re
 import streamlit as st
 
@@ -5,6 +7,28 @@ import chart
 import colors
 import utils
 import validate
+
+
+def _sort(data, *, ascending=False):
+    """
+    Sort a DataFrame or Series and give it an index from 0 to 1
+    """
+    assert validate.is_dataframe(data) or validate.is_series(data)
+    assert validate.is_bool(ascending)
+
+    # Create an index from 0 to 1
+    index = np.linspace(start=0, stop=1, num=len(data.index))
+
+    # Return a sorted Series if the data is a Series
+    if validate.is_series(data):
+        return pd.Series(data.sort_values(ascending=ascending).tolist(), index=index)
+
+    # Return a sorted DataFrame if the data is a DataFrame
+    data_sorted = pd.DataFrame(index=index)
+    for column_name in data:
+        data_sorted[column_name] = data[column_name].sort_values(ascending=ascending).tolist()
+
+    return data_sorted
 
 
 def duration_curve(output_directory, resolution):
@@ -31,6 +55,7 @@ def duration_curve(output_directory, resolution):
         col1, col2 = st.sidebar.columns(2)
         numerator = col1.selectbox("Numerator", relevant_columns, format_func=utils.format_column_name)
         denominator = col2.selectbox("Denominator", relevant_columns, format_func=utils.format_column_name)
+        denominator_type = col2.selectbox("Denominator type", ["series", "min", "mean", "max"], format_func=utils.format_str)
     else:
         numerator = st.sidebar.selectbox("Column", relevant_columns, format_func=utils.format_column_name)
         denominator = None
@@ -40,7 +65,7 @@ def duration_curve(output_directory, resolution):
     col1, col2 = st.sidebar.columns(2)
     ylabel_match = re.search("(.+)_(\w+)$", numerator)
     ylabel_text = utils.format_str(ylabel_match.group(1))
-    ylabel_unit = ylabel_match.group(2) if denominator is None else "%"
+    ylabel_unit = ylabel_match.group(2) if denominator is None else "%" if denominator_type == "series" else f"$\%_{{{denominator_type}}}$"
     xlabel = col1.text_input("Label x-axis", value="Time (%)")
     ylabel = col2.text_input("Label y-axis", value=f"{ylabel_text} ({ylabel_unit})")
     axis_scale_options = ["linear", "log", "symlog", "logit"]
@@ -51,27 +76,23 @@ def duration_curve(output_directory, resolution):
     st.sidebar.subheader("Options")
     range_area = st.sidebar.checkbox("Range area", value=True)
     individual_lines = st.sidebar.checkbox("Individual lines", value=False)
-    ignore_zeroes = st.sidebar.checkbox("Ignore zeroes", value=False)
     unity_line = st.sidebar.checkbox("Unity line", value=False)
 
-    # Create two new DataFrames with only the numerator/denominator column and all values sorted
-    waterfall_df = utils.merge_dataframes_on_column(all_temporal_results, numerator, sorted=True)
+    # Calculate the waterfall DataFrame (for each country) and Series (for all countries combined)
     if denominator:
-        denominator_df = utils.merge_dataframes_on_column(all_temporal_results, denominator, sorted=True)
-        waterfall_df = waterfall_df / denominator_df.max()
+        numerator_df = utils.merge_dataframes_on_column(all_temporal_results, numerator)
+        denominator_df = utils.merge_dataframes_on_column(all_temporal_results, denominator)
+        if denominator_type != "series":
+            denominator_df = getattr(denominator_df, denominator_type)()
+        waterfall_df = _sort(numerator_df / denominator_df)
+        waterfall_df_mean = _sort((numerator_df / denominator_df).mean(axis=1))
+    else:
+        numerator_df = utils.merge_dataframes_on_column(all_temporal_results, numerator)
+        waterfall_df = _sort(numerator_df)
+        waterfall_df_mean = _sort(numerator_df.mean(axis=1))
 
     # Create the chart
     waterfall_plot = chart.Chart(xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
-
-    # Create an index ranging from 0 to 1
-    num_rows = waterfall_df.shape[0]
-    waterfall_df["index"] = [i / num_rows for i in range(num_rows)]
-    waterfall_df = waterfall_df.set_index("index")
-
-    # Remove all rows where all values are zero
-    if ignore_zeroes:
-        last_non_zero_row = waterfall_df[waterfall_df.max(axis=1) != 0].iloc[-1].name
-        waterfall_df = waterfall_df[:last_non_zero_row]
 
     # Plot the range fill
     if range_area:
@@ -79,10 +100,10 @@ def duration_curve(output_directory, resolution):
 
     # Plot a line for each column (country)
     if individual_lines:
-        waterfall_plot.ax.plot(waterfall_df, color=colors.primary(alpha=0.5), linewidth=1)
+        waterfall_plot.ax.plot(waterfall_df, color=colors.primary(alpha=0.1), linewidth=1)
 
     # Plot the mean values
-    waterfall_plot.ax.plot(waterfall_df.mean(axis=1), color=colors.primary())
+    waterfall_plot.ax.plot(waterfall_df_mean, color=colors.primary())
 
     # Plot the unity line
     if unity_line:
@@ -98,3 +119,7 @@ def duration_curve(output_directory, resolution):
     # Plot the figure
     waterfall_plot.display()
     waterfall_plot.download_button("duration_curve.png")
+
+    # Show the table in an expander
+    with st.expander("Data points"):
+        st.dataframe(waterfall_df)
