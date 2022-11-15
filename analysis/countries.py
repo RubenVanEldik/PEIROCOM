@@ -131,9 +131,6 @@ def countries(output_directory, resolution):
         # Format the data as a percentage
         format_percentage = st.sidebar.checkbox("Show as percentage")
 
-        # If data is still a DataFrame, convert the single column DataFrame to a series (only applicable when the 'mode' aggregator has been used)
-        if validate.is_dataframe(data):
-            data = data[data.columns[0]]
 
         # Remove excluded countries from the data
         excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts_2: utils.get_country_property(nuts_2, "name"))
