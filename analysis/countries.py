@@ -130,7 +130,8 @@ def countries(output_directory, resolution):
         label = st.sidebar.text_input("Label")
 
         # Show zero values as white areas
-        if st.sidebar.checkbox("Exclude zero values"):
+        exclude_zero_values = st.sidebar.checkbox("Exclude zero values")
+        if exclude_zero_values:
             data.loc[data == 0] = None
 
         # Ask if the data should be shown as a (stacked) bar chart
@@ -149,6 +150,10 @@ def countries(output_directory, resolution):
 
         # Create and show the map
         if show_stacked_bar_chart:
+            # Drop the non-exising values when zero values are excluded
+            if exclude_zero_values:
+                data = data.dropna()
+
             # Initialize bar chart
             bar_chart = chart.Chart(xlabel="Countries", ylabel=label, wide=True)
             bar_width = 0.8
