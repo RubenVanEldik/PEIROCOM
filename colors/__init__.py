@@ -1,11 +1,11 @@
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+import pandas as pd
 
 import validate
-import utils
 
-# Read the colors file
-all_colors = utils.read_csv(utils.path("colors", "colors.csv"), index_col=0)
+# Read the colors file (don't use utils.read_csv since it might create a circular import)
+all_colors = pd.read_csv("./colors/colors.csv", index_col=0)
 
 
 def get(color, value, *, alpha=1):
