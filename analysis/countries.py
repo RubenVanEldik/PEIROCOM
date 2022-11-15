@@ -155,7 +155,7 @@ def countries(output_directory, resolution):
                 data = data.dropna()
 
             # Initialize bar chart
-            bar_chart = chart.Chart(xlabel="Countries", ylabel=label, wide=True)
+            bar_chart = chart.Chart(xlabel="", ylabel=label, wide=True)
             bar_width = 0.8
 
             if validate.is_dataframe(data):
