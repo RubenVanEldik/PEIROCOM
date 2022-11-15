@@ -1,3 +1,4 @@
+import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
 import validate
@@ -76,6 +77,24 @@ def technology(technology_name, *, alpha=0.8):
         return get("rose", 500, alpha=alpha)
     if technology_name == "hydrogen":
         return get("indigo", 600, alpha=alpha)
+
+
+def random(color=None, value=None, alpha=0.8):
+    """
+    Get a random color
+    """
+    assert validate.is_color_name(color, required=False)
+    assert validate.is_color_value(value, required=False)
+    assert validate.is_number(alpha, min_value=0, max_value=1)
+
+    # Get a random color and value if not defined
+    if color is None:
+        color = all_colors.columns[np.random.randint(0, len(all_colors.columns))]
+    if value is None:
+        value = all_colors.index[np.random.randint(0, len(all_colors.index))]
+
+    # Get the color code
+    return get(color, value, alpha=alpha)
 
 
 def list():
