@@ -150,7 +150,7 @@ def countries(output_directory, resolution):
         # Create and show the map
         if show_stacked_bar_chart:
             # Initialize bar chart
-            bar_chart = chart.Chart(xlabel="Countries", ylabel=label)
+            bar_chart = chart.Chart(xlabel="Countries", ylabel=label, wide=True)
             bar_width = 0.8
 
             if validate.is_dataframe(data):
@@ -167,7 +167,7 @@ def countries(output_directory, resolution):
                 bar_chart.format_yticklabels("{:,.0%}")
 
             country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
-            bar_chart.ax.set_xticklabels(country_names, fontsize=8, rotation=90)
+            bar_chart.ax.set_xticklabels(country_names, rotation=90)
             padding = bar_width - (1 - bar_width) / 2
             bar_chart.ax.set_xlim(-padding, len(data.index) - (1 - padding))
             bar_chart.display()
