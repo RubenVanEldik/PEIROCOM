@@ -22,20 +22,13 @@ This will install the required packages and start up the Streamlit app.
 
 ## Deploying
 
-To deploy the app on a (HPC) server the the app can be exported using the commands below. These will package and upload the Docker container to the specified server.
+PEIROCOM can be deployed on a (HPC) server in just four steps. After downloading the repository and adding the environment variables in `.env`, Docker can be installed and the server can be spun up using the following commands:
 
 ```shell
-bash scripts/build_container.sh
-bash scripts/export_container.sh
-bash scripts/upload_model.sh
+bash scripts/install_docker.sh
+bash scripts/run.sh
 ```
 
-On the server side the package can be imported and run as follows.
-
-```shell
-bash scripts/import_container.sh
-bash scripts/run_container.sh
-```
 
 ## Features
 
