@@ -18,10 +18,10 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY . /app
 
 # Download and unzip the bidding zone and interconnection data
-RUN bash scripts/docker.input.sh
+RUN bash scripts/download_input.sh
 
 # Generate the Gurobi license file
-RUN bash scripts/docker.gurobi.sh
+RUN bash scripts/generate_gurobi_license.sh
 
 # Command used to start the application
 ENTRYPOINT ["streamlit", "run", "🌤️_Introduction.py"]

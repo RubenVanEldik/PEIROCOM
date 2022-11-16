@@ -25,18 +25,16 @@ This will install the required packages and start up the Streamlit app.
 To deploy the app on a (HPC) server the the app can be exported using the commands below. These will package and upload the Docker container to the specified server.
 
 ```shell
-cd scripts
-bash docker.build.sh
-bash docker.export.sh
-bash docker.upload.sh
+bash scripts/build_container.sh
+bash scripts/export_container.sh
+bash scripts/upload_model.sh
 ```
 
 On the server side the package can be imported and run as follows.
 
 ```shell
-cd scripts
-bash docker.import.sh
-bash docker.run.sh
+bash scripts/import_container.sh
+bash scripts/run_container.sh
 ```
 
 ## Features

@@ -1,4 +1,3 @@
-cd ..
 docker container stop peirocom-container
 docker rm peirocom-container
 docker image rm peirocom
