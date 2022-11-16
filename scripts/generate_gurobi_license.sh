@@ -1,4 +1,5 @@
-cat > gurobi.lic << EOL
+mkdir /opt/gurobi -p
+cat > /opt/gurobi/gurobi.lic << EOL
 # Gurobi WLS license file
 # Your credentials are private and should not be shared or copied to public repositories.
 # Visit https://license.gurobi.com/manager/doc/overview for more information.
