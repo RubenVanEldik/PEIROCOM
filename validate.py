@@ -100,6 +100,8 @@ def is_config(value, *, required=True):
         return False
     if not is_country_code_list(value.get("country_codes"), code_type="nuts_2"):
         return False
+    if len(value.get("country_codes")) == 0:
+        return False
     if not is_dict(value.get("climate_years")):
         return False
     if not is_integer(value["climate_years"].get("start"), min_value=1982, max_value=2016):
