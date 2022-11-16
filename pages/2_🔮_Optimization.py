@@ -34,9 +34,8 @@ with st.sidebar.expander("Scope"):
     if not utils.is_demo and st.checkbox("Include all countries", value=True):
         config["country_codes"] = country_codes
     else:
-        default_countries = ["NL", "BE", "DE"]
         format_func = lambda nuts_2: utils.get_country_property(nuts_2, "name")
-        config["country_codes"] = st.multiselect("Countries", country_codes, default=default_countries, format_func=format_func)
+        config["country_codes"] = st.multiselect("Countries", country_codes, format_func=format_func)
 
     # Select the range of years that should be modeled
     climate_years = range(1982, 2017)
