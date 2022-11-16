@@ -21,7 +21,10 @@ COPY . /app
 RUN bash scripts/download_input.sh
 
 # Generate the Gurobi license file
-RUN bash scripts/generate_gurobi_license.sh
+RUN mkdir /opt/gurobi -p
+RUN echo "WLSACCESSID=$GUROBI_WLSACCESSID" > /opt/gurobi/gurobi.lic
+RUN echo "WLSSECRET=$GUROBI_WLSSECRET" >> /opt/gurobi/gurobi.lic
+RUN echo "LICENSEID=$GUROBI_LICENSEID" >> /opt/gurobi/gurobi.lic
 
 # Command used to start the application
 ENTRYPOINT ["streamlit", "run", "🌤️_Introduction.py"]
