@@ -147,6 +147,7 @@ def countries(output_directory, resolution):
         # Get the units for the color bar
         units = {10 ** -9: "Billionth", 10 ** -6: "Millionth", 10 ** -3: "Thousandth", 1: "One", 10 ** 3: "Thousand", 10 ** 6: "Million", 10 ** 9: "Billion"}
         unit = st.sidebar.select_slider("Format units", units.keys(), value=1, format_func=lambda key: units[key])
+        data = data / unit
 
         # Create and show the map
         if show_stacked_bar_chart:
@@ -182,11 +183,11 @@ def countries(output_directory, resolution):
             if validate.is_dataframe(data):
                 data = data.sum(axis=1)
 
-            map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
+            map = chart.Map(data, label=label, format_percentage=format_percentage)
             map.display()
             map.download_button("countries.png")
 
         # Show the table in an expander
         with st.expander("Data points"):
             data.index = [utils.get_country_property(country_code, "name") for country_code in data.index]
-            st.table(data / unit)
+            st.table(data)
