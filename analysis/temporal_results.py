@@ -1,5 +1,7 @@
 import streamlit as st
 
+import chart
+import colors
 import utils
 import validate
 
@@ -39,8 +41,17 @@ def temporal_results(output_directory, resolution):
         data_range = st.sidebar.slider("Date range", value=(start_data, end_data), min_value=start_data, max_value=end_data)
         temporal_results = temporal_results.loc[data_range[0] : data_range[1]]
 
-        # Show the line chart
-        st.line_chart(temporal_results)
+        # Initialize the plot
+        plot = chart.Chart(xlabel="Time", ylabel="", wide=True)
+
+        # Add each of the selected columns to the plot
+        for column_name in temporal_results:
+            plot.ax.plot(temporal_results[column_name], label=column_name, color=colors.random())
+
+        # Show the plot
+        plot.ax.legend()
+        plot.display()
+        plot.download_button("temporal_results.png")
 
         # Show the table in an expander
         with st.expander("Data points"):
