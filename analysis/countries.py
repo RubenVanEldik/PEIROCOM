@@ -36,15 +36,20 @@ def _select_data(output_directory, resolution, *, name):
 
     if data_source == "Temporal results":
         # Get the temporal results
-        all_temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
+        temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
 
         # Merge the DataFrames on a specific column
-        relevant_columns = utils.find_common_columns(all_temporal_results)
-        column_name = col2.selectbox("Column", relevant_columns, format_func=utils.format_column_name, key=name)
-        temporal_results = utils.merge_dataframes_on_column(all_temporal_results, column_name)
+        relevant_columns = utils.find_common_columns(temporal_results)
+        column_names = col2.multiselect("Column", relevant_columns, format_func=utils.format_column_name, key=name)
 
-        # Average values of the selected temporal column
-        return temporal_results.mean()
+        if len(column_names) == 0:
+            return
+
+        # Merge all temporal results
+        data = pd.DataFrame()
+        for name in column_names:
+            data[name] = utils.merge_dataframes_on_column(temporal_results, name).mean()
+        return data
 
     if data_source == "Country info":
         # Get the country information
