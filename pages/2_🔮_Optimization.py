@@ -31,11 +31,14 @@ with st.sidebar.expander("Scope"):
     # Select the countries
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
     country_codes = [country["nuts_2"] for country in countries]
+    map_country_name_to_code = lambda nuts_2: utils.get_country_property(nuts_2, "name")
     if not utils.is_demo and st.checkbox("Include all countries", value=True):
         config["country_codes"] = country_codes
     else:
-        format_func = lambda nuts_2: utils.get_country_property(nuts_2, "name")
-        config["country_codes"] = st.multiselect("Countries", country_codes, format_func=format_func)
+        config["country_codes"] = st.multiselect("Countries", country_codes, format_func=map_country_name_to_code)
+
+    # Sort the countries by name
+    config["country_codes"] = sorted(config["country_codes"], key=map_country_name_to_code)
 
     # Select the range of years that should be modeled
     climate_years = range(1982, 2017)
