@@ -12,9 +12,6 @@ class Map:
     Create a geopandas map based on a Series with country level data
     """
 
-    fig = None
-    ax = None
-
     def __init__(self, data, *, label=None, format_percentage=False):
         # Create the figure
         self.fig, self.ax = plt.subplots(figsize=(6, 4))
