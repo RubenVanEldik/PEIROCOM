@@ -8,16 +8,25 @@ import validate
 all_colors = pd.read_csv("./colors/colors.csv", index_col=0)
 
 
-def get(color, value, *, alpha=1):
+def get(color_name, value, *, alpha=1, format="hex"):
     """
-    Return the HEX value for a specific color and value
+    Return the HEX value for a specific color name and value
     """
-    assert validate.is_color_name(color)
+    assert validate.is_color_name(color_name)
     assert validate.is_color_value(value)
     assert validate.is_number(alpha, min_value=0, max_value=1)
+    assert validate.is_color_format(format)
 
-    alpha_hex = hex(round(alpha * 255))[2:].upper().rjust(2, "0")
-    return f"{all_colors.loc[value, color]}{alpha_hex}"
+    # Get the color
+    hex_color = all_colors.loc[value, color_name]
+
+    if format == "hex":
+        hex_alpha = hex(round(alpha * 255))[2:].upper().rjust(2, "0")
+        return f"{hex_color}{hex_alpha}"
+    elif format == "rgb":
+        return f"rgb({int(hex_color[1:3], 16)}, {int(hex_color[3:5], 16)}, {int(hex_color[5:7], 16)})"
+    elif format == "rgba":
+        return f"rgba({int(hex_color[1:3], 16)}, {int(hex_color[3:5], 16)}, {int(hex_color[5:7], 16)}, {alpha})"
 
 
 def primary(*, alpha=0.8):
