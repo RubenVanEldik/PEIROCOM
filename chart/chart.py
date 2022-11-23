@@ -9,9 +9,6 @@ class Chart:
     Create a matplotlib figure
     """
 
-    fig = None
-    ax = None
-
     def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear", wide=False):
         # Create the figure
         figure_width = 12 if wide else 6

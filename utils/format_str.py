@@ -1,6 +1,8 @@
 import utils
 import validate
 
+word_dict = {"lcoe": "LCOE", "hvac": "HVAC", "hvdc": "HVDC", "soc": "SoC", "wacc": "WACC", "capex": "CAPEX", "om": "O&M"}
+
 
 @utils.cache
 def format_str(str):
@@ -17,8 +19,8 @@ def format_str(str):
     for index, word in enumerate(str.split(" ")):
         if validate.is_technology(word):
             word_list.append(utils.format_technology(word, capitalize=index == 0))
-        elif word in ["lcoe", "hvac", "hvdc"]:
-            word_list.append(word.upper())
+        elif word in word_dict:
+            word_list.append(word_dict[word])
         elif index == 0:
             word_list.append(word.capitalize())
         else:

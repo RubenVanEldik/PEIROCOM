@@ -71,6 +71,13 @@ def is_color(value, *, required=True):
     return bool(re.search("^#([A-F0-9]{6}|[A-F0-9]{8})$", value))
 
 
+def is_color_format(value, *, required=True):
+    if value is None:
+        return not required
+
+    return value in ["hex", "rgb", "rgba"]
+
+
 def is_color_name(value, *, required=True):
     if value is None:
         return not required
