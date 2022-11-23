@@ -13,7 +13,7 @@ def _read_and_map_export_limits(*, model_year, connection_type, timestamps):
 
     # Read the interconnection CSV file
     filepath = utils.path("input", "interconnections", model_year, f"{connection_type}.csv")
-    export_limits = utils.read_csv(filepath, parse_dates=True, index_col=0, header=[0, 1])
+    export_limits = utils.read_temporal_data(filepath, header=[0, 1])
 
     # Resample the export limits if required
     if len(export_limits.index) != len(timestamps):

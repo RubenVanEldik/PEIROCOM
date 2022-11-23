@@ -48,7 +48,7 @@ def _validate_and_import_bidding_zone_data():
             filename = utils.path("input", "bidding_zones", year, f"{bidding_zone}.csv")
             if filename.is_file():
                 is_valid_file = True
-                data = utils.read_csv(filename, parse_dates=True, index_col=0)
+                data = utils.read_temporal_data(filename)
 
                 if not validate.is_dataframe(data):
                     is_valid_file = False
@@ -87,7 +87,7 @@ def _validate_and_import_interconnection_data():
             filename = utils.path("input", "interconnections", year, f"{interconnection_type}.csv")
             if filename.is_file():
                 is_valid_file = True
-                data = utils.read_csv(filename, parse_dates=True, index_col=0, header=[0, 1])
+                data = utils.read_temporal_data(filename, header=[0, 1])
 
                 if not validate.is_dataframe(data):
                     is_valid_file = False
