@@ -30,8 +30,8 @@ with st.sidebar.expander("Scope"):
 
     # Select the countries
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
-    country_codes = [country["nuts_2"] for country in countries]
-    map_country_name_to_code = lambda nuts_2: utils.get_country_property(nuts_2, "name")
+    country_codes = [country["nuts2"] for country in countries]
+    map_country_name_to_code = lambda nuts2: utils.get_country_property(nuts2, "name")
     if not utils.is_demo and st.checkbox("Include all countries", value=True):
         config["country_codes"] = country_codes
     else:

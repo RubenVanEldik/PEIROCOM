@@ -12,7 +12,7 @@ def get_production_capacity(output_directory, resolution, *, group=None, country
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
     assert validate.is_aggregation_level(group, required=False)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     # If no countries are specified, set them to all countries modelled in this run
     if not country_codes:

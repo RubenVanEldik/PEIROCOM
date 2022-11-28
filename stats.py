@@ -8,7 +8,7 @@ def firm_lcoe(output_directory, resolution, *, country_codes=None, breakdown_lev
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
@@ -31,7 +31,7 @@ def unconstrained_lcoe(output_directory, resolution, *, country_codes=None, brea
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
@@ -55,7 +55,7 @@ def premium(output_directory, resolution, *, country_codes=None, breakdown_level
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
@@ -72,7 +72,7 @@ def relative_curtailment(output_directory, resolution, *, country_codes=None):
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     temporal_results = utils.get_temporal_results(output_directory, resolution, group="all", country_codes=country_codes)
     return temporal_results.curtailed_MW.sum() / temporal_results.production_total_MW.sum()
@@ -84,7 +84,7 @@ def production_capacity(output_directory, resolution, *, country_codes=None):
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     production_capacity = utils.get_production_capacity(output_directory, resolution, group="all", country_codes=country_codes)
     return production_capacity.to_dict()
@@ -97,7 +97,7 @@ def storage_capacity(output_directory, resolution, *, storage_type, country_code
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
     assert validate.is_string(storage_type)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     storage_capacity = utils.get_storage_capacity(output_directory, resolution, group="all", country_codes=country_codes)
 
@@ -114,7 +114,7 @@ def self_sufficiency(output_directory, resolution, *, country_codes=None):
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_resolution(resolution)
-    assert validate.is_country_code_list(country_codes, code_type="nuts_2", required=False)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     temporal_results = utils.get_temporal_results(output_directory, resolution, country_codes=country_codes)
     mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW").mean(axis=1)

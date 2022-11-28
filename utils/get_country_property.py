@@ -2,7 +2,7 @@ import utils
 import validate
 
 
-def get_country_property(country_code, key, *, code_type="nuts_2"):
+def get_country_property(country_code, key, *, code_type="nuts2"):
     """
     Get a specific property of a country via its code
     """
