@@ -1,6 +1,6 @@
 - name: Albania
   nuts2: AL
-  alpha_3: ALB
+  alpha3: ALB
   flag: 🇦🇱
   bidding_zones: [AL00]
   included_geographic_units: [ALB]
@@ -16,7 +16,7 @@
     hydrogen: 50000000
 - name: Austria
   nuts2: AT
-  alpha_3: AUT
+  alpha3: AUT
   flag: 🇦🇹
   bidding_zones: [AT00]
   included_geographic_units: [AUT]
@@ -31,7 +31,7 @@
     hydrogen: 0
 - name: Bosnia and Herzegovina
   nuts2: BA
-  alpha_3: BIH
+  alpha3: BIH
   flag: 🇧🇦
   bidding_zones: [BA00]
   included_geographic_units: [BHF, BIS, BHB]
@@ -46,7 +46,7 @@
     hydrogen: 800000000
 - name: Belgium
   nuts2: BE
-  alpha_3: BEL
+  alpha3: BEL
   flag: 🇧🇪
   bidding_zones: [BE00]
   included_geographic_units: [BFR, BWR, BCR]
@@ -62,7 +62,7 @@
     hydrogen: 0
 - name: Bulgaria
   nuts2: BG
-  alpha_3: BGR
+  alpha3: BGR
   flag: 🇧🇬
   bidding_zones: [BG00]
   included_geographic_units: [BGR]
@@ -78,7 +78,7 @@
     hydrogen: 0
 - name: Switzerland
   nuts2: CH
-  alpha_3: CHE
+  alpha3: CHE
   flag: 🇨🇭
   bidding_zones: [CH00]
   included_geographic_units: [CHE]
@@ -93,7 +93,7 @@
     hydrogen: 0
 - name: Cyprus
   nuts2: CY
-  alpha_3: CYP
+  alpha3: CYP
   flag: 🇨🇾
   bidding_zones: [CY00]
   included_geographic_units: [CYP]
@@ -107,7 +107,7 @@
     hydrogen: 0
 - name: Czechia
   nuts2: CZ
-  alpha_3: CZE
+  alpha3: CZE
   flag: 🇨🇿
   bidding_zones: [CZ00]
   included_geographic_units: [CZE]
@@ -122,7 +122,7 @@
     hydrogen: 0
 - name: Germany
   nuts2: DE
-  alpha_3: DEU
+  alpha3: DEU
   flag: 🇩🇪
   bidding_zones: [DE00]
   included_geographic_units: [DEU]
@@ -138,7 +138,7 @@
     hydrogen: 9450000000
 - name: Denmark
   nuts2: DK
-  alpha_3: DNK
+  alpha3: DNK
   flag: 🇩🇰
   bidding_zones: [DKE1, DKW1]
   included_geographic_units: [DNK]
@@ -154,7 +154,7 @@
     hydrogen: 600000000
 - name: Estonia
   nuts2: EE
-  alpha_3: EST
+  alpha3: EST
   flag: 🇪🇪
   bidding_zones: [EE00]
   included_geographic_units: [EST]
@@ -170,7 +170,7 @@
     hydrogen: 0
 - name: Spain
   nuts2: ES
-  alpha_3: ESP
+  alpha3: ESP
   flag: 🇪🇸
   bidding_zones: [ES00]
   included_geographic_units: [ESP]
@@ -187,7 +187,7 @@
     hydrogen: 1260000000
 - name: Finland
   nuts2: FI
-  alpha_3: FIN
+  alpha3: FIN
   flag: 🇫🇮
   bidding_zones: [FI00]
   included_geographic_units: [FIN, ALD]
@@ -203,7 +203,7 @@
     hydrogen: 0
 - name: France
   nuts2: FR
-  alpha_3: FRA
+  alpha3: FRA
   flag: 🇫🇷
   bidding_zones: [FR00, FR15]
   included_geographic_units: [FXX]
@@ -219,7 +219,7 @@
     hydrogen: 510000000
 - name: Greece
   nuts2: GR
-  alpha_3: GRC
+  alpha3: GRC
   flag: 🇬🇷
   bidding_zones: [GR00, GR03]
   included_geographic_units: [GRC]
@@ -235,7 +235,7 @@
     hydrogen: 110000000
 - name: Croatia
   nuts2: HR
-  alpha_3: HRV
+  alpha3: HRV
   flag: 🇭🇷
   bidding_zones: [HR00]
   included_geographic_units: [HRV]
@@ -251,7 +251,7 @@
     hydrogen: 0
 - name: Hungary
   nuts2: HU
-  alpha_3: HUN
+  alpha3: HUN
   flag: 🇭🇺
   bidding_zones: [HU00]
   included_geographic_units: [HUN]
@@ -266,7 +266,7 @@
     hydrogen: 0
 - name: Ireland
   nuts2: IE
-  alpha_3: IRL
+  alpha3: IRL
   flag: 🇮🇪
   bidding_zones: [IE00]
   included_geographic_units: [IRL]
@@ -282,7 +282,7 @@
     hydrogen: 0
 - name: Italy
   nuts2: IT
-  alpha_3: ITA
+  alpha3: ITA
   flag: 🇮🇹
   bidding_zones: [ITCA, ITCN, ITCS, ITN1, ITS1, ITSA, ITSI]
   included_geographic_units: [ITA]
@@ -298,7 +298,7 @@
     hydrogen: 0
 - name: Lithuania
   nuts2: LT
-  alpha_3: LTU
+  alpha3: LTU
   flag: 🇱🇹
   bidding_zones: [LT00]
   included_geographic_units: [LTU]
@@ -314,7 +314,7 @@
     hydrogen: 0
 - name: Luxembourg
   nuts2: LU
-  alpha_3: LUX
+  alpha3: LUX
   flag: 🇱🇺
   bidding_zones: [LUB1, LUF1, LUG1]
   included_geographic_units: [LUX]
@@ -329,7 +329,7 @@
     hydrogen: 0
 - name: Latvia
   nuts2: LV
-  alpha_3: LVA
+  alpha3: LVA
   flag: 🇱🇻
   bidding_zones: [LV00]
   included_geographic_units: [LVA]
@@ -345,7 +345,7 @@
     hydrogen: 0
 - name: Montenegro
   nuts2: ME
-  alpha_3: MNE
+  alpha3: MNE
   flag: 🇲🇪
   bidding_zones: [ME00]
   included_geographic_units: [MNE]
@@ -361,7 +361,7 @@
     hydrogen: 0
 - name: North Macedonia
   nuts2: MK
-  alpha_3: MKD
+  alpha3: MKD
   flag: 🇲🇰
   bidding_zones: [MK00]
   included_geographic_units: [MKD]
@@ -376,7 +376,7 @@
     hydrogen: 0
 - name: Malta
   nuts2: MT
-  alpha_3: MLT
+  alpha3: MLT
   flag: 🇲🇹
   bidding_zones: [MT00]
   included_geographic_units: [MLT]
@@ -390,7 +390,7 @@
     hydrogen: 0
 - name: Netherlands
   nuts2: NL
-  alpha_3: NLD
+  alpha3: NLD
   flag: 🇳🇱
   bidding_zones: [NL00]
   included_geographic_units: [NLX]
@@ -406,7 +406,7 @@
     hydrogen: 300000000
 - name: Norway
   nuts2: "NO" # Strings are required, otherwise the YAML parser will parse it as a boolean False value
-  alpha_3: NOR
+  alpha3: NOR
   flag: 🇳🇴
   bidding_zones: [NOM1, NON1, NOS0]
   included_geographic_units: [NOW]
@@ -422,7 +422,7 @@
     hydrogen: 0
 - name: Poland
   nuts2: PL
-  alpha_3: POL
+  alpha3: POL
   flag: 🇵🇱
   bidding_zones: [PL00]
   included_geographic_units: [POL]
@@ -438,7 +438,7 @@
     hydrogen: 7240000000
 - name: Portugal
   nuts2: PT
-  alpha_3: PRT
+  alpha3: PRT
   flag: 🇵🇹
   bidding_zones: [PT00]
   included_geographic_units: [PRX]
@@ -454,7 +454,7 @@
     hydrogen: 250000000
 - name: Romania
   nuts2: RO
-  alpha_3: ROU
+  alpha3: ROU
   flag: 🇷🇴
   bidding_zones: [RO00]
   included_geographic_units: [ROU]
@@ -470,7 +470,7 @@
     hydrogen: 1100000000
 - name: Serbia
   nuts2: RS
-  alpha_3: SRB
+  alpha3: SRB
   flag: 🇷🇸
   bidding_zones: [RS00]
   included_geographic_units: [SRV, SRS]
@@ -485,7 +485,7 @@
     hydrogen: 0
 - name: Sweden
   nuts2: SE
-  alpha_3: SWE
+  alpha3: SWE
   flag: 🇸🇪
   bidding_zones: [SE01, SE02, SE03, SE04]
   included_geographic_units: [SWE]
@@ -501,7 +501,7 @@
     hydrogen: 0
 - name: Slovenia
   nuts2: SI
-  alpha_3: SVN
+  alpha3: SVN
   flag: 🇸🇮
   bidding_zones: [SI00]
   included_geographic_units: [SVN]
@@ -517,7 +517,7 @@
     hydrogen: 0
 - name: Slovakia
   nuts2: SK
-  alpha_3: SVK
+  alpha3: SVK
   flag: 🇸🇰
   bidding_zones: [SK00]
   included_geographic_units: [SVK]
@@ -532,7 +532,7 @@
     hydrogen: 0
 - name: Turkey
   nuts2: TR
-  alpha_3: TUR
+  alpha3: TUR
   flag: 🇹🇷
   bidding_zones: [TR00]
   included_geographic_units: [TUR]
@@ -548,7 +548,7 @@
     hydrogen: 0
 - name: Ukraine
   nuts2: UA
-  alpha_3: UKR
+  alpha3: UKR
   flag: 🇺🇦
   bidding_zones: [UA01]
   included_geographic_units: [UKR]
@@ -562,7 +562,7 @@
     hydrogen: 0
 - name: United Kingdom
   nuts2: UK
-  alpha_3: GBR
+  alpha3: GBR
   flag: 🇬🇧
   bidding_zones: [UK00, UKNI]
   included_geographic_units: [ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS]

@@ -140,7 +140,7 @@ def is_country_code(value, *, required=True, code_type):
 
     if code_type == "nuts2":
         return bool(re.search("^[A-Z]{2}$", value))
-    if code_type == "alpha_3":
+    if code_type == "alpha3":
         return bool(re.search("^[A-Z]{3}$", value))
     return False
 
@@ -159,7 +159,7 @@ def is_country_code_type(value, *, required=True):
     if value is None:
         return not required
 
-    return value == "nuts2" or value == "alpha_3"
+    return value == "nuts2" or value == "alpha3"
 
 
 def is_country_obj(value, *, required=True):
