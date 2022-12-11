@@ -105,7 +105,7 @@ def is_config(value, *, required=True):
         return False
     if not is_model_year(value.get("model_year")):
         return False
-    if not is_country_code_list(value.get("country_codes"), code_type="nuts_2"):
+    if not is_country_code_list(value.get("country_codes"), code_type="nuts2"):
         return False
     if len(value.get("country_codes")) == 0:
         return False
@@ -138,9 +138,9 @@ def is_country_code(value, *, required=True, code_type):
     if value is None:
         return not required
 
-    if code_type == "nuts_2":
+    if code_type == "nuts2":
         return bool(re.search("^[A-Z]{2}$", value))
-    if code_type == "alpha_3":
+    if code_type == "alpha3":
         return bool(re.search("^[A-Z]{3}$", value))
     return False
 
@@ -159,7 +159,7 @@ def is_country_code_type(value, *, required=True):
     if value is None:
         return not required
 
-    return value == "nuts_2" or value == "alpha_3"
+    return value == "nuts2" or value == "alpha3"
 
 
 def is_country_obj(value, *, required=True):

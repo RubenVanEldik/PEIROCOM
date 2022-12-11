@@ -62,7 +62,7 @@ def _select_data(output_directory, resolution, *, name):
         selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace(".", " ")), key=name)
 
         # Return a Series with the potential per country for the selected technology
-        data = pd.Series({country["nuts_2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts_2"] in config["country_codes"]})
+        data = pd.Series({country["nuts2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts2"] in config["country_codes"]})
         data[data == 0] = None
         return data
 
@@ -146,7 +146,7 @@ def countries(output_directory, resolution):
         format_percentage = st.sidebar.checkbox("Show as percentage")
 
         # Remove excluded countries from the data
-        excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts_2: utils.get_country_property(nuts_2, "name"))
+        excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts2: utils.get_country_property(nuts2, "name"))
         data = data[~data.index.isin(excluded_country_codes)]
 
         # Get the units for the color bar
@@ -163,6 +163,8 @@ def countries(output_directory, resolution):
             # Initialize bar chart
             bar_chart = chart.Chart(xlabel="", ylabel=label, wide=True)
             bar_width = 0.8
+
+            data = data.sort_index(key=lambda x: [utils.get_country_property(xx, "name") for xx in x])
 
             if validate.is_dataframe(data):
                 bottom = 0
