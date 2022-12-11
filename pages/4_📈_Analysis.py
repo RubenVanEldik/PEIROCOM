@@ -53,7 +53,7 @@ def run():
     selected_resolution = st.sidebar.selectbox("Resolution", sorted_resolution_stages)
 
     # Set the analysis type options
-    analysis_type_options = ["statistics", "temporal_results", "countries", "correlation", "duration_curve"]
+    analysis_type_options = ["statistics", "temporal_results", "countries", "correlation", "duration_curve", "sankey_diagram"]
     if is_sensitivity_analysis:
         # Add a Streamlit placeholder for if the sensitivity step should be specified
         sensitivity_step_placeholder = st.sidebar.empty()
