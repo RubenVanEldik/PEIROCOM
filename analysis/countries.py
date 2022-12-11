@@ -164,6 +164,8 @@ def countries(output_directory, resolution):
             bar_chart = chart.Chart(xlabel="", ylabel=label, wide=True)
             bar_width = 0.8
 
+            data = data.sort_index(key=lambda x: [utils.get_country_property(xx, "name") for xx in x])
+
             if validate.is_dataframe(data):
                 bottom = 0
                 for column_name in data:
