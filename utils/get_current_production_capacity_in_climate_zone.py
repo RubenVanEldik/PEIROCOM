@@ -21,7 +21,7 @@ def get_current_production_capacity_in_climate_zone(bidding_zone, production_tec
     # Calculate the number of climate zones in the country
     climate_zone_count = 0
     for bidding_zone_in_country in utils.get_country_property(country_code, "bidding_zones"):
-        temporal_data = utils.read_temporal_data(utils.path("input", "bidding_zones", config["model_year"], f"{bidding_zone_in_country}.csv"))
+        temporal_data = utils.read_temporal_data(utils.path("input", "scenarios", config["scenario"], "bidding_zones", f"{bidding_zone_in_country}.csv"))
         climate_zone_count += len([column for column in temporal_data.columns if column.startswith(f"{production_technology}_")])
 
     # Return zero if there are no climate zones in the country for this technology (otherwise there will be a division by zero error in the final return statement)

@@ -65,10 +65,10 @@ def run():
 
     if data_type == "bidding_zones":
         # Select the model year
-        model_year = st.sidebar.selectbox("Model year", [2025, 2030])
+        scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
 
         # Select the bidding zone
-        input_path = utils.path("input", "bidding_zones", model_year)
+        input_path = utils.path("input", "scenarios", scenario, "bidding_zones")
         bidding_zones = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
         bidding_zone = st.sidebar.selectbox("Bidding zone", bidding_zones)
 
@@ -84,7 +84,7 @@ def run():
 
     if data_type == "interconnections":
         # Select the model year
-        model_year = st.sidebar.selectbox("Model year", [2025, 2030])
+        scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
 
         # Select the bidding zone
         interconnection_type = st.sidebar.selectbox("Interconnection type", ["hvac", "hvdc"], format_func=utils.format_str)
@@ -92,7 +92,7 @@ def run():
         st.header(utils.format_str(f"{interconnection_type}_interconnection_capacities"))
 
         # Read the temporal data
-        interconnection_typedf = utils.read_temporal_data(utils.path("input", "interconnections", model_year, f"{interconnection_type}.csv"), header=[0, 1])
+        interconnection_typedf = utils.read_temporal_data(utils.path("input", "scenarios", scenario, "interconnections", f"{interconnection_type}.csv"), header=[0, 1])
 
         # Format the index and column names and show the DataFrame
         interconnection_typedf.index = interconnection_typedf.index.strftime("%Y-%m-%d %H:%M UTC")

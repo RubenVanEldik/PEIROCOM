@@ -60,7 +60,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
         status.update(f"{country_flag} Importing data")
 
-        filepath = utils.path("input", "bidding_zones", config["model_year"], f"{bidding_zone}.csv")
+        filepath = utils.path("input", "scenarios", config["scenario"], "bidding_zones", f"{bidding_zone}.csv")
         start_year = config["climate_years"]["start"]
         end_year = config["climate_years"]["end"]
         # Get the temporal data and resample to the required resolution
