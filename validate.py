@@ -103,7 +103,7 @@ def is_config(value, *, required=True):
 
     if not is_string(value.get("name")):
         return False
-    if not is_model_year(value.get("model_year")):
+    if not is_scenario(value.get("scenario")):
         return False
     if not is_country_code_list(value.get("country_codes"), code_type="nuts2"):
         return False
@@ -366,13 +366,6 @@ def is_model(value, *, required=True):
     return isinstance(value, gurobipy.Model)
 
 
-def is_model_year(value, *, required=True):
-    if value is None:
-        return not required
-
-    return value == 2025 or value == 2030
-
-
 def is_number(value, *, required=True, min_value=None, max_value=None):
     if value is None:
         return not required
@@ -409,6 +402,13 @@ def is_resolution_stages(value, *, required=True):
         return False
 
     return all(is_resolution(resolution) for resolution in value)
+
+
+def is_scenario(value, *, required=True):
+    if value is None:
+        return not required
+
+    return value in [directory.name for directory in pathlib.Path("./input/scenarios").iterdir() if directory.is_dir()]
 
 
 def is_sensitivity_config(value, *, required=True):

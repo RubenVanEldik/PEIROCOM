@@ -60,7 +60,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
         status.update(f"{country_flag} Importing data")
 
-        filepath = utils.path("input", "bidding_zones", config["model_year"], f"{bidding_zone}.csv")
+        filepath = utils.path("input", "scenarios", config["scenario"], "bidding_zones", f"{bidding_zone}.csv")
         start_year = config["climate_years"]["start"]
         end_year = config["climate_years"]["end"]
         # Get the temporal data and resample to the required resolution
@@ -77,7 +77,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
 
         if previous_resolution:
             # Get the temporal results from the previous run
-            previous_temporal_results = utils.read_csv(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv", parse_dates=True, index_col=0)
+            previous_temporal_results = utils.read_temporal_data(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv")
             # Multiply the previous temporal results witht the propagation factor
             previous_temporal_results = config["time_discretization"]["value_propagation"] * previous_temporal_results
             # Resample the previous results so it has the same timestamps as the current step
