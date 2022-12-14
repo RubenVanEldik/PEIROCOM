@@ -18,6 +18,10 @@ def get_production_potential_in_climate_zone(bidding_zone, production_technology
     if production_potential is None:
         return float("inf")
 
+    # Return 0 if there is no production potential for this technology in this bidding zone
+    if production_potential is 0:
+        return 0
+
     # Calculate the number of climate zones in the country
     climate_zone_count = 0
     for bidding_zone_in_country in utils.get_country_property(country_code, "bidding_zones"):
