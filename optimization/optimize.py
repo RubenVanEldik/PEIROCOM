@@ -318,9 +318,11 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 sum_production += gp.quicksum(temporal_results[bidding_zone].production_total_MW)
                 sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
                 sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
-            # Add the self-sufficiency constraint
-            min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
-            model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
+
+            # Add the self-sufficiency constraint if there is any demand in the country
+            if sum_demand > 0:
+                min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
+                model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
 
     """
     Step 5: Define the storage costs constraint
