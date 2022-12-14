@@ -150,7 +150,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             status.update(f"{country_flag} Adding {utils.format_technology(storage_technology, capitalize=False)} storage")
 
             # Get the specific storage assumptions
-            storage_assumptions = utils.read_yaml(utils.path("input", "technologies", "storage.yaml"))[storage_technology]
+            storage_assumptions = utils.get_technologies(technology_type="storage")[storage_technology]
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
             timestep_hours = pd.Timedelta(resolution).total_seconds() / 3600
 

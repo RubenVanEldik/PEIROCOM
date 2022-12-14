@@ -46,7 +46,7 @@ def run():
             st.header(utils.format_str(f"{technology_type}_technologies"))
 
             # Read the technology data and convert it to a DataFrame
-            technologies_df = pd.DataFrame(utils.read_yaml(utils.path("input", "technologies", f"{technology_type}.yaml"))).transpose()
+            technologies_df = pd.DataFrame(utils.get_technologies(technology_type=technology_type)).transpose()
 
             for scenario_type in ["conservative", "moderate", "advanced"]:
                 # technologies_df = technologies_df.drop(scenario_type)

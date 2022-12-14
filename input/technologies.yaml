@@ -1,0 +1,79 @@
+production:
+  pv:
+    economic_lifetime: 30
+    wacc: 0.044
+    conservative:
+      capex: 912
+      fixed_om: 12
+      variable_om: 0
+    moderate:
+      capex: 700
+      fixed_om: 10
+      variable_om: 0
+    advanced:
+      capex: 520
+      fixed_om: 8
+      variable_om: 0
+  onshore:
+    economic_lifetime: 30
+    wacc: 0.05
+    conservative:
+      capex: 900
+      fixed_om: 41
+      variable_om: 0
+    moderate:
+      capex: 760
+      fixed_om: 33
+      variable_om: 0
+    advanced:
+      capex: 525
+      fixed_om: 24
+      variable_om: 0
+  offshore:
+    economic_lifetime: 30
+    wacc: 0.052
+    conservative:
+      capex: 2817
+      fixed_om: 94
+      variable_om: 0
+    moderate:
+      capex: 1945
+      fixed_om: 71
+      variable_om: 0
+    advanced:
+      capex: 1583
+      fixed_om: 61
+      variable_om: 0
+storage:
+  lion:
+    soc_min: 0.2
+    soc_max: 1
+    roundtrip_efficiency: 0.85
+    economic_lifetime: 15
+    wacc: 0.05
+    fixed_om: 0.025
+    conservative:
+      energy_capex: 143
+      power_capex: 260
+    moderate:
+      energy_capex: 81
+      power_capex: 243
+    advanced:
+      energy_capex: 57
+      power_capex: 104
+  hydrogen:
+    soc_min: 0.0
+    soc_max: 1
+    roundtrip_efficiency: 0.40
+    economic_lifetime: 18
+    wacc: 0.05
+    fixed_om: 0.025
+    conservative:
+      energy_capex: 1.5
+      power_capex: 1950
+    moderate:
+      energy_capex: 1
+      power_capex: 1300
+    advanced:
+      energy_capex: 0.5
+      power_capex: 650
