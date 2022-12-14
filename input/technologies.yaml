@@ -1,7 +1,7 @@
 production:
   pv:
-    name: "Solar PV"
-    color: 
+    name: "solar PV"
+    color:
       name: 'amber'
       value: 400
     economic_lifetime: 30
