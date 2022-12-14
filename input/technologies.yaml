@@ -1,6 +1,9 @@
 production:
   pv:
     name: "Solar PV"
+    color: 
+      name: 'amber'
+      value: 400
     economic_lifetime: 30
     wacc: 0.044
     conservative:
@@ -17,6 +20,9 @@ production:
       variable_om: 0
   onshore:
     name: "onshore wind"
+    color:
+      name: 'sky'
+      value: 400
     economic_lifetime: 30
     wacc: 0.05
     conservative:
@@ -33,6 +39,9 @@ production:
       variable_om: 0
   offshore:
     name: "offshore wind"
+    color:
+      name: 'teal'
+      value: 700
     economic_lifetime: 30
     wacc: 0.052
     conservative:
@@ -50,6 +59,9 @@ production:
 storage:
   lion:
     name: "Li-ion"
+    color:
+      name: 'rose'
+      value: 500
     soc_min: 0.2
     soc_max: 1
     roundtrip_efficiency: 0.85
@@ -67,6 +79,9 @@ storage:
       power_capex: 104
   hydrogen:
     name: "hydrogen"
+    color:
+      name: 'indigo'
+      value: 600
     soc_min: 0.0
     soc_max: 1
     roundtrip_efficiency: 0.40

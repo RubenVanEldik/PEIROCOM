@@ -76,16 +76,8 @@ def technology(technology_name, *, alpha=0.8):
     assert validate.is_technology(technology_name)
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    if technology_name == "pv":
-        return get("amber", 400, alpha=alpha)
-    if technology_name == "onshore":
-        return get("sky", 400, alpha=alpha)
-    if technology_name == "offshore":
-        return get("teal", 700, alpha=alpha)
-    if technology_name == "lion":
-        return get("rose", 500, alpha=alpha)
-    if technology_name == "hydrogen":
-        return get("indigo", 600, alpha=alpha)
+    technology_color = utils.get_technologies()[technology_name]["color"]
+    return get(technology_color["name"], technology_color["value"], alpha=alpha)
 
 
 def random(color=None, value=None, alpha=0.8):
