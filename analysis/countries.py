@@ -139,8 +139,9 @@ def countries(output_directory, resolution):
         if exclude_zero_values:
             data.loc[data == 0] = None
 
-        # Ask if the data should be shown as a (stacked) bar chart
-        show_stacked_bar_chart = st.sidebar.checkbox("Show as a (stacked) bar chart")
+        # Ask if the data should be shown on a map if all countries have geographic units defined
+        all_countries_have_geographic_units = all(len(utils.get_country_property(country_code, "included_geographic_units")) > 0 for country_code in data.index)
+        show_as_map = all_countries_have_geographic_units and st.sidebar.checkbox("Show countries on a map")
 
         # Ask if the data should be formatted as a percentage
         format_percentage = st.sidebar.checkbox("Show as percentage")
@@ -155,7 +156,15 @@ def countries(output_directory, resolution):
         data = data / unit
 
         # Create and show the map
-        if show_stacked_bar_chart:
+        if show_as_map:
+            # If data is still a DataFrame, convert the single column DataFrame to a series
+            if validate.is_dataframe(data):
+                data = data.sum(axis=1)
+
+            map = chart.Map(data, label=label, format_percentage=format_percentage)
+            map.display()
+            map.download_button("countries.png")
+        else:
             # Drop the non-exising values when zero values are excluded
             if exclude_zero_values:
                 data = data.dropna()
@@ -185,14 +194,6 @@ def countries(output_directory, resolution):
             bar_chart.ax.set_xlim(-padding, len(data.index) - (1 - padding))
             bar_chart.display()
             bar_chart.download_button("countries.png")
-        else:
-            # If data is still a DataFrame, convert the single column DataFrame to a series
-            if validate.is_dataframe(data):
-                data = data.sum(axis=1)
-
-            map = chart.Map(data, label=label, format_percentage=format_percentage)
-            map.display()
-            map.download_button("countries.png")
 
         # Show the table in an expander
         with st.expander("Data points"):
