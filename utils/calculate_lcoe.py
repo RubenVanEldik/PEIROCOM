@@ -43,7 +43,7 @@ def _calculate_annualized_production_costs(production_technologies, production_c
     assert validate.is_dataframe(production_capacity_MW, column_validator=validate.is_technology)
 
     # Read the production assumptions
-    production_assumptions = utils.read_yaml(utils.path("input", "technologies", "production.yaml"))
+    production_assumptions = utils.get_technologies(technology_type="production")
 
     # Calculate the total annual production costs
     annualized_costs_production = pd.Series([], dtype="float64")
@@ -65,7 +65,7 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     assert validate.is_dataframe(storage_capacity_MWh)
 
     # Read the storage assumptions
-    storage_assumptions = utils.read_yaml(utils.path("input", "technologies", "storage.yaml"))
+    storage_assumptions = utils.get_technologies(technology_type="storage")
 
     # Calculate the total annual storage costs
     annualized_costs_storage = pd.Series([], dtype="float64")

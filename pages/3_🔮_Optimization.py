@@ -65,7 +65,7 @@ with st.sidebar.expander("Technologies"):
     col1, col2 = st.columns(2)
     col1.subheader("Production")
     config["technologies"]["production"] = {}
-    production_technology_options = utils.read_yaml(utils.path("input", "technologies", "production.yaml")).keys()
+    production_technology_options = utils.get_technologies(technology_type="production").keys()
     for technology in production_technology_options:
         if col1.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["production"][technology] = scenario_level
@@ -73,7 +73,7 @@ with st.sidebar.expander("Technologies"):
     # Select the storage technologies
     col2.subheader("Storage")
     config["technologies"]["storage"] = {}
-    storage_technologies_options = utils.read_yaml(utils.path("input", "technologies", "storage.yaml")).keys()
+    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
     for technology in storage_technologies_options:
         if col2.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["storage"][technology] = scenario_level
