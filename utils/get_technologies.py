@@ -2,6 +2,7 @@ import utils
 import validate
 
 
+@utils.cache
 def get_technologies(*, technology_type=None):
     """
     Retrieve the production technologies
