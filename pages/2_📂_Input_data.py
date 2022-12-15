@@ -51,6 +51,9 @@ def run():
             # Read the technology data and convert it to a DataFrame
             technologies_df = pd.DataFrame(utils.get_technologies(technology_type=technology_type)).transpose()
 
+            # Beautify the color column
+            technologies_df["color"] = technologies_df["color"].apply(lambda obj: f"{obj['name'].capitalize()} ({obj['value']})")
+
             for scenario_type in ["conservative", "moderate", "advanced"]:
                 # technologies_df = technologies_df.drop(scenario_type)
                 values = pd.DataFrame(technologies_df[scenario_type].values.tolist()).transpose()
