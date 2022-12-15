@@ -32,9 +32,9 @@ def run():
                 countries_df.insert(column_index, f"{column_name}_{sub_column_name}", column_df[sub_column_name])
                 column_index += 1
 
-        # Remove the geographic units from the dataframe
-        countries_df = countries_df.drop("included_geographic_units", axis=1)
-        countries_df = countries_df.drop("excluded_geographic_subunits", axis=1)
+        # Remove the geographic units from the dataframe (if they exist)
+        countries_df = countries_df.drop("included_geographic_units", axis=1, errors="ignore")
+        countries_df = countries_df.drop("excluded_geographic_subunits", axis=1, errors="ignore")
 
         # Set the name as index and sort by the name
         countries_df = countries_df.set_index("name")
