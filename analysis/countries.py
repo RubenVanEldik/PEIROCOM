@@ -57,9 +57,9 @@ def _select_data(output_directory, resolution, *, name):
 
         # Select the numeric parameter that should be shown
         country_parameters = list(set([parameter for country in country_info for parameter in country if isinstance(country[parameter], (int, float))]))
-        country_parameters += list(set([f"current.{technology}" for country in country_info for technology in country["current"]]))
-        country_parameters += list(set([f"potential.{technology}" for country in country_info for technology in country["potential"]]))
-        selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace(".", " ")), key=name)
+        country_parameters += list(set([f"capacity.current.{technology}" for country in country_info for technology in country["capacity"]["current"]]))
+        country_parameters += list(set([f"capacity.potential.{technology}" for country in country_info for technology in country["capacity"]["potential"]]))
+        selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace("capacity.", "").replace(".", " ")), key=name)
 
         # Return a Series with the potential per country for the selected technology
         data = pd.Series({country["nuts2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts2"] in config["country_codes"]})

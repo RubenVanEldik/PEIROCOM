@@ -17,4 +17,4 @@ def get_country_property(country_code, key, *, code_type="nuts2"):
     country = next(country for country in countries if country[code_type] == country_code)
 
     # Return the key from the country
-    return country.get(key)
+    return utils.get_nested_key(country, key)
