@@ -69,7 +69,7 @@ def statistics(output_directory, resolution):
     # Show the production capacities
     with st.expander("Production capacity", expanded=True):
         # Ask if the results should be shown relative to the mean demand
-        show_relative_production_capacity = st.checkbox("Relative to demand", value=True, key="production")
+        show_relative_production_capacity = st.checkbox("Relative to demand", key="production")
         show_hourly_production = st.checkbox("Mean hourly production")
 
         # Get the production capacities
@@ -99,7 +99,7 @@ def statistics(output_directory, resolution):
     # Show the storage capacities
     with st.expander("Storage capacity", expanded=True):
         # Ask if the results should be shown relative to the mean demand
-        show_relative_storage_capacity = st.checkbox("Relative to demand", value=True, key="storage")
+        show_relative_storage_capacity = st.checkbox("Relative to demand", key="storage")
         show_power_capacity = st.checkbox("Power capacity")
         storage_type = "power" if show_power_capacity else "energy"
 
