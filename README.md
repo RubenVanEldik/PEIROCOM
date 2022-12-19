@@ -1,6 +1,6 @@
 # PEIROCOM
 
-**V0.1.8**
+**V0.1.11**
 
 The Pan-European Intermittent Renewable Overbuilding and Curtailment Optimization Model (PEIROCOM) is an optimization model for a fully intermittent renewable Pan-European electricity grid. The model aims to find the least-cost solution for the deployment of solar PV, wind energy and storage. By overbuilding generation capacity to some degree, significant less storage capacity is required, resulting in lower system costs.
 
@@ -22,22 +22,13 @@ This will install the required packages and start up the Streamlit app.
 
 ## Deploying
 
-To deploy the app on a (HPC) server the the app can be exported using the commands below. These will package and upload the Docker container to the specified server.
+PEIROCOM can be deployed on a (HPC) server in just four steps. After downloading the repository and adding the environment variables in `.env`, Docker can be installed and the server can be spun up using the following commands:
 
 ```shell
-cd scripts
-bash docker.build.sh
-bash docker.export.sh
-bash docker.upload.sh
+bash scripts/install_docker.sh
+bash scripts/run.sh
 ```
 
-On the server side the package can be imported and run as follows.
-
-```shell
-cd scripts
-bash docker.import.sh
-bash docker.run.sh
-```
 
 ## Features
 

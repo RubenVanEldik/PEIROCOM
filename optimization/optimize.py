@@ -60,7 +60,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
         status.update(f"{country_flag} Importing data")
 
-        filepath = utils.path("input", "bidding_zones", config["model_year"], f"{bidding_zone}.csv")
+        filepath = utils.path("input", "scenarios", config["scenario"], "bidding_zones", f"{bidding_zone}.csv")
         start_year = config["climate_years"]["start"]
         end_year = config["climate_years"]["end"]
         # Get the temporal data and resample to the required resolution
@@ -77,7 +77,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
 
         if previous_resolution:
             # Get the temporal results from the previous run
-            previous_temporal_results = utils.read_csv(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv", parse_dates=True, index_col=0)
+            previous_temporal_results = utils.read_temporal_data(output_directory / previous_resolution / "temporal_results" / f"{bidding_zone}.csv")
             # Multiply the previous temporal results witht the propagation factor
             previous_temporal_results = config["time_discretization"]["value_propagation"] * previous_temporal_results
             # Resample the previous results so it has the same timestamps as the current step
@@ -150,7 +150,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             status.update(f"{country_flag} Adding {utils.format_technology(storage_technology, capitalize=False)} storage")
 
             # Get the specific storage assumptions
-            storage_assumptions = utils.read_yaml(utils.path("input", "technologies", "storage.yaml"))[storage_technology]
+            storage_assumptions = utils.get_technologies(technology_type="storage")[storage_technology]
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
             timestep_hours = pd.Timedelta(resolution).total_seconds() / 3600
 
@@ -318,9 +318,11 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 sum_production += gp.quicksum(temporal_results[bidding_zone].production_total_MW)
                 sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
                 sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
-            # Add the self-sufficiency constraint
-            min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
-            model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
+
+            # Add the self-sufficiency constraint if there is any demand in the country
+            if sum_demand > 0:
+                min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
+                model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
 
     """
     Step 5: Define the storage costs constraint

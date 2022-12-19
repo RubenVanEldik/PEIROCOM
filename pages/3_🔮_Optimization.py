@@ -26,17 +26,19 @@ with st.sidebar.expander("Scope"):
         st.warning("**This is a demo**\n\nA maximum of 3 countries and 1 year can be modeled simultaneously. Download the model from Github to run larger simulations.")
 
     # Select the model year
-    config["model_year"] = st.selectbox("Model year", [2025, 2030], index=1)
+    config["scenario"] = st.selectbox("Scenario", utils.get_scenarios(), index=1)
 
     # Select the countries
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
-    country_codes = [country["nuts_2"] for country in countries]
+    country_codes = [country["nuts2"] for country in countries]
+    map_country_name_to_code = lambda nuts2: utils.get_country_property(nuts2, "name")
     if not utils.is_demo and st.checkbox("Include all countries", value=True):
         config["country_codes"] = country_codes
     else:
-        default_countries = ["NL", "BE", "DE"]
-        format_func = lambda nuts_2: utils.get_country_property(nuts_2, "name")
-        config["country_codes"] = st.multiselect("Countries", country_codes, default=default_countries, format_func=format_func)
+        config["country_codes"] = st.multiselect("Countries", country_codes, format_func=map_country_name_to_code)
+
+    # Sort the countries by name
+    config["country_codes"] = sorted(config["country_codes"], key=map_country_name_to_code)
 
     # Select the range of years that should be modeled
     climate_years = range(1982, 2017)
@@ -63,7 +65,7 @@ with st.sidebar.expander("Technologies"):
     col1, col2 = st.columns(2)
     col1.subheader("Production")
     config["technologies"]["production"] = {}
-    production_technology_options = utils.read_yaml(utils.path("input", "technologies", "production.yaml")).keys()
+    production_technology_options = utils.get_technologies(technology_type="production").keys()
     for technology in production_technology_options:
         if col1.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["production"][technology] = scenario_level
@@ -71,7 +73,7 @@ with st.sidebar.expander("Technologies"):
     # Select the storage technologies
     col2.subheader("Storage")
     config["technologies"]["storage"] = {}
-    storage_technologies_options = utils.read_yaml(utils.path("input", "technologies", "storage.yaml")).keys()
+    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
     for technology in storage_technologies_options:
         if col2.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["storage"][technology] = scenario_level

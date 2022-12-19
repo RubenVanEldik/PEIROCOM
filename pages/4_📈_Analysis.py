@@ -53,14 +53,14 @@ def run():
     selected_resolution = st.sidebar.selectbox("Resolution", sorted_resolution_stages)
 
     # Set the analysis type options
-    analysis_type_options = ["statistics", "temporal_results", "countries", "correlation", "duration_curve", "optimization_log"]
+    analysis_type_options = ["statistics", "temporal_results", "countries", "correlation", "duration_curve", "energy_destination", "sankey_diagram"]
     if is_sensitivity_analysis:
         # Add a Streamlit placeholder for if the sensitivity step should be specified
         sensitivity_step_placeholder = st.sidebar.empty()
 
         # Ask which analysis type should be used
-        analysis_type_options.append("sensitivity")
-        analysis_type = st.sidebar.radio("Type of analysis", analysis_type_options, index=len(analysis_type_options) - 1, format_func=utils.format_str)
+        analysis_type_options.extend(["sensitivity", "optimization_log"])
+        analysis_type = st.sidebar.radio("Type of analysis", analysis_type_options, index=len(analysis_type_options) - 2, format_func=utils.format_str)
 
         # If its not a sensitivity analysis, ask for which sensitivity step the data should be shown
         if analysis_type != "sensitivity":
@@ -74,6 +74,7 @@ def run():
         # Run the analysis
         getattr(analysis, analysis_type)(output_directory, selected_resolution)
     else:
+        analysis_type_options.append("optimization_log")
         # Ask which analysis type should be used
         analysis_type = st.sidebar.radio("Type of analysis", analysis_type_options, format_func=utils.format_str)
 

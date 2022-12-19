@@ -1,3 +1,4 @@
+import utils
 import validate
 
 
@@ -8,15 +9,11 @@ def format_technology(key, *, capitalize=True):
     assert validate.is_technology(key)
     assert validate.is_bool(capitalize)
 
-    if key == "pv":
-        label = "solar PV"
-    if key == "onshore":
-        label = "onshore wind"
-    if key == "offshore":
-        label = "offshore wind"
-    if key == "lion":
-        label = "Li-ion"
-    if key == "hydrogen":
-        label = "hydrogen"
+    # Get a dictionary with all technologies
+    technologies = utils.get_technologies()
 
-    return (label[0].upper() + label[1:]) if capitalize else label
+    # Get the technology name
+    technology_name = technologies[key]["name"]
+
+    # Return a formatted technology name
+    return (technology_name[0].upper() + technology_name[1:]) if capitalize else technology_name

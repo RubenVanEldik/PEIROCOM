@@ -9,12 +9,11 @@ class Chart:
     Create a matplotlib figure
     """
 
-    fig = None
-    ax = None
-
-    def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear"):
+    def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear", wide=False):
         # Create the figure
-        self.fig, self.ax = plt.subplots(figsize=(6, 4))
+        figure_width = 12 if wide else 6
+        figure_height = 4
+        self.fig, self.ax = plt.subplots(figsize=(figure_width, figure_height))
 
         # Set the axes' labels and scale and remove the top and right spine
         self.ax.set(xlabel=xlabel)

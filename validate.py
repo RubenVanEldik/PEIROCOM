@@ -7,7 +7,6 @@ import re
 import shapely
 
 import chart
-import colors
 
 
 def is_bidding_zone(value, *, required=True):
@@ -72,11 +71,20 @@ def is_color(value, *, required=True):
     return bool(re.search("^#([A-F0-9]{6}|[A-F0-9]{8})$", value))
 
 
+def is_color_format(value, *, required=True):
+    if value is None:
+        return not required
+
+    return value in ["hex", "rgb", "rgba"]
+
+
 def is_color_name(value, *, required=True):
     if value is None:
         return not required
 
-    return value in colors.list()
+    # Don't use utils.read_csv because it might create a circular import
+    colors = ["slate", "gray", "zinc", "neutral", "stone", "red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky", "blue", "indigo", "violet", "purple", "fuchsia", "pink", "rose"]
+    return value in colors
 
 
 def is_color_value(value, *, required=True):
@@ -95,9 +103,11 @@ def is_config(value, *, required=True):
 
     if not is_string(value.get("name")):
         return False
-    if not is_model_year(value.get("model_year")):
+    if not is_scenario(value.get("scenario")):
         return False
-    if not is_country_code_list(value.get("country_codes"), code_type="nuts_2"):
+    if not is_country_code_list(value.get("country_codes"), code_type="nuts2"):
+        return False
+    if len(value.get("country_codes")) == 0:
         return False
     if not is_dict(value.get("climate_years")):
         return False
@@ -128,9 +138,9 @@ def is_country_code(value, *, required=True, code_type):
     if value is None:
         return not required
 
-    if code_type == "nuts_2":
+    if code_type == "nuts2":
         return bool(re.search("^[A-Z]{2}$", value))
-    if code_type == "alpha_3":
+    if code_type == "alpha3":
         return bool(re.search("^[A-Z]{3}$", value))
     return False
 
@@ -149,7 +159,7 @@ def is_country_code_type(value, *, required=True):
     if value is None:
         return not required
 
-    return value == "nuts_2" or value == "alpha_3"
+    return value == "nuts2" or value == "alpha3"
 
 
 def is_country_obj(value, *, required=True):
@@ -356,13 +366,6 @@ def is_model(value, *, required=True):
     return isinstance(value, gurobipy.Model)
 
 
-def is_model_year(value, *, required=True):
-    if value is None:
-        return not required
-
-    return value == 2025 or value == 2030
-
-
 def is_number(value, *, required=True, min_value=None, max_value=None):
     if value is None:
         return not required
@@ -399,6 +402,13 @@ def is_resolution_stages(value, *, required=True):
         return False
 
     return all(is_resolution(resolution) for resolution in value)
+
+
+def is_scenario(value, *, required=True):
+    if value is None:
+        return not required
+
+    return value in [directory.name for directory in pathlib.Path("./input/scenarios").iterdir() if directory.is_dir()]
 
 
 def is_sensitivity_config(value, *, required=True):

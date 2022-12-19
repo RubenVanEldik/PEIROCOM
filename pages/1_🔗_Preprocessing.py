@@ -41,14 +41,14 @@ def _validate_and_import_bidding_zone_data():
     # Initialize a progress bar
     bidding_zone_progress = st.progress(0.0)
 
-    for year_index, year in enumerate(years):
+    for scenario_index, scenario in enumerate(scenarios):
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
-            bidding_zone_progress.progress(year_index / len(years) + bidding_zone_index / len(years) / len(bidding_zones))
+            bidding_zone_progress.progress(scenario_index / len(scenarios) + bidding_zone_index / len(scenarios) / len(bidding_zones))
 
-            filename = utils.path("input", "bidding_zones", year, f"{bidding_zone}.csv")
+            filename = utils.path("input", "scenarios", scenario["name"], "bidding_zones", f"{bidding_zone}.csv")
             if filename.is_file():
                 is_valid_file = True
-                data = utils.read_csv(filename, parse_dates=True, index_col=0)
+                data = utils.read_temporal_data(filename)
 
                 if not validate.is_dataframe(data):
                     is_valid_file = False
@@ -66,8 +66,8 @@ def _validate_and_import_bidding_zone_data():
                     is_valid_file = False
 
                 if not is_valid_file:
-                    with st.spinner(f"Preprocessing {bidding_zone} ({year})"):
-                        utils.preprocess_bidding_zone(bidding_zone, year)
+                    with st.spinner(f"Preprocessing {bidding_zone} ({scenario['name']})"):
+                        utils.preprocess_bidding_zone(bidding_zone, scenario["name"])
 
     bidding_zone_progress.empty()
     bidding_zone_placeholder.success("The data for all bidding zones is succesfully preprocessed")
@@ -79,15 +79,15 @@ def _validate_and_import_interconnection_data():
     """
     interconnection_progress = st.progress(0.0)
 
-    for year_index, year in enumerate(years):
+    for scenario_index, scenario in enumerate(scenarios):
         interconnection_types = ["hvac", "hvdc", "limits"]
         for interconnection_type_index, interconnection_type in enumerate(interconnection_types):
-            interconnection_progress.progress(year_index / len(years) + interconnection_type_index / len(years) / len(interconnection_types))
+            interconnection_progress.progress(scenario_index / len(scenarios) + interconnection_type_index / len(scenarios) / len(interconnection_types))
 
-            filename = utils.path("input", "interconnections", year, f"{interconnection_type}.csv")
+            filename = utils.path("input", "scenarios", scenario["name"], "interconnections", f"{interconnection_type}.csv")
             if filename.is_file():
                 is_valid_file = True
-                data = utils.read_csv(filename, parse_dates=True, index_col=0, header=[0, 1])
+                data = utils.read_temporal_data(filename, header=[0, 1])
 
                 if not validate.is_dataframe(data):
                     is_valid_file = False
@@ -96,8 +96,8 @@ def _validate_and_import_interconnection_data():
                     is_valid_file = False
 
                 # Check if the DataFrame has any missing timestamps
-                start_date = pd.Timestamp(datetime.strptime(f"{year}-01-01", "%Y-%m-%d").strftime("%Y-%m-%d 00:00:00+00:00"))
-                end_date = pd.Timestamp(datetime.strptime(f"{year}-12-31", "%Y-%m-%d").strftime("%Y-%m-%d 00:00:00+00:00"))
+                start_date = pd.Timestamp(datetime.strptime(f"{scenario['year']}-01-01", "%Y-%m-%d").strftime("%Y-%m-%d 00:00:00+00:00"))
+                end_date = pd.Timestamp(datetime.strptime(f"{scenario['year']}-12-31", "%Y-%m-%d").strftime("%Y-%m-%d 00:00:00+00:00"))
                 required_timestamps = pd.date_range(start=start_date, end=end_date, freq="1H")
                 missing_timestamps = required_timestamps.difference(data.index)
                 has_missing_timestamps = len(missing_timestamps[~((missing_timestamps.month == 2) & (missing_timestamps.day == 29))]) != 0
@@ -105,8 +105,8 @@ def _validate_and_import_interconnection_data():
                     is_valid_file = False
 
                 if not is_valid_file:
-                    with st.spinner(f"Preprocessing {utils.format_str(interconnection_type)} interconnections ({year})"):
-                        utils.preprocess_interconnections(interconnection_type, year)
+                    with st.spinner(f"Preprocessing {utils.format_str(interconnection_type)} interconnections ({scenario['name']})"):
+                        utils.preprocess_interconnections(interconnection_type, scenario["name"])
 
     interconnection_progress.empty()
     interconnection_placeholder.success("The data for all interconnections is succesfully preprocessed")
@@ -114,12 +114,12 @@ def _validate_and_import_interconnection_data():
 
 # Global variables
 input_directory = utils.path("input", "eraa")
-years = [2025, 2030]
+scenarios = [{"name": "ERAA 2025", "year": 2025}, {"name": "ERAA 2030", "year": 2030}]
 
 
 # Download the demand files
 st.header("Bidding zones")
-demand_filenames = [utils.path(input_directory, "Demand Data", f"Demand_TimeSeries_{year}_NationalEstimates.xlsx") for year in years]
+demand_filenames = [utils.path(input_directory, "Demand Data", f"Demand_TimeSeries_{scenario['year']}_NationalEstimates.xlsx") for scenario in scenarios]
 if not utils.validate_files(demand_filenames):
     st.warning("The demand files could not be found.")
 
@@ -129,7 +129,7 @@ if not utils.validate_files(demand_filenames):
         _download_data(demand_data_url, input_directory, demand_filenames)
 
 # Download the climate files
-climate_filenames = [utils.path(input_directory, "Climate Data", f"PECD_{production_type}_{year}_edition 2021.3.xlsx") for year in years for production_type in ["LFSolarPV", "Onshore", "Offshore"]]
+climate_filenames = [utils.path(input_directory, "Climate Data", f"PECD_{production_type}_{scenario['year']}_edition 2021.3.xlsx") for scenario in scenarios for production_type in ["LFSolarPV", "Onshore", "Offshore"]]
 if not utils.validate_files(climate_filenames):
     st.warning("The climate files could not be found.")
 
@@ -147,7 +147,7 @@ if utils.validate_files(demand_filenames) and utils.validate_files(climate_filen
 
 # Check and download the interconnection files
 st.header("Interconnections")
-interconnection_filenames = [utils.path(input_directory, "Transfer Capacities", f"Transfer Capacities_ERAA2021_TY{year}.xlsx") for year in years]
+interconnection_filenames = [utils.path(input_directory, "Transfer Capacities", f"Transfer Capacities_ERAA2021_TY{scenario['year']}.xlsx") for scenario in scenarios]
 if not utils.validate_files(interconnection_filenames):
     st.warning("The interconnection files could not be found.")
 

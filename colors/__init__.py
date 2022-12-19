@@ -1,23 +1,33 @@
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+import pandas as pd
 
-import validate
 import utils
+import validate
 
-# Read the colors file
-all_colors = utils.read_csv(utils.path("colors", "colors.csv"), index_col=0)
+# Read the colors file (don't use utils.read_csv since it might create a circular import)
+all_colors = pd.read_csv("./colors/colors.csv", index_col=0)
 
 
-def get(color, value, *, alpha=1):
+def get(color_name, value, *, alpha=1, format="hex"):
     """
-    Return the HEX value for a specific color and value
+    Return the HEX value for a specific color name and value
     """
-    assert validate.is_color_name(color)
+    assert validate.is_color_name(color_name)
     assert validate.is_color_value(value)
     assert validate.is_number(alpha, min_value=0, max_value=1)
+    assert validate.is_color_format(format)
 
-    alpha_hex = hex(round(alpha * 255))[2:].upper().rjust(2, "0")
-    return f"{all_colors.loc[value, color]}{alpha_hex}"
+    # Get the color
+    hex_color = all_colors.loc[value, color_name]
+
+    if format == "hex":
+        hex_alpha = hex(round(alpha * 255))[2:].upper().rjust(2, "0")
+        return f"{hex_color}{hex_alpha}"
+    elif format == "rgb":
+        return f"rgb({int(hex_color[1:3], 16)}, {int(hex_color[3:5], 16)}, {int(hex_color[5:7], 16)})"
+    elif format == "rgba":
+        return f"rgba({int(hex_color[1:3], 16)}, {int(hex_color[3:5], 16)}, {int(hex_color[5:7], 16)}, {alpha})"
 
 
 def primary(*, alpha=0.8):
@@ -67,16 +77,8 @@ def technology(technology_name, *, alpha=0.8):
     assert validate.is_technology(technology_name)
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    if technology_name == "pv":
-        return get("amber", 400, alpha=alpha)
-    if technology_name == "onshore":
-        return get("sky", 400, alpha=alpha)
-    if technology_name == "offshore":
-        return get("teal", 700, alpha=alpha)
-    if technology_name == "lion":
-        return get("rose", 500, alpha=alpha)
-    if technology_name == "hydrogen":
-        return get("indigo", 600, alpha=alpha)
+    technology_color = utils.get_technologies()[technology_name]["color"]
+    return get(technology_color["name"], technology_color["value"], alpha=alpha)
 
 
 def random(color=None, value=None, alpha=0.8):
@@ -95,14 +97,6 @@ def random(color=None, value=None, alpha=0.8):
 
     # Get the color code
     return get(color, value, alpha=alpha)
-
-
-def list():
-    """
-    Return a list of all available colors
-    """
-    colors = utils.read_csv(utils.path("colors", "colors.csv"), index_col=0)
-    return colors.columns.tolist()
 
 
 def colormap(color1, color2=None, *, alpha=1):

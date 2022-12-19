@@ -10,4 +10,4 @@ def get_country_of_bidding_zone(bidding_zone):
     assert validate.is_bidding_zone(bidding_zone)
 
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
-    return next(country["nuts_2"] for country in countries if bidding_zone in country["bidding_zones"])
+    return next(country["nuts2"] for country in countries if bidding_zone in country["bidding_zones"])

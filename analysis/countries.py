@@ -36,15 +36,20 @@ def _select_data(output_directory, resolution, *, name):
 
     if data_source == "Temporal results":
         # Get the temporal results
-        all_temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
+        temporal_results = utils.get_temporal_results(output_directory, resolution, group="country")
 
         # Merge the DataFrames on a specific column
-        relevant_columns = utils.find_common_columns(all_temporal_results)
-        column_name = col2.selectbox("Column", relevant_columns, format_func=utils.format_column_name, key=name)
-        temporal_results = utils.merge_dataframes_on_column(all_temporal_results, column_name)
+        relevant_columns = utils.find_common_columns(temporal_results)
+        column_names = col2.multiselect("Column", relevant_columns, format_func=utils.format_column_name, key=name)
 
-        # Average values of the selected temporal column
-        return temporal_results.mean()
+        if len(column_names) == 0:
+            return
+
+        # Merge all temporal results
+        data = pd.DataFrame()
+        for name in column_names:
+            data[name] = utils.merge_dataframes_on_column(temporal_results, name).mean()
+        return data
 
     if data_source == "Country info":
         # Get the country information
@@ -52,12 +57,12 @@ def _select_data(output_directory, resolution, *, name):
 
         # Select the numeric parameter that should be shown
         country_parameters = list(set([parameter for country in country_info for parameter in country if isinstance(country[parameter], (int, float))]))
-        country_parameters += list(set([f"current.{technology}" for country in country_info for technology in country["current"]]))
-        country_parameters += list(set([f"potential.{technology}" for country in country_info for technology in country["potential"]]))
-        selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace(".", " ")), key=name)
+        country_parameters += list(set([f"capacity.current.{technology}" for country in country_info for technology in country["capacity"]["current"]]))
+        country_parameters += list(set([f"capacity.potential.{technology}" for country in country_info for technology in country["capacity"]["potential"]]))
+        selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace("capacity.", "").replace(".", " ")), key=name)
 
         # Return a Series with the potential per country for the selected technology
-        data = pd.Series({country["nuts_2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts_2"] in config["country_codes"]})
+        data = pd.Series({country["nuts2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts2"] in config["country_codes"]})
         data[data == 0] = None
         return data
 
@@ -130,28 +135,45 @@ def countries(output_directory, resolution):
         label = st.sidebar.text_input("Label")
 
         # Show zero values as white areas
-        if st.sidebar.checkbox("Exclude zero values"):
+        exclude_zero_values = st.sidebar.checkbox("Exclude zero values")
+        if exclude_zero_values:
             data.loc[data == 0] = None
 
-        # Ask if the data should be shown as a (stacked) bar chart
-        show_stacked_bar_chart = st.sidebar.checkbox("Show as a (stacked) bar chart")
+        # Ask if the data should be shown on a map if all countries have geographic units defined
+        all_countries_have_geographic_units = all(len(utils.get_country_property(country_code, "included_geographic_units")) > 0 for country_code in data.index)
+        show_as_map = all_countries_have_geographic_units and st.sidebar.checkbox("Show countries on a map")
 
         # Ask if the data should be formatted as a percentage
         format_percentage = st.sidebar.checkbox("Show as percentage")
 
         # Remove excluded countries from the data
-        excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts_2: utils.get_country_property(nuts_2, "name"))
+        excluded_country_codes = st.sidebar.multiselect("Exclude countries", options=data.index, format_func=lambda nuts2: utils.get_country_property(nuts2, "name"))
         data = data[~data.index.isin(excluded_country_codes)]
 
         # Get the units for the color bar
         units = {10 ** -9: "Billionth", 10 ** -6: "Millionth", 10 ** -3: "Thousandth", 1: "One", 10 ** 3: "Thousand", 10 ** 6: "Million", 10 ** 9: "Billion"}
         unit = st.sidebar.select_slider("Format units", units.keys(), value=1, format_func=lambda key: units[key])
+        data = data / unit
 
         # Create and show the map
-        if show_stacked_bar_chart:
+        if show_as_map:
+            # If data is still a DataFrame, convert the single column DataFrame to a series
+            if validate.is_dataframe(data):
+                data = data.sum(axis=1)
+
+            map = chart.Map(data, label=label, format_percentage=format_percentage)
+            map.display()
+            map.download_button("countries.png")
+        else:
+            # Drop the non-exising values when zero values are excluded
+            if exclude_zero_values:
+                data = data.dropna()
+
             # Initialize bar chart
-            bar_chart = chart.Chart(xlabel="Countries", ylabel=label)
+            bar_chart = chart.Chart(xlabel="", ylabel=label, wide=True)
             bar_width = 0.8
+
+            data = data.sort_index(key=lambda x: [utils.get_country_property(xx, "name") for xx in x])
 
             if validate.is_dataframe(data):
                 bottom = 0
@@ -167,21 +189,13 @@ def countries(output_directory, resolution):
                 bar_chart.format_yticklabels("{:,.0%}")
 
             country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
-            bar_chart.ax.set_xticklabels(country_names, fontsize=8, rotation=90)
+            bar_chart.ax.set_xticklabels(country_names, rotation=90)
             padding = bar_width - (1 - bar_width) / 2
             bar_chart.ax.set_xlim(-padding, len(data.index) - (1 - padding))
             bar_chart.display()
             bar_chart.download_button("countries.png")
-        else:
-            # If data is still a DataFrame, convert the single column DataFrame to a series
-            if validate.is_dataframe(data):
-                data = data.sum(axis=1)
-
-            map = chart.Map(data / unit, label=label, format_percentage=format_percentage)
-            map.display()
-            map.download_button("countries.png")
 
         # Show the table in an expander
         with st.expander("Data points"):
             data.index = [utils.get_country_property(country_code, "name") for country_code in data.index]
-            st.table(data / unit)
+            st.table(data)
