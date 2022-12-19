@@ -14,7 +14,7 @@ def get_current_production_capacity_in_climate_zone(bidding_zone, production_tec
     country_code = utils.get_country_of_bidding_zone(bidding_zone)
 
     # Return zero if the production technology has no current capacity specified for this country
-    current_capacity = utils.get_country_property(country_code, "current").get(production_technology)
+    current_capacity = utils.get_country_property(country_code, "capacity.current").get(production_technology)
     if current_capacity is None:
         return 0
 

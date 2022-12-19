@@ -17,21 +17,24 @@ def run():
         # Read the countries data and convert it to a DataFrame
         countries_df = pd.DataFrame(utils.read_yaml(utils.path("input", "countries.yaml")))
 
-        # Split the current and potential columns
-        for column_name in ["current", "potential"]:
-            # Split the column into a DataFrame
-            column_df = pd.DataFrame(countries_df[column_name].values.tolist())
-            # Get the index of the column
-            column_index = countries_df.columns.get_loc(column_name)
-            # Drop the column
-            countries_df = countries_df.drop(column_name, axis=1)
-            # Add the sub columns to the DataFrame
-            for index, sub_column_name in enumerate(column_df.columns):
-                countries_df.insert(column_index + index, f"{column_name}_{sub_column_name}", column_df[sub_column_name])
+        # Split the capacity column into a new DataFrame
+        capacity_df = pd.DataFrame(countries_df.capacity.values.tolist())
+        # Get the index of the column
+        column_index = countries_df.columns.get_loc("capacity")
+        # Drop the column
+        countries_df = countries_df.drop("capacity", axis=1)
 
-        # Remove the geographic units from the dataframe
-        countries_df = countries_df.drop("included_geographic_units", axis=1)
-        countries_df = countries_df.drop("excluded_geographic_subunits", axis=1)
+        # Split the current and potential columns again and add the results to the original countries_df DataFrame
+        for column_name in ["current", "potential"]:
+            column_df = pd.DataFrame(capacity_df[column_name].values.tolist())
+            # Add the sub columns to the DataFrame
+            for sub_column_name in column_df.columns:
+                countries_df.insert(column_index, f"{column_name}_{sub_column_name}", column_df[sub_column_name])
+                column_index += 1
+
+        # Remove the geographic units from the dataframe (if they exist)
+        countries_df = countries_df.drop("included_geographic_units", axis=1, errors="ignore")
+        countries_df = countries_df.drop("excluded_geographic_subunits", axis=1, errors="ignore")
 
         # Set the name as index and sort by the name
         countries_df = countries_df.set_index("name")
@@ -47,6 +50,9 @@ def run():
 
             # Read the technology data and convert it to a DataFrame
             technologies_df = pd.DataFrame(utils.get_technologies(technology_type=technology_type)).transpose()
+
+            # Beautify the color column
+            technologies_df["color"] = technologies_df["color"].apply(lambda obj: f"{obj['name'].capitalize()} ({obj['value']})")
 
             for scenario_type in ["conservative", "moderate", "advanced"]:
                 # technologies_df = technologies_df.drop(scenario_type)

@@ -5,6 +5,26 @@ import utils
 import validate
 
 
+def _format_value_with_unit(value, *, unit):
+    """
+    Format the value with the proper unit
+    """
+    assert validate.is_number(value)
+    assert validate.is_string(unit)
+
+    if value > 10 ** 15:
+        return f"{value / 10 ** 15:,.0f}P{unit}"
+    if value > 10 ** 12:
+        return f"{value / 10 ** 12:,.0f}T{unit}"
+    if value > 10 ** 9:
+        return f"{value / 10 ** 9:,.0f}G{unit}"
+    if value > 10 ** 6:
+        return f"{value / 10 ** 6:,.0f}M{unit}"
+    if value > 10 ** 3:
+        return f"{value / 10 ** 3:,.0f}k{unit}"
+    return f"{value:,.0f}{unit}"
+
+
 def statistics(output_directory, resolution):
     """
     Show the key indicators for a run
@@ -49,7 +69,7 @@ def statistics(output_directory, resolution):
     # Show the production capacities
     with st.expander("Production capacity", expanded=True):
         # Ask if the results should be shown relative to the mean demand
-        show_relative_production_capacity = st.checkbox("Relative to demand", value=True, key="production")
+        show_relative_production_capacity = st.checkbox("Relative to demand", key="production")
         show_hourly_production = st.checkbox("Mean hourly production")
 
         # Get the production capacities
@@ -66,12 +86,12 @@ def statistics(output_directory, resolution):
                 if show_relative_production_capacity:
                     metric_value = f"{mean_hourly_production / mean_demand:.1%}"
                 else:
-                    metric_value = f"{mean_hourly_production / 1000:,.0f}GW"
+                    metric_value = _format_value_with_unit(mean_hourly_production * 10 ** 6, unit="W")
             else:
                 if show_relative_production_capacity:
                     metric_value = f"{production_capacity[technology] / mean_demand:.1%}"
                 else:
-                    metric_value = f"{production_capacity[technology] / 1000:,.0f}GW"
+                    metric_value = _format_value_with_unit(production_capacity[technology] * 10 ** 6, unit="W")
 
             # Set the metric
             cols[index].metric(utils.format_technology(technology), metric_value)
@@ -79,7 +99,7 @@ def statistics(output_directory, resolution):
     # Show the storage capacities
     with st.expander("Storage capacity", expanded=True):
         # Ask if the results should be shown relative to the mean demand
-        show_relative_storage_capacity = st.checkbox("Relative to demand", value=True, key="storage")
+        show_relative_storage_capacity = st.checkbox("Relative to demand", key="storage")
         show_power_capacity = st.checkbox("Power capacity")
         storage_type = "power" if show_power_capacity else "energy"
 
@@ -96,12 +116,12 @@ def statistics(output_directory, resolution):
                 if show_relative_storage_capacity:
                     metric_value = f"{storage_capacity[technology] / mean_demand:.1%}"
                 else:
-                    metric_value = f"{storage_capacity[technology] / 1000:,.0f}GW"
+                    metric_value = _format_value_with_unit(storage_capacity[technology] * 10 ** 6, unit="W")
             else:
                 if show_relative_storage_capacity:
                     metric_value = f"{storage_capacity[technology] / mean_demand:.2f}H"
                 else:
-                    metric_value = f"{storage_capacity[technology] / 1000:,.0f}GWh"
+                    metric_value = _format_value_with_unit(storage_capacity[technology] * 10 ** 6, unit="Wh")
 
             # Set the metric
             cols[index].metric(f"{utils.format_technology(technology)} {storage_type}", metric_value)

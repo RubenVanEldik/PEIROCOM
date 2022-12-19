@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 import pandas as pd
 
+import utils
 import validate
 
 # Read the colors file (don't use utils.read_csv since it might create a circular import)

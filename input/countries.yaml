@@ -6,14 +6,15 @@
   included_geographic_units: [ALB]
   population: 2811666
   land_area: 27400
-  current:
-    pv: 0
-    onshore: 0
-    offshore: 0
-  potential:
-    onshore: 16368.52499
-    offshore: 0
-    hydrogen: 50000000
+  capacity:
+    current:
+      pv: 0
+      onshore: 0
+      offshore: 0
+    potential:
+      onshore: 16368.52499
+      offshore: 0
+      hydrogen: 50000000
 - name: Austria
   nuts2: AT
   alpha3: AUT
@@ -22,13 +23,14 @@
   included_geographic_units: [AUT]
   population: 8956279
   land_area: 82520
-  current:
-    pv: 2500
-    onshore: 3500
-    offshore: 0
-  potential:
-    onshore: 111695.2452
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 2500
+      onshore: 3500
+      offshore: 0
+    potential:
+      onshore: 111695.2452
+      hydrogen: 0
 - name: Bosnia and Herzegovina
   nuts2: BA
   alpha3: BIH
@@ -37,13 +39,14 @@
   included_geographic_units: [BHF, BIS, BHB]
   population: 3263459
   land_area: 51200
-  current:
-    pv: 0
-    onshore: 135
-    offshore: 0
-  potential:
-    onshore: 92454.61278
-    hydrogen: 800000000
+  capacity:
+    current:
+      pv: 0
+      onshore: 135
+      offshore: 0
+    potential:
+      onshore: 92454.61278
+      hydrogen: 800000000
 - name: Belgium
   nuts2: BE
   alpha3: BEL
@@ -52,14 +55,15 @@
   included_geographic_units: [BFR, BWR, BCR]
   population: 11587882
   land_area: 30280
-  current:
-    pv: 4788
-    onshore: 2787
-    offshore: 2254
-  potential:
-    onshore: 13548.88149
-    offshore: 4720
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 4788
+      onshore: 2787
+      offshore: 2254
+    potential:
+      onshore: 13548.88149
+      offshore: 4720
+      hydrogen: 0
 - name: Bulgaria
   nuts2: BG
   alpha3: BGR
@@ -68,14 +72,15 @@
   included_geographic_units: [BGR]
   population: 6899125
   land_area: 108560
-  current:
-    pv: 1313
-    onshore: 705
-    offshore: 0
-  potential:
-    onshore: 8487.873066
-    offshore: 0
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 1313
+      onshore: 705
+      offshore: 0
+    potential:
+      onshore: 8487.873066
+      offshore: 0
+      hydrogen: 0
 - name: Switzerland
   nuts2: CH
   alpha3: CHE
@@ -84,13 +89,14 @@
   included_geographic_units: [CHE]
   population: 8697723
   land_area: 39516.03
-  current:
-    pv: 0
-    onshore: 0
-    offshore: 0
-  potential:
-    onshore: 13684.3703
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 0
+      offshore: 0
+    potential:
+      onshore: 13684.3703
+      hydrogen: 0
 - name: Cyprus
   nuts2: CY
   alpha3: CYP
@@ -99,12 +105,13 @@
   included_geographic_units: [CYP]
   population: 1215588
   land_area: 9240
-  current:
-    pv: 0
-    onshore: 0
-    offshore: 0
-  potential:
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 0
+      offshore: 0
+    potential:
+      hydrogen: 0
 - name: Czechia
   nuts2: CZ
   alpha3: CZE
@@ -113,13 +120,14 @@
   included_geographic_units: [CZE]
   population: 10703446
   land_area: 77198.53
-  current:
-    pv: 2053
-    onshore: 339
-    offshore: 0
-  potential:
-    onshore: 40886.12328
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 2053
+      onshore: 339
+      offshore: 0
+    potential:
+      onshore: 40886.12328
+      hydrogen: 0
 - name: Germany
   nuts2: DE
   alpha3: DEU
@@ -128,14 +136,15 @@
   included_geographic_units: [DEU]
   population: 83129285
   land_area: 349390
-  current:
-    pv: 56347
-    onshore: 55560
-    offshore: 7787
-  potential:
-    onshore: 117392.8253
-    offshore: 40980
-    hydrogen: 9450000000
+  capacity:
+    current:
+      pv: 56347
+      onshore: 55560
+      offshore: 7787
+    potential:
+      onshore: 117392.8253
+      offshore: 40980
+      hydrogen: 9450000000
 - name: Denmark
   nuts2: DK
   alpha3: DNK
@@ -144,14 +153,15 @@
   included_geographic_units: [DNK]
   population: 5856733
   land_area: 40000
-  current:
-    pv: 1536
-    onshore: 4644
-    offshore: 2305
-  potential:
-    onshore: 150548.3151
-    offshore: 172350
-    hydrogen: 600000000
+  capacity:
+    current:
+      pv: 1536
+      onshore: 4644
+      offshore: 2305
+    potential:
+      onshore: 150548.3151
+      offshore: 172350
+      hydrogen: 600000000
 - name: Estonia
   nuts2: EE
   alpha3: EST
@@ -160,14 +170,15 @@
   included_geographic_units: [EST]
   population: 1329254
   land_area: 42750
-  current:
-    pv: 370
-    onshore: 326
-    offshore: 0
-  potential:
-    onshore: 144673.9717
-    offshore: 81810
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 370
+      onshore: 326
+      offshore: 0
+    potential:
+      onshore: 144673.9717
+      offshore: 81810
+      hydrogen: 0
 - name: Spain
   nuts2: ES
   alpha3: ESP
@@ -177,14 +188,15 @@
   excluded_geographic_subunits: [ESC]
   population: 47326687
   land_area: 499556.645
-  current:
-    pv: 14640
-    onshore: 27735
-    offshore: 0
-  potential:
-    onshore: 391316.1594
-    offshore: 25710
-    hydrogen: 1260000000
+  capacity:
+    current:
+      pv: 14640
+      onshore: 27735
+      offshore: 0
+    potential:
+      onshore: 391316.1594
+      offshore: 25710
+      hydrogen: 1260000000
 - name: Finland
   nuts2: FI
   alpha3: FIN
@@ -193,14 +205,15 @@
   included_geographic_units: [FIN, ALD]
   population: 5541696
   land_area: 303940
-  current:
-    pv: 7
-    onshore: 3184
-    offshore: 0
-  potential:
-    onshore: 777503.8953
-    offshore: 46920
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 7
+      onshore: 3184
+      offshore: 0
+    potential:
+      onshore: 777503.8953
+      offshore: 46920
+      hydrogen: 0
 - name: France
   nuts2: FR
   alpha3: FRA
@@ -209,14 +222,15 @@
   included_geographic_units: [FXX]
   population: 67499343
   land_area: 547557
-  current:
-    pv: 14298
-    onshore: 0
-    offshore: 10
-  potential:
-    onshore: 1079711.951
-    offshore: 177110
-    hydrogen: 510000000
+  capacity:
+    current:
+      pv: 14298
+      onshore: 0
+      offshore: 10
+    potential:
+      onshore: 1079711.951
+      offshore: 177110
+      hydrogen: 510000000
 - name: Greece
   nuts2: GR
   alpha3: GRC
@@ -225,14 +239,15 @@
   included_geographic_units: [GRC]
   population: 10664568
   land_area: 128900
-  current:
-    pv: 3820
-    onshore: 4150
-    offshore: 0
-  potential:
-    onshore: 72093.18945
-    offshore: 9500
-    hydrogen: 110000000
+  capacity:
+    current:
+      pv: 3820
+      onshore: 4150
+      offshore: 0
+    potential:
+      onshore: 72093.18945
+      offshore: 9500
+      hydrogen: 110000000
 - name: Croatia
   nuts2: HR
   alpha3: HRV
@@ -241,14 +256,15 @@
   included_geographic_units: [HRV]
   population: 3899000
   land_area: 55960
-  current:
-    pv: 96
-    onshore: 925
-    offshore: 0
-  potential:
-    onshore: 34181.50698
-    offshore: 0
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 96
+      onshore: 925
+      offshore: 0
+    potential:
+      onshore: 34181.50698
+      offshore: 0
+      hydrogen: 0
 - name: Hungary
   nuts2: HU
   alpha3: HUN
@@ -257,13 +273,14 @@
   included_geographic_units: [HUN]
   population: 9709886
   land_area: 91260
-  current:
-    pv: 2210
-    onshore: 323
-    offshore: 0
-  potential:
-    onshore: 17033.15274
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 2210
+      onshore: 323
+      offshore: 0
+    potential:
+      onshore: 17033.15274
+      hydrogen: 0
 - name: Ireland
   nuts2: IE
   alpha3: IRL
@@ -272,14 +289,15 @@
   included_geographic_units: [IRL]
   population: 5028230
   land_area: 68890
-  current:
-    pv: 0
-    onshore: 1919
-    offshore: 0
-  potential:
-    onshore: 317525.7372
-    offshore: 648740
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 1919
+      offshore: 0
+    potential:
+      onshore: 317525.7372
+      offshore: 648740
+      hydrogen: 0
 - name: Italy
   nuts2: IT
   alpha3: ITA
@@ -288,14 +306,15 @@
   included_geographic_units: [ITA]
   population: 59066225
   land_area: 295717
-  current:
-    pv: 5137
-    onshore: 10658
-    offshore: 0
-  potential:
-    onshore: 109494.4076
-    offshore: 0
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 5137
+      onshore: 10658
+      offshore: 0
+    potential:
+      onshore: 109494.4076
+      offshore: 0
+      hydrogen: 0
 - name: Lithuania
   nuts2: LT
   alpha3: LTU
@@ -304,14 +323,15 @@
   included_geographic_units: [LTU]
   population: 2795321
   land_area: 62620
-  current:
-    pv: 259
-    onshore: 671
-    offshore: 0
-  potential:
-    onshore: 221926.6599
-    offshore: 14090
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 259
+      onshore: 671
+      offshore: 0
+    potential:
+      onshore: 221926.6599
+      offshore: 14090
+      hydrogen: 0
 - name: Luxembourg
   nuts2: LU
   alpha3: LUX
@@ -320,13 +340,14 @@
   included_geographic_units: [LUX]
   population: 639070
   land_area: 2574.46
-  current:
-    pv: 258
-    onshore: 167
-    offshore: 0
-  potential:
-    onshore: 167
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 258
+      onshore: 167
+      offshore: 0
+    potential:
+      onshore: 167
+      hydrogen: 0
 - name: Latvia
   nuts2: LV
   alpha3: LVA
@@ -335,14 +356,15 @@
   included_geographic_units: [LVA]
   population: 1883162
   land_area: 62230
-  current:
-    pv: 14
-    onshore: 87
-    offshore: 0
-  potential:
-    onshore: 155110.0796
-    offshore: 85160
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 14
+      onshore: 87
+      offshore: 0
+    potential:
+      onshore: 155110.0796
+      offshore: 85160
+      hydrogen: 0
 - name: Montenegro
   nuts2: ME
   alpha3: MNE
@@ -351,14 +373,15 @@
   included_geographic_units: [MNE]
   population: 620173
   land_area: 13450
-  current:
-    pv: 0
-    onshore: 118
-    offshore: 0
-  potential:
-    onshore: 28013.26503
-    offshore: 0
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 118
+      offshore: 0
+    potential:
+      onshore: 28013.26503
+      offshore: 0
+      hydrogen: 0
 - name: North Macedonia
   nuts2: MK
   alpha3: MKD
@@ -367,13 +390,14 @@
   included_geographic_units: [MKD]
   population: 2065092
   land_area: 25220
-  current:
-    pv: 22
-    onshore: 37
-    offshore: 0
-  potential:
-    onshore: 5757.915653
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 22
+      onshore: 37
+      offshore: 0
+    potential:
+      onshore: 5757.915653
+      hydrogen: 0
 - name: Malta
   nuts2: MT
   alpha3: MLT
@@ -382,12 +406,13 @@
   included_geographic_units: [MLT]
   population: 516869
   land_area: 320
-  current:
-    pv: 0
-    onshore: 0
-    offshore: 0
-  potential:
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 0
+      offshore: 0
+    potential:
+      hydrogen: 0
 - name: Netherlands
   nuts2: NL
   alpha3: NLD
@@ -396,14 +421,15 @@
   included_geographic_units: [NLX]
   population: 17533405
   land_area: 33670
-  current:
-    pv: 16074
-    onshore: 7303
-    offshore: 3757
-  potential:
-    onshore: 78847.25957
-    offshore: 77070
-    hydrogen: 300000000
+  capacity:
+    current:
+      pv: 16074
+      onshore: 7303
+      offshore: 3757
+    potential:
+      onshore: 78847.25957
+      offshore: 77070
+      hydrogen: 300000000
 - name: Norway
   nuts2: "NO" # Strings are required, otherwise the YAML parser will parse it as a boolean False value
   alpha3: NOR
@@ -412,14 +438,15 @@
   included_geographic_units: [NOW]
   population: 5408320
   land_area: 364285
-  current:
-    pv: 0
-    onshore: 5105
-    offshore: 0
-  potential:
-    onshore: 747165.9611
-    offshore: 641030
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 5105
+      offshore: 0
+    potential:
+      onshore: 747165.9611
+      offshore: 641030
+      hydrogen: 0
 - name: Poland
   nuts2: PL
   alpha3: POL
@@ -428,14 +455,15 @@
   included_geographic_units: [POL]
   population: 37781024
   land_area: 306130
-  current:
-    pv: 6036
-    onshore: 7886
-    offshore: 0
-  potential:
-    onshore: 419543.8884
-    offshore: 79680
-    hydrogen: 7240000000
+  capacity:
+    current:
+      pv: 6036
+      onshore: 7886
+      offshore: 0
+    potential:
+      onshore: 419543.8884
+      offshore: 79680
+      hydrogen: 7240000000
 - name: Portugal
   nuts2: PT
   alpha3: PRT
@@ -444,14 +472,15 @@
   included_geographic_units: [PRX]
   population: 10299423
   land_area: 91605.6
-  current:
-    pv: 1032
-    onshore: 5328
-    offshore: 25
-  potential:
-    onshore: 59674.41051
-    offshore: 2830
-    hydrogen: 250000000
+  capacity:
+    current:
+      pv: 1032
+      onshore: 5328
+      offshore: 25
+    potential:
+      onshore: 59674.41051
+      offshore: 2830
+      hydrogen: 250000000
 - name: Romania
   nuts2: RO
   alpha3: ROU
@@ -460,14 +489,15 @@
   included_geographic_units: [ROU]
   population: 19115146
   land_area: 230080
-  current:
-    pv: 1160
-    onshore: 2957
-    offshore: 0
-  potential:
-    onshore: 38135.22537
-    offshore: 0
-    hydrogen: 1100000000
+  capacity:
+    current:
+      pv: 1160
+      onshore: 2957
+      offshore: 0
+    potential:
+      onshore: 38135.22537
+      offshore: 0
+      hydrogen: 1100000000
 - name: Serbia
   nuts2: RS
   alpha3: SRB
@@ -476,13 +506,14 @@
   included_geographic_units: [SRV, SRS]
   population: 6844078
   land_area: 87460
-  current:
-    pv: 3
-    onshore: 533
-    offshore: 0
-  potential:
-    onshore: 23653.77034
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 3
+      onshore: 533
+      offshore: 0
+    potential:
+      onshore: 23653.77034
+      hydrogen: 0
 - name: Sweden
   nuts2: SE
   alpha3: SWE
@@ -491,14 +522,15 @@
   included_geographic_units: [SWE]
   population: 10415811
   land_area: 407283.532
-  current:
-    pv: 0
-    onshore: 12100
-    offshore: 0
-  potential:
-    onshore: 841925.3066
-    offshore: 166650
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 12100
+      offshore: 0
+    potential:
+      onshore: 841925.3066
+      offshore: 166650
+      hydrogen: 0
 - name: Slovenia
   nuts2: SI
   alpha3: SVN
@@ -507,14 +539,15 @@
   included_geographic_units: [SVN]
   population: 2107007
   land_area: 20136.4
-  current:
-    pv: 286
-    onshore: 2
-    offshore: 0
-  potential:
-    onshore: 4580.086726
-    offshore: 0
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 286
+      onshore: 2
+      offshore: 0
+    potential:
+      onshore: 4580.086726
+      offshore: 0
+      hydrogen: 0
 - name: Slovakia
   nuts2: SK
   alpha3: SVK
@@ -523,13 +556,14 @@
   included_geographic_units: [SVK]
   population: 5447247
   land_area: 48080
-  current:
-    pv: 0
-    onshore: 0
-    offshore: 0
-  potential:
-    onshore: 17375.51911
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 0
+      offshore: 0
+    potential:
+      onshore: 17375.51911
+      hydrogen: 0
 - name: Turkey
   nuts2: TR
   alpha3: TUR
@@ -538,14 +572,15 @@
   included_geographic_units: [TUR]
   population: 85042736
   land_area: 769630
-  current:
-    pv: 0
-    onshore: 0
-    offshore: 0
-  potential:
-    onshore: 468071.8363
-    offshore: 460
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 0
+      onshore: 0
+      offshore: 0
+    potential:
+      onshore: 468071.8363
+      offshore: 460
+      hydrogen: 0
 - name: Ukraine
   nuts2: UA
   alpha3: UKR
@@ -554,12 +589,13 @@
   included_geographic_units: [UKR]
   population: 43814581
   land_area: 579400
-  current:
-    pv: 5363
-    onshore: 1111
-    offshore: 0
-  potential:
-    hydrogen: 0
+  capacity:
+    current:
+      pv: 5363
+      onshore: 1111
+      offshore: 0
+    potential:
+      hydrogen: 0
 - name: United Kingdom
   nuts2: UK
   alpha3: GBR
@@ -568,11 +604,12 @@
   included_geographic_units: [ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS]
   population: 67326569
   land_area: 241930
-  current:
-    pv: 13470
-    onshore: 13932
-    offshore: 12160
-  potential:
-    onshore: 689995.2295
-    offshore: 1028930
-    hydrogen: 1040000000
+  capacity:
+    current:
+      pv: 13470
+      onshore: 13932
+      offshore: 12160
+    potential:
+      onshore: 689995.2295
+      offshore: 1028930
+      hydrogen: 1040000000
