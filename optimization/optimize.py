@@ -22,6 +22,9 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     duration = {}
     initializing_start = datetime.now()
 
+    # Check if the interconnections should be optimized individually
+    optimize_individual_interconnections = config["interconnections"]["optimize_individual_interconnections"] == True and config["interconnections"]["relative_capacity"] != 1
+
     """
     Step 1: Create the model and set the parameters
     """
@@ -49,6 +52,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     temporal_data = {}
     temporal_results = {}
     temporal_export = {}
+    interconnection_capacity = {}
     production_capacity = {}
     storage_capacity = {}
 
@@ -102,6 +106,12 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             temporal_export_columns = pd.MultiIndex.from_tuples([], names=["from", "to"])
             temporal_export["hvac"] = pd.DataFrame(index=temporal_results[bidding_zone].index, columns=temporal_export_columns)
             temporal_export["hvdc"] = pd.DataFrame(index=temporal_results[bidding_zone].index, columns=temporal_export_columns)
+
+        # Create empty DataFrames for the extra interconnection capacity, if they don't exist yet
+        if not len(interconnection_capacity):
+            interconnection_capacity_index = pd.MultiIndex.from_arrays([[], []], names=("from", "to"))
+            interconnection_capacity["hvac"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
+            interconnection_capacity["hvdc"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
 
         """
         Step 2B: Define production capacity variables
@@ -244,10 +254,31 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             status.update(f"{country_flag} Adding {connection_type.upper()} interconnections")
             # Get the export limits
             temporal_export_limits = utils.get_export_limits(bidding_zone, connection_type=connection_type, index=temporal_results[bidding_zone].index, config=config)
-            # Multiply the export limits with the relative capacity factor
-            temporal_export_limits *= config["interconnections"]["relative_capacity"]
-            # Create the variables for the export variables
-            temporal_export[connection_type][temporal_export_limits.columns] = temporal_export_limits.apply(lambda column: pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_export_limits[column.name])))
+
+            for temporal_export_limit_column_name in temporal_export_limits.columns:
+                # Get the current temporal export limits
+                temporal_export_limit = temporal_export_limits[temporal_export_limit_column_name]
+
+                # Add the interconnection capacities to the DataFrames and create the temporal interconnection variables
+                if optimize_individual_interconnections:
+                    # Create a variable for the extra interconnection capacity
+                    extra_interconnection_capacity = model.addVar()
+                    # Add the mean current and extra interconnection capacity to the interconnection capacity DataFrame
+                    interconnection_capacity[connection_type].loc[temporal_export_limit_column_name, "current"] = temporal_export_limit.mean()
+                    interconnection_capacity[connection_type].loc[temporal_export_limit_column_name, "extra"] = extra_interconnection_capacity
+                    # Add the extra capacity to the temporal export limit
+                    temporal_export_limit += extra_interconnection_capacity
+                    # Create the variables for the export variables and add the constraint manually (can't use 'ub' because there is a Gurobi variable in the constraint)
+                    temporal_export[connection_type][temporal_export_limit_column_name] = pd.Series(model.addVars(temporal_export[connection_type].index))
+                    model.addConstrs(temporal_export[connection_type].loc[timestamp, temporal_export_limit_column_name] <= temporal_export_limit.loc[timestamp] for timestamp in temporal_export[connection_type].index)
+                else:
+                    # Add the mean current and extra interconnection capacity to the interconnection capacity DataFrame
+                    interconnection_capacity[connection_type].loc[temporal_export_limit_column_name, "current"] = temporal_export_limit.mean()
+                    interconnection_capacity[connection_type].loc[temporal_export_limit_column_name, "extra"] = (config["interconnections"]["relative_capacity"] - 1) * temporal_export_limit.mean()
+                    # Multiply the export limits with the relative capacity factor
+                    temporal_export_limit *= config["interconnections"]["relative_capacity"]
+                    # Create the variables for the export variables
+                    temporal_export[connection_type][temporal_export_limit_column_name] = pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_export_limit))
 
     """
     Step 3: Define demand constraints
@@ -295,7 +326,16 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("production_total_MW"), "curtailed_MW", curtailed_MW)
 
     """
-    Step 4: Define the self-sufficiency constraints per country
+    Step 4: Define interconnection capacity constraint if the individual interconnections are optimized
+    """
+    if optimize_individual_interconnections:
+        total_current_capacity = sum(interconnection_capacity[connection_type]["current"].sum() for connection_type in ["hvac", "hvdc"])
+        total_extra_capacity = sum(interconnection_capacity[connection_type]["extra"].sum() for connection_type in ["hvac", "hvdc"])
+        if total_current_capacity > 0:
+            model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
+
+    """
+    Step 5: Define the self-sufficiency constraints per country
     """
     if config["interconnections"]["min_self_sufficiency"] > 0:
         for country_code in config["country_codes"]:
@@ -325,7 +365,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
                 model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
 
     """
-    Step 5: Define the storage costs constraint
+    Step 6: Define the storage costs constraint
     """
     if config.get("fixed_storage") is not None:
         status.update("Adding the storage costs constraint")
@@ -342,7 +382,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
             model.addConstr(storage_costs <= fixed_storage_costs)
 
     """
-    Step 6: Set objective function
+    Step 7: Set objective function
     """
     status.update("Setting the objective function")
     temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
@@ -354,7 +394,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     duration["initializing"] = round((initializing_end - initializing_start).total_seconds())
 
     """
-    Step 7: Solve model
+    Step 8: Solve model
     """
     # Set the status message and create
     status.update("Optimizing")
@@ -446,7 +486,7 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     duration["optimizing"] = round((optimizing_end - optimizing_start).total_seconds())
 
     """
-    Step 8: Check if the model could be solved
+    Step 9: Check if the model could be solved
     """
     if model.status == gp.GRB.OPTIMAL:
         error_message = None
@@ -480,12 +520,12 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
         return {"duration": duration, "error_message": error_message}
 
     """
-    Step 9: Store the results
+    Step 10: Store the results
     """
     storing_start = datetime.now()
 
     # Make a directory for each type of output
-    for sub_directory in ["temporal_results", "temporal_export", "production_capacities", "storage_capacities"]:
+    for sub_directory in ["temporal_results", "temporal_export", "production_capacities", "storage_capacities", "interconnection_capacity"]:
         (output_directory / resolution / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
@@ -509,8 +549,12 @@ def optimize(config, *, resolution, previous_resolution, status, output_director
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:
         status.update(f"Converting and storing the {connection_type.upper()} interconnection results")
+        # Convert and store the temporal interconnection flows
         temporal_export_connection_type = utils.convert_variables_recursively(temporal_export[connection_type])
         temporal_export_connection_type.to_csv(output_directory / resolution / "temporal_export" / f"{connection_type}.csv")
+        # Convert and store the interconnection capacities
+        interconnection_capacity_connection_type = utils.convert_variables_recursively(interconnection_capacity[connection_type])
+        interconnection_capacity_connection_type.to_csv(output_directory / resolution / "interconnection_capacity" / f"{connection_type}.csv")
 
     # Add the storing duration to the dictionary
     storing_end = datetime.now()

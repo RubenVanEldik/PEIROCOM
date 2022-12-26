@@ -83,6 +83,7 @@ with st.sidebar.expander("Interconnections"):
     config["interconnections"] = {"efficiency": {}}
     config["interconnections"]["min_self_sufficiency"] = st.slider("Minimum self sufficiency factor", value=0.8, max_value=1.0, step=0.05)
     config["interconnections"]["relative_capacity"] = st.slider("Relative capacity", value=1.0, max_value=1.5, step=0.05)
+    config["interconnections"]["optimize_individual_interconnections"] = st.checkbox("Optimize individual interconnections")
     config["interconnections"]["efficiency"]["hvac"] = st.number_input("Efficiency HVAC", value=0.95, max_value=1.0)
     config["interconnections"]["efficiency"]["hvdc"] = st.number_input("Efficiency HVDC", value=0.95, max_value=1.0)
 
