@@ -62,21 +62,17 @@ with st.sidebar.expander("Technologies"):
     config["technologies"]["relative_baseload"] = st.slider("Relative baseload", min_value=0.0, max_value=0.95, step=0.05)
 
     # Select the production technologies
-    col1, col2 = st.columns(2)
-    col1.subheader("Production")
     config["technologies"]["production"] = {}
     production_technology_options = utils.get_technologies(technology_type="production").keys()
-    for technology in production_technology_options:
-        if col1.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["production"][technology] = scenario_level
+    for technology in st.multiselect("Production technologies", production_technology_options, default=production_technology_options, format_func=utils.format_technology):
+        config["technologies"]["production"][technology] = scenario_level
 
     # Select the storage technologies
-    col2.subheader("Storage")
     config["technologies"]["storage"] = {}
     storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
-    for technology in storage_technologies_options:
-        if col2.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["storage"][technology] = scenario_level
+    for technology in st.multiselect("Storage technologies", storage_technologies_options, default=storage_technologies_options, format_func=utils.format_technology):
+        config["technologies"]["storage"][technology] = scenario_level
+
 
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):
