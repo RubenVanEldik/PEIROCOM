@@ -32,11 +32,13 @@ def optimize(config, *, status, output_directory):
     # Set the user defined parameters
     model.setParam("Threads", config["optimization"]["thread_count"])
     model.setParam("Method", config["optimization"]["method"])
+    if config["optimization"]["method"] == 2:
+        model.setParam("BarConvTol", config["optimization"]["barrier_convergence_tolerance"])
+        model.setParam("BarIterLimit", config["optimization"]["max_barrier_iterations"])
 
     # Disable crossover and set BarHomogeneous and Aggregate
     objective_scale_factor = 10 ** 6
     model.setParam("Crossover", 0)
-    model.setParam("BarConvTol", config["optimization"]["barrier_convergence_tolerance"])
     model.setParam("BarHomogeneous", 1)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Aggregate", 0)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Presolve", 2)  # Use an aggressive presolver
