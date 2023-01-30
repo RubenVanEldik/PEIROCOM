@@ -187,6 +187,7 @@ def countries(output_directory):
                 bar_chart.format_yticklabels("{:,.0%}")
 
             country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
+            bar_chart.ax.set_xticks(bar_chart.ax.get_xticks())  # Required to not get a warning message when using set_xticklabels
             bar_chart.ax.set_xticklabels(country_names, rotation=90)
             padding = bar_width - (1 - bar_width) / 2
             bar_chart.ax.set_xlim(-padding, len(data.index) - (1 - padding))
