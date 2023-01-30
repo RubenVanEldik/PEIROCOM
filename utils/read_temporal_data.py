@@ -34,8 +34,8 @@ def read_temporal_data(filepath, *, start_year=None, end_year=None, timezone=Non
         raise TypeError("The data has not timezone and no timezone was specified")
 
     # Set the time to the beginning and end of the start and end date respectively
-    start = datetime.datetime(start_year, 1, 1, 0, 0, 0, tzinfo=temporal_data.index.tz) if start_year else None
-    end = datetime.datetime(end_year, 12, 31, 0, 0, 0, tzinfo=temporal_data.index.tz) if end_year else None
+    start = datetime.datetime(start_year, 1, 1, 0, 0, tzinfo=temporal_data.index.tz) if start_year else None
+    end = datetime.datetime(end_year, 12, 31, 23, 59, tzinfo=temporal_data.index.tz) if end_year else None
 
     # Return the temporal data
     return temporal_data[start:end]
