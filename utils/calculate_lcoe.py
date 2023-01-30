@@ -35,26 +35,26 @@ def _calculate_scenario_costs(assumptions, variable, scenario_level):
         return (1 + scenario_level) * assumptions["moderate"][variable] - scenario_level * assumptions["conservative"][variable]
 
 
-def _calculate_annualized_production_costs(production_technologies, production_capacity_MW):
+def _calculate_annualized_generation_costs(generation_technologies, generation_capacity_MW):
     """
-    Calculate the annualized production costs
+    Calculate the annualized generation costs
     """
-    assert validate.is_dict(production_technologies)
-    assert validate.is_dataframe(production_capacity_MW, column_validator=validate.is_technology)
+    assert validate.is_dict(generation_technologies)
+    assert validate.is_dataframe(generation_capacity_MW, column_validator=validate.is_technology)
 
-    # Read the production assumptions
-    production_assumptions = utils.get_technologies(technology_type="production")
+    # Read the generation assumptions
+    generation_assumptions = utils.get_technologies(technology_type="generation")
 
-    # Calculate the total annual production costs
-    annualized_costs_production = pd.Series([], dtype="float64")
-    for technology, scenario_level in production_technologies.items():
-        capacity_kW = production_capacity_MW[technology].sum() * 1000
-        capex = capacity_kW * _calculate_scenario_costs(production_assumptions[technology], "capex", scenario_level)
-        fixed_om = capacity_kW * _calculate_scenario_costs(production_assumptions[technology], "fixed_om", scenario_level)
-        crf = _calculate_crf(production_assumptions[technology])
-        annualized_costs_production[technology] = crf * capex + fixed_om
+    # Calculate the total annual generation costs
+    annualized_costs_generation = pd.Series([], dtype="float64")
+    for technology, scenario_level in generation_technologies.items():
+        capacity_kW = generation_capacity_MW[technology].sum() * 1000
+        capex = capacity_kW * _calculate_scenario_costs(generation_assumptions[technology], "capex", scenario_level)
+        fixed_om = capacity_kW * _calculate_scenario_costs(generation_assumptions[technology], "fixed_om", scenario_level)
+        crf = _calculate_crf(generation_assumptions[technology])
+        annualized_costs_generation[technology] = crf * capex + fixed_om
 
-    return annualized_costs_production
+    return annualized_costs_generation
 
 
 def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_MWh):
@@ -96,23 +96,23 @@ def _calculate_annual_demand(demand_MW):
     return demand_MW.sum() * timestep_hours / share_of_year_modelled
 
 
-def calculate_lcoe(production_capacities, storage_capacities, demand_per_bidding_zone, *, config, breakdown_level=0):
+def calculate_lcoe(generation_capacities, storage_capacities, demand_per_bidding_zone, *, config, breakdown_level=0):
     """
     Calculate the average LCOE for all bidding zones
     """
-    assert validate.is_bidding_zone_dict(production_capacities)
+    assert validate.is_bidding_zone_dict(generation_capacities)
     assert validate.is_bidding_zone_dict(storage_capacities, required=False)
     assert validate.is_dataframe(demand_per_bidding_zone, column_validator=validate.is_bidding_zone)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
 
-    annualized_production_costs = 0
+    annualized_generation_costs = 0
     annualized_storage_costs = 0
     annual_electricity_demand = 0
 
     for bidding_zone in demand_per_bidding_zone.columns:
-        # Add the annualized production and storage costs
-        annualized_production_costs += _calculate_annualized_production_costs(config["technologies"]["production"], production_capacities[bidding_zone])
+        # Add the annualized generation and storage costs
+        annualized_generation_costs += _calculate_annualized_generation_costs(config["technologies"]["generation"], generation_capacities[bidding_zone])
         annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacities[bidding_zone])
 
         # Add the annual electricity demand
@@ -120,10 +120,10 @@ def calculate_lcoe(production_capacities, storage_capacities, demand_per_bidding
 
     # Calculate and return the LCOE
     if breakdown_level == 0:
-        total_costs = annualized_production_costs.sum() + annualized_storage_costs.sum()
+        total_costs = annualized_generation_costs.sum() + annualized_storage_costs.sum()
     if breakdown_level == 1:
-        total_costs = pd.Series({"production": annualized_production_costs.sum(), "storage": annualized_storage_costs.sum()})
+        total_costs = pd.Series({"generation": annualized_generation_costs.sum(), "storage": annualized_storage_costs.sum()})
     if breakdown_level == 2:
-        total_costs = pd.concat([annualized_production_costs, annualized_storage_costs])
+        total_costs = pd.concat([annualized_generation_costs, annualized_storage_costs])
     eur_usd = 1.1290  # Source: https://www.federalreserve.gov/releases/h10/20220110/
     return (total_costs / annual_electricity_demand) / eur_usd

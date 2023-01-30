@@ -52,7 +52,7 @@ def optimize(config, *, status, output_directory):
     temporal_results = {}
     temporal_export = {}
     interconnection_capacity = {}
-    production_capacity = {}
+    generation_capacity = {}
     storage_capacity = {}
 
     bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
@@ -75,8 +75,8 @@ def optimize(config, *, status, output_directory):
         # Calculate the energy covered by the baseload
         temporal_results[bidding_zone]["baseload_MW"] = temporal_results[bidding_zone].demand_MW.mean() * config["technologies"]["relative_baseload"]
 
-        # Create a DataFrame for the production capacities
-        production_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["production"])
+        # Create a DataFrame for the generation capacities
+        generation_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["generation"])
 
         # Create empty DataFrames for the interconnections, if they don't exist yet
         if not len(temporal_export):
@@ -91,26 +91,26 @@ def optimize(config, *, status, output_directory):
             interconnection_capacity["hvdc"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
 
         """
-        Step 2B: Define production capacity variables
+        Step 2B: Define generation capacity variables
         """
-        temporal_results[bidding_zone]["production_total_MW"] = 0
-        for production_technology in config["technologies"]["production"]:
-            status.update(f"{country_flag} Adding {utils.format_technology(production_technology, capitalize=False)} production")
+        temporal_results[bidding_zone]["generation_total_MW"] = 0
+        for generation_technology in config["technologies"]["generation"]:
+            status.update(f"{country_flag} Adding {utils.format_technology(generation_technology, capitalize=False)} generation")
 
             # Create a capacity variable for each climate zone
-            climate_zones = [re.match(f"{production_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{production_technology}_")]
-            production_potential = utils.get_production_potential_in_climate_zone(bidding_zone, production_technology, config=config)
-            current_capacity = utils.get_current_production_capacity_in_climate_zone(bidding_zone, production_technology, config=config)
-            capacities = model.addVars(climate_zones, lb=current_capacity, ub=production_potential)
+            climate_zones = [re.match(f"{generation_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{generation_technology}_")]
+            generation_potential = utils.get_generation_potential_in_climate_zone(bidding_zone, generation_technology, config=config)
+            current_capacity = utils.get_current_generation_capacity_in_climate_zone(bidding_zone, generation_technology, config=config)
+            capacities = model.addVars(climate_zones, lb=current_capacity, ub=generation_potential)
 
-            # Add the capacities to the production_capacity DataFrame and calculate the temporal production for a specific technology
-            temporal_production = 0
+            # Add the capacities to the generation_capacity DataFrame and calculate the temporal generation for a specific technology
+            temporal_generation = 0
             for climate_zone, capacity in capacities.items():
-                production_capacity[bidding_zone].loc[climate_zone, production_technology] = capacity
+                generation_capacity[bidding_zone].loc[climate_zone, generation_technology] = capacity
                 # Apply is required, otherwise it will throw a ValueError if there are more than a few thousand rows (see https://stackoverflow.com/questions/64801287)
-                temporal_production += temporal_data[bidding_zone][f"{production_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
-            temporal_results[bidding_zone][f"production_{production_technology}_MW"] = temporal_production
-            temporal_results[bidding_zone]["production_total_MW"] += temporal_production
+                temporal_generation += temporal_data[bidding_zone][f"{generation_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
+            temporal_results[bidding_zone][f"generation_{generation_technology}_MW"] = temporal_generation
+            temporal_results[bidding_zone]["generation_total_MW"] += temporal_generation
 
         """
         Step 2C: Define storage variables and constraints
@@ -269,11 +269,11 @@ def optimize(config, *, status, output_directory):
                 temporal_results[bidding_zone]["net_export_MW"] += temporal_results[bidding_zone][column_name]
 
         # Add the demand constraint
-        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.production_total_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
+        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_total_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
 
         # Calculate the curtailed energy per hour
-        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].production_total_MW - temporal_results[bidding_zone].demand_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
-        temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("production_total_MW"), "curtailed_MW", curtailed_MW)
+        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_total_MW - temporal_results[bidding_zone].demand_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
+        temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_total_MW"), "curtailed_MW", curtailed_MW)
 
     """
     Step 4: Define interconnection capacity constraint if the individual interconnections are optimized
@@ -295,24 +295,24 @@ def optimize(config, *, status, output_directory):
             # Set the variables required to calculate the cumulative results in the country
             sum_demand = 0
             sum_baseload = 0
-            sum_production = 0
+            sum_generation = 0
             sum_curtailed = 0
             sum_storage_flow = 0
 
             # Loop over all bidding zones in the country
             for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
-                # Calculate the total demand and non-curtailed production in this country
+                # Calculate the total demand and non-curtailed generation in this country
                 sum_demand += temporal_results[bidding_zone].demand_MW.sum()
                 # The Gurobi .quicksum method is significantly faster than Panda's .sum method
                 sum_baseload += gp.quicksum(temporal_results[bidding_zone].baseload_MW)
-                sum_production += gp.quicksum(temporal_results[bidding_zone].production_total_MW)
+                sum_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_MW)
                 sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
                 sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
 
             # Add the self-sufficiency constraint if there is any demand in the country
             if sum_demand > 0:
                 min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
-                model.addConstr((sum_baseload + sum_production - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
+                model.addConstr((sum_baseload + sum_generation - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
 
     """
     Step 6: Define the storage costs constraint
@@ -322,7 +322,7 @@ def optimize(config, *, status, output_directory):
 
         # Calculate the storage costs
         temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
-        storage_costs = utils.calculate_lcoe(production_capacity, storage_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
+        storage_costs = utils.calculate_lcoe(generation_capacity, storage_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_storage_costs = config["fixed_storage"]["costs"]
@@ -336,7 +336,7 @@ def optimize(config, *, status, output_directory):
     """
     status.update("Setting the objective function")
     temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
-    firm_lcoe = utils.calculate_lcoe(production_capacity, storage_capacity, temporal_net_demand, config=config)
+    firm_lcoe = utils.calculate_lcoe(generation_capacity, storage_capacity, temporal_net_demand, config=config)
     model.setObjective(firm_lcoe * objective_scale_factor, gp.GRB.MINIMIZE)
 
     # Add the initializing duration to the dictionary
@@ -474,7 +474,7 @@ def optimize(config, *, status, output_directory):
     storing_start = datetime.now()
 
     # Make a directory for each type of output
-    for sub_directory in ["temporal_results", "temporal_export", "production_capacities", "storage_capacities", "interconnection_capacity"]:
+    for sub_directory in ["temporal_results", "temporal_export", "generation_capacities", "storage_capacities", "interconnection_capacity"]:
         (output_directory / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
@@ -487,9 +487,9 @@ def optimize(config, *, status, output_directory):
         # Store the temporal results to a CSV file
         temporal_results_bidding_zone.to_csv(output_directory / "temporal_results" / f"{bidding_zone}.csv")
 
-        # Convert and store the production capacity
-        production_capacity_bidding_zone = utils.convert_variables_recursively(production_capacity[bidding_zone])
-        production_capacity_bidding_zone.to_csv(output_directory / "production_capacities" / f"{bidding_zone}.csv")
+        # Convert and store the generation capacity
+        generation_capacity_bidding_zone = utils.convert_variables_recursively(generation_capacity[bidding_zone])
+        generation_capacity_bidding_zone.to_csv(output_directory / "generation_capacities" / f"{bidding_zone}.csv")
 
         # Convert and store the storage capacity
         storage_capacity_bidding_zone = utils.convert_variables_recursively(storage_capacity[bidding_zone])

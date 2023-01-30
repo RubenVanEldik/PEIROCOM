@@ -7,7 +7,7 @@ import validate
 # Don't cache this, since the data is also cached when reading the CSV file and it's a lot of data
 def get_temporal_results(output_directory, *, group=None, country_codes=None):
     """
-    Return the (grouped) production capacity
+    Return the (grouped) temporal results
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_aggregation_level(group, required=False)

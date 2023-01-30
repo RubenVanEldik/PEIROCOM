@@ -68,7 +68,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         if sensitivity_config["analysis_type"] == "technology_scenario":
             breakdown_level = 0
         else:
-            breakdown_level_options = {0: "Off", 1: "Production and storage", 2: "Technologies"}
+            breakdown_level_options = {0: "Off", 1: "Generation and storage", 2: "Technologies"}
             breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
 
         # Get the data and set the label
@@ -108,7 +108,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
                 sensitivity_plot.ax.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
             sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
-            sensitivity_plot.ax.plot(data["production"], color=colors.technology_type("production"), label="Production")
+            sensitivity_plot.ax.plot(data["generation"], color=colors.technology_type("generation"), label="Generation")
             sensitivity_plot.ax.plot(data["storage"], color=colors.technology_type("storage"), label="Storage")
             sensitivity_plot.ax.legend()
         else:
@@ -122,11 +122,11 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         sensitivity_plot.ax.set_ylabel("Relative curtailment (%)")
         sensitivity_plot.ax.plot(data, label=label, color=line_color)
         sensitivity_plot.format_yticklabels("{:,.0%}")
-    if statistic_name == "production_capacity":
-        data = _retrieve_statistics(steps, "production_capacity", output_directory) / 1000
-        for production_technology in data:
-            sensitivity_plot.ax.plot(data[production_technology], color=colors.technology(production_technology), label=utils.format_technology(production_technology))
-        sensitivity_plot.ax.set_ylabel("Production capacity (GW)")
+    if statistic_name == "generation_capacity":
+        data = _retrieve_statistics(steps, "generation_capacity", output_directory) / 1000
+        for generation_technology in data:
+            sensitivity_plot.ax.plot(data[generation_technology], color=colors.technology(generation_technology), label=utils.format_technology(generation_technology))
+        sensitivity_plot.ax.set_ylabel("Generation capacity (GW)")
         sensitivity_plot.ax.legend()
     if statistic_name == "storage_capacity":
         storage_capacity_type = st.sidebar.selectbox("Storage capacity type", ["energy", "power"], format_func=utils.format_str)
@@ -169,7 +169,7 @@ def sensitivity(output_directory):
     # Select an output variable to run the sensitivity analysis on
     statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment"]
     if sensitivity_config["analysis_type"] != "technology_scenario":
-        statistic_options += ["production_capacity", "storage_capacity", "optimization_duration"]
+        statistic_options += ["generation_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
     # Plot the data

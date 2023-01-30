@@ -112,7 +112,7 @@ def run_sensitivity(config, sensitivity_config):
 
                 # Calculate the curtailment
                 current_temporal_results = utils.get_temporal_results(output_directory_step, group="all")
-                current_curtailment = current_temporal_results.curtailed_MW.sum() / current_temporal_results.production_total_MW.sum()
+                current_curtailment = current_temporal_results.curtailed_MW.sum() / current_temporal_results.generation_total_MW.sum()
 
                 # Break the while loop if the premium exceeds the maximum premium
                 firm_lcoe = stats.firm_lcoe(output_directory_step)

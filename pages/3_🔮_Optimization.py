@@ -65,11 +65,11 @@ with st.sidebar.expander("Technologies"):
     # Select the relative share of baseload
     config["technologies"]["relative_baseload"] = st.slider("Relative baseload", min_value=0.0, max_value=0.95, step=0.05)
 
-    # Select the production technologies
-    config["technologies"]["production"] = {}
-    production_technology_options = utils.get_technologies(technology_type="production").keys()
-    for technology in st.multiselect("Production technologies", production_technology_options, default=production_technology_options, format_func=utils.format_technology):
-        config["technologies"]["production"][technology] = scenario_level
+    # Select the generation technologies
+    config["technologies"]["generation"] = {}
+    generation_technology_options = utils.get_technologies(technology_type="generation").keys()
+    for technology in st.multiselect("Generation technologies", generation_technology_options, default=generation_technology_options, format_func=utils.format_technology):
+        config["technologies"]["generation"][technology] = scenario_level
 
     # Select the storage technologies
     config["technologies"]["storage"] = {}
@@ -124,7 +124,7 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitity_steps = np.linspace(start=-1, stop=1, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
         # Select the technologies
-        technology_names = {technology_name: technology_type for technology_type in ["production", "storage"] for technology_name in config["technologies"][technology_type]}
+        technology_names = {technology_name: technology_type for technology_type in ["generation", "storage"] for technology_name in config["technologies"][technology_type]}
         selected_technologies = st.multiselect("Technologies", technology_names, format_func=utils.format_technology)
         sensitivity_config["technologies"] = {technology_name: technology_names[technology_name] for technology_name in selected_technologies}
     elif sensitivity_analysis_type == "interconnection_capacity":

@@ -4,7 +4,7 @@ import validate
 
 def get_storage_potential_in_bidding_zone(bidding_zone, storage_technology, *, config):
     """
-    Calculate the maximum storage capacity for a specific bidding zone and production technology
+    Calculate the maximum storage capacity for a specific bidding zone and generation technology
     """
     assert validate.is_bidding_zone(bidding_zone)
     assert validate.is_technology(storage_technology)

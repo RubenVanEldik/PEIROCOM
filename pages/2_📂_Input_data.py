@@ -45,7 +45,7 @@ def run():
         st.dataframe(countries_df, height=600)
 
     if data_type == "technologies":
-        for technology_type in ["production", "storage"]:
+        for technology_type in ["generation", "storage"]:
             st.header(utils.format_str(f"{technology_type}_technologies"))
 
             # Read the technology data and convert it to a DataFrame

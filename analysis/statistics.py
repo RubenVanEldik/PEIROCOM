@@ -65,32 +65,32 @@ def statistics(output_directory):
         curtailment_delta = f"{(curtailment_selected / curtailment_all) - 1:.0%}" if selected_country_codes else None
         col3.metric("Curtailment", f"{curtailment_selected:.1%}", curtailment_delta, delta_color="inverse")
 
-    # Show the production capacities
-    with st.expander("Production capacity", expanded=True):
+    # Show the generation capacities
+    with st.expander("Generation capacity", expanded=True):
         # Ask if the results should be shown relative to the mean demand
-        show_relative_production_capacity = st.checkbox("Relative to demand", key="production")
-        show_hourly_production = st.checkbox("Mean hourly production")
+        show_relative_generation_capacity = st.checkbox("Relative to demand", key="generation")
+        show_hourly_generation = st.checkbox("Mean hourly generation")
 
-        # Get the production capacities
-        production_capacity = stats.production_capacity(output_directory, country_codes=selected_country_codes)
+        # Get the generation capacities
+        generation_capacity = stats.generation_capacity(output_directory, country_codes=selected_country_codes)
 
         # Create the storage capacity columns
-        cols = st.columns(max(len(production_capacity), 3))
+        cols = st.columns(max(len(generation_capacity), 3))
 
-        # Create the metric for each production technology
-        for index, technology in enumerate(production_capacity):
+        # Create the metric for each generation technology
+        for index, technology in enumerate(generation_capacity):
             # Set the metric value depending on the checkboxes
-            if show_hourly_production:
-                mean_hourly_production = utils.merge_dataframes_on_column(temporal_results, f"production_{technology}_MW").sum(axis=1).mean()
-                if show_relative_production_capacity:
-                    metric_value = f"{mean_hourly_production / mean_demand:.1%}"
+            if show_hourly_generation:
+                mean_hourly_generation = utils.merge_dataframes_on_column(temporal_results, f"generation_{technology}_MW").sum(axis=1).mean()
+                if show_relative_generation_capacity:
+                    metric_value = f"{mean_hourly_generation / mean_demand:.1%}"
                 else:
-                    metric_value = _format_value_with_unit(mean_hourly_production * 10 ** 6, unit="W")
+                    metric_value = _format_value_with_unit(mean_hourly_generation * 10 ** 6, unit="W")
             else:
-                if show_relative_production_capacity:
-                    metric_value = f"{production_capacity[technology] / mean_demand:.1%}"
+                if show_relative_generation_capacity:
+                    metric_value = f"{generation_capacity[technology] / mean_demand:.1%}"
                 else:
-                    metric_value = _format_value_with_unit(production_capacity[technology] * 10 ** 6, unit="W")
+                    metric_value = _format_value_with_unit(generation_capacity[technology] * 10 ** 6, unit="W")
 
             # Set the metric
             cols[index].metric(utils.format_technology(technology), metric_value)

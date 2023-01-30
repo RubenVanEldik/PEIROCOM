@@ -42,7 +42,7 @@ def sankey_diagram(output_directory):
             temporal_results_bidding_zone["export_MW"] += temporal_results_bidding_zone[export_column].clip(lower=0)
             temporal_results_bidding_zone["import_MW"] += -temporal_results_bidding_zone[export_column].clip(upper=0)
 
-        temporal_results_bidding_zone["in_MW"] = temporal_results_bidding_zone.production_total_MW + temporal_results_bidding_zone.import_MW
+        temporal_results_bidding_zone["in_MW"] = temporal_results_bidding_zone.generation_total_MW + temporal_results_bidding_zone.import_MW
         temporal_results_bidding_zone["out_MW"] = temporal_results_bidding_zone.demand_MW + temporal_results_bidding_zone.export_MW
 
         temporal_results_bidding_zone["lion_in_MW"] = temporal_results_bidding_zone.net_storage_flow_lion_MW.clip(lower=0)
@@ -85,9 +85,9 @@ def sankey_diagram(output_directory):
     sankey.add_node("Export", x=0.9, y=0.7)
 
     # Add the links
-    sankey.add_link("Solar PV", "In", temporal_results.production_pv_MW)
-    sankey.add_link("Onshore wind", "In", temporal_results.production_onshore_MW)
-    sankey.add_link("Offshore wind", "In", temporal_results.production_offshore_MW)
+    sankey.add_link("Solar PV", "In", temporal_results.generation_pv_MW)
+    sankey.add_link("Onshore wind", "In", temporal_results.generation_onshore_MW)
+    sankey.add_link("Offshore wind", "In", temporal_results.generation_offshore_MW)
     sankey.add_link("Import", "In", temporal_results.import_MW)
     sankey.add_link("In", "Curtailed", temporal_results.curtailed_MW)
     sankey.add_link("In", "Li-ion", temporal_results.lion_from_in_MW)

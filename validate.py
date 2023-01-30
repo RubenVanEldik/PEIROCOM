@@ -119,7 +119,7 @@ def is_config(value, *, required=True):
         return False
     if not is_resolution(value.get("resolution")):
         return False
-    if len(value.get("technologies").get("production")) == 0:
+    if len(value.get("technologies").get("generation")) == 0:
         return False
     if len(value.get("technologies").get("storage")) == 0:
         return False
@@ -430,9 +430,9 @@ def is_technology(value, *, required=True):
     if value is None:
         return not required
 
-    production_technologies = ["pv", "onshore", "offshore"]
+    generation_technologies = ["pv", "onshore", "offshore"]
     storage_technologies = ["lion", "hydrogen"]
-    return value in production_technologies or value in storage_technologies
+    return value in generation_technologies or value in storage_technologies
 
 
 def is_technology_list(value, *, required=True):
@@ -456,7 +456,7 @@ def is_technology_type(value, *, required=True):
     if value is None:
         return not required
 
-    return value in ["production", "storage"]
+    return value in ["generation", "storage"]
 
 
 def is_url(value, *, required=True):

@@ -64,7 +64,7 @@ def technology_type(technology_type, *, alpha=0.8):
     assert validate.is_technology_type(technology_type)
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    if technology_type == "production":
+    if technology_type == "generation":
         return get("blue", 600, alpha=alpha)
     if technology_type == "storage":
         return get("red", 600, alpha=alpha)
