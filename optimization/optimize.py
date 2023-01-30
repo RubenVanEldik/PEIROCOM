@@ -70,7 +70,7 @@ def optimize(config, *, status, output_directory):
         temporal_data[bidding_zone] = utils.read_temporal_data(filepath, start_year=start_year, end_year=end_year).resample(config["resolution"]).mean()
         # Remove the leap days from the dataset that could have been introduced by the resample method
         temporal_data[bidding_zone] = temporal_data[bidding_zone][~((temporal_data[bidding_zone].index.month == 2) & (temporal_data[bidding_zone].index.day == 29))]
-        # Create an temporal_results DataFrame with the demand_MW column
+        # Create a temporal_results DataFrame with the demand_MW column
         temporal_results[bidding_zone] = temporal_data[bidding_zone].loc[:, ["demand_MW"]]
         # Calculate the energy covered by the baseload
         temporal_results[bidding_zone]["baseload_MW"] = temporal_results[bidding_zone].demand_MW.mean() * config["technologies"]["relative_baseload"]
@@ -154,9 +154,6 @@ def optimize(config, *, status, output_directory):
             net_flow = pd.Series(data=[inflow_value - outflow_value for inflow_value, outflow_value in zip(inflow.values(), outflow.values())], index=temporal_results[bidding_zone].index)
             temporal_results[bidding_zone][f"net_storage_flow_{storage_technology}_MW"] = net_flow
             temporal_results[bidding_zone]["net_storage_flow_total_MW"] += net_flow
-
-            # Create the energy stored column for this storage technology in the temporal_results DataFrame
-            temporal_results[bidding_zone][f"energy_stored_{storage_technology}_MWh"] = None
 
             # Unpack the energy and power capacities for this storage technology
             energy_capacity = storage_capacity[bidding_zone].loc[storage_technology, "energy"]
