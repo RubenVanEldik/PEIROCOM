@@ -9,15 +9,12 @@ generation:
     conservative:
       capex: 912
       fixed_om: 12
-      variable_om: 0
     moderate:
       capex: 700
       fixed_om: 10
-      variable_om: 0
     advanced:
       capex: 520
       fixed_om: 8
-      variable_om: 0
   onshore:
     name: "onshore wind"
     color:
@@ -28,15 +25,12 @@ generation:
     conservative:
       capex: 900
       fixed_om: 41
-      variable_om: 0
     moderate:
       capex: 760
       fixed_om: 33
-      variable_om: 0
     advanced:
       capex: 525
       fixed_om: 24
-      variable_om: 0
   offshore:
     name: "offshore wind"
     color:
@@ -47,15 +41,12 @@ generation:
     conservative:
       capex: 2817
       fixed_om: 94
-      variable_om: 0
     moderate:
       capex: 1945
       fixed_om: 71
-      variable_om: 0
     advanced:
       capex: 1583
       fixed_om: 61
-      variable_om: 0
 storage:
   lion:
     name: "Li-ion"
