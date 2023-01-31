@@ -73,11 +73,11 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
         capacity_energy_kWh = storage_capacity_MWh.loc[technology, "energy"] * 1000
         capacity_power_kW = storage_capacity_MWh.loc[technology, "power"] * 1000
 
-        capex_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "energy_capex", scenario_level)
-        capex_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "power_capex", scenario_level)
+        capex_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "capex_energy", scenario_level)
+        capex_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "capex_power", scenario_level)
         capex = capex_energy + capex_power
-        fixed_om_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "energy_fixed_om", scenario_level)
-        fixed_om_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "power_fixed_om", scenario_level)
+        fixed_om_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_energy", scenario_level)
+        fixed_om_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_power", scenario_level)
         fixed_om = fixed_om_energy + fixed_om_power
         crf = _calculate_crf(storage_assumptions[technology])
         annualized_costs_storage[technology] = crf * capex + fixed_om

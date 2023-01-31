@@ -59,20 +59,20 @@ storage:
     economic_lifetime: 15
     wacc: 0.05
     conservative:
-      energy_capex: 143
-      power_capex: 260
-      energy_fixed_om: 3.575
-      power_fixed_om: 6.5
+      capex_energy: 143
+      capex_power: 260
+      fixed_om_energy: 3.575
+      fixed_om_power: 6.5
     moderate:
-      energy_capex: 81
-      power_capex: 243
-      energy_fixed_om: 2.025
-      power_fixed_om: 6.075
+      capex_energy: 81
+      capex_power: 243
+      fixed_om_energy: 2.025
+      fixed_om_power: 6.075
     advanced:
-      energy_capex: 57
-      power_capex: 104
-      energy_fixed_om: 1.425
-      power_fixed_om: 2.6
+      capex_energy: 57
+      capex_power: 104
+      fixed_om_energy: 1.425
+      fixed_om_power: 2.6
   hydrogen:
     name: "hydrogen"
     color:
@@ -84,17 +84,17 @@ storage:
     economic_lifetime: 18
     wacc: 0.05
     conservative:
-      energy_capex: 1.5
-      power_capex: 1950
-      energy_fixed_om: 0.0375
-      power_fixed_om: 48.75
+      capex_energy: 1.5
+      capex_power: 1950
+      fixed_om_energy: 0.0375
+      fixed_om_power: 48.75
     moderate:
-      energy_capex: 1
-      power_capex: 1300
-      energy_fixed_om: 0.025
-      power_fixed_om: 32.5
+      capex_energy: 1
+      capex_power: 1300
+      fixed_om_energy: 0.025
+      fixed_om_power: 32.5
     advanced:
-      energy_capex: 0.5
-      power_capex: 650
-      energy_fixed_om: 0.0125
-      power_fixed_om: 16.25
+      capex_energy: 0.5
+      capex_power: 650
+      fixed_om_energy: 0.0125
+      fixed_om_power: 16.25
