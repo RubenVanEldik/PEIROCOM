@@ -144,14 +144,14 @@ def optimize(config, *, status, output_directory):
 
             # Create the inflow and outflow variables
             if storage_potential == 0:
-                inflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
-                outflow = {timestamp: 0 for timestamp in temporal_data[bidding_zone].index}
+                inflow = pd.Series({timestamp: 0 for timestamp in temporal_data[bidding_zone].index})
+                outflow = pd.Series({timestamp: 0 for timestamp in temporal_data[bidding_zone].index})
             else:
-                inflow = model.addVars(temporal_data[bidding_zone].index)
-                outflow = model.addVars(temporal_data[bidding_zone].index)
+                inflow = pd.Series(model.addVars(temporal_data[bidding_zone].index))
+                outflow = pd.Series(model.addVars(temporal_data[bidding_zone].index))
 
             # Add the net storage flow variables to the temporal_results DataFrame
-            net_flow = pd.Series(data=[inflow_value - outflow_value for inflow_value, outflow_value in zip(inflow.values(), outflow.values())], index=temporal_results[bidding_zone].index)
+            net_flow = inflow - outflow
             temporal_results[bidding_zone][f"net_storage_flow_{storage_technology}_MW"] = net_flow
             temporal_results[bidding_zone]["net_storage_flow_total_MW"] += net_flow
 
@@ -188,7 +188,7 @@ def optimize(config, *, status, output_directory):
                     energy_stored_previous = energy_stored_current
 
                 # Convert the temporal_energy_stored_dict to a Series
-                temporal_energy_stored = pd.Series(data=temporal_energy_stored_dict)
+                temporal_energy_stored = pd.Series(temporal_energy_stored_dict)
 
                 # Ensure that the SOC of the first timestep equals the SOC of the last timestep
                 model.addConstr(temporal_energy_stored.head(1).item() == temporal_energy_stored.tail(1).item())
