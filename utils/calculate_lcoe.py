@@ -101,7 +101,7 @@ def calculate_lcoe(generation_capacity, storage_capacity, demand_per_bidding_zon
     Calculate the average LCOE for all bidding zones
     """
     assert validate.is_bidding_zone_dict(generation_capacity)
-    assert validate.is_bidding_zone_dict(storage_capacity, required=False)
+    assert validate.is_bidding_zone_dict(storage_capacity)
     assert validate.is_dataframe(demand_per_bidding_zone, column_validator=validate.is_bidding_zone)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
