@@ -118,7 +118,7 @@ def optimize(config, *, status, output_directory):
         # Create a DataFrame for the storage capacity in this bidding zone
         storage_capacity[bidding_zone] = pd.DataFrame(0, index=config["technologies"]["storage"], columns=["energy", "power"])
 
-        # Create an object to save the storage capacity (energy & power) and add 2 columns to the results DataFrame
+        # Add the total storage flow and total stored energy columns to the results DataFrame
         temporal_results[bidding_zone]["net_storage_flow_total_MW"] = 0
         temporal_results[bidding_zone]["energy_stored_total_MWh"] = 0
 
@@ -129,7 +129,7 @@ def optimize(config, *, status, output_directory):
             # Get the specific storage assumptions
             storage_assumptions = utils.get_technologies(technology_type="storage")[storage_technology]
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
-            timestep_hours = pd.Timedelta(config["resolution"]).total_seconds() / 3600
+            interval_length = pd.Timedelta(config["resolution"]).total_seconds() / 3600
 
             # Get the storage energy potential
             storage_potential = utils.get_storage_potential_in_bidding_zone(bidding_zone, storage_technology, config=config)
@@ -171,7 +171,7 @@ def optimize(config, *, status, output_directory):
 
                     # Add the SOC constraint with regard to the previous timestamp
                     if energy_stored_previous:
-                        model.addConstr(energy_stored_current == energy_stored_previous + (inflow[timestamp] * efficiency - outflow[timestamp] / efficiency) * timestep_hours)
+                        model.addConstr(energy_stored_current == energy_stored_previous + (inflow[timestamp] * efficiency - outflow[timestamp] / efficiency) * interval_length)
 
                     # Add the energy capacity constraints (can't be added when the flow variables are defined because it's a gurobipy.Var)
                     model.addConstr(energy_stored_current >= storage_assumptions["soc_min"] * energy_capacity)
