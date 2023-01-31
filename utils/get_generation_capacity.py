@@ -21,7 +21,7 @@ def get_generation_capacity(output_directory, *, group=None, country_codes=None)
     # Get the generation capacity for each bidding zone
     generation_capacity = {}
     for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / "generation_capacities" / f"{bidding_zone}.csv"
+        filepath = output_directory / "generation_capacity" / f"{bidding_zone}.csv"
         generation_capacity[bidding_zone] = utils.read_csv(filepath, index_col=0)
 
     # Return a dictionary with the generation capacity per bidding zone DataFrame if not grouped

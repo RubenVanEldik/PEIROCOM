@@ -96,12 +96,12 @@ def _calculate_annual_demand(demand_MW):
     return demand_MW.sum() * timestep_hours / share_of_year_modelled
 
 
-def calculate_lcoe(generation_capacities, storage_capacities, demand_per_bidding_zone, *, config, breakdown_level=0):
+def calculate_lcoe(generation_capacity, storage_capacity, demand_per_bidding_zone, *, config, breakdown_level=0):
     """
     Calculate the average LCOE for all bidding zones
     """
-    assert validate.is_bidding_zone_dict(generation_capacities)
-    assert validate.is_bidding_zone_dict(storage_capacities, required=False)
+    assert validate.is_bidding_zone_dict(generation_capacity)
+    assert validate.is_bidding_zone_dict(storage_capacity, required=False)
     assert validate.is_dataframe(demand_per_bidding_zone, column_validator=validate.is_bidding_zone)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
@@ -112,8 +112,8 @@ def calculate_lcoe(generation_capacities, storage_capacities, demand_per_bidding
 
     for bidding_zone in demand_per_bidding_zone.columns:
         # Add the annualized generation and storage costs
-        annualized_generation_costs += _calculate_annualized_generation_costs(config["technologies"]["generation"], generation_capacities[bidding_zone])
-        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacities[bidding_zone])
+        annualized_generation_costs += _calculate_annualized_generation_costs(config["technologies"]["generation"], generation_capacity[bidding_zone])
+        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[bidding_zone])
 
         # Add the annual electricity demand
         annual_electricity_demand += _calculate_annual_demand(demand_per_bidding_zone[bidding_zone])

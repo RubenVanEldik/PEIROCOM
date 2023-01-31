@@ -474,7 +474,7 @@ def optimize(config, *, status, output_directory):
     storing_start = datetime.now()
 
     # Make a directory for each type of output
-    for sub_directory in ["temporal_results", "temporal_export", "generation_capacities", "storage_capacities", "interconnection_capacity"]:
+    for sub_directory in ["temporal_results", "temporal_export", "generation_capacity", "storage_capacity", "interconnection_capacity"]:
         (output_directory / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
@@ -489,11 +489,11 @@ def optimize(config, *, status, output_directory):
 
         # Convert and store the generation capacity
         generation_capacity_bidding_zone = utils.convert_variables_recursively(generation_capacity[bidding_zone])
-        generation_capacity_bidding_zone.to_csv(output_directory / "generation_capacities" / f"{bidding_zone}.csv")
+        generation_capacity_bidding_zone.to_csv(output_directory / "generation_capacity" / f"{bidding_zone}.csv")
 
         # Convert and store the storage capacity
         storage_capacity_bidding_zone = utils.convert_variables_recursively(storage_capacity[bidding_zone])
-        storage_capacity_bidding_zone.to_csv(output_directory / "storage_capacities" / f"{bidding_zone}.csv")
+        storage_capacity_bidding_zone.to_csv(output_directory / "storage_capacity" / f"{bidding_zone}.csv")
 
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:
