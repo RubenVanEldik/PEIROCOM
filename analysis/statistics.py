@@ -118,7 +118,7 @@ def statistics(output_directory):
                     metric_value = _format_value_with_unit(storage_capacity[technology] * 10 ** 6, unit="W")
             else:
                 if show_relative_storage_capacity:
-                    metric_value = f"{storage_capacity[technology] / mean_demand:.2f}H"
+                    metric_value = f"{storage_capacity[technology] / mean_demand:.1f}H"
                 else:
                     metric_value = _format_value_with_unit(storage_capacity[technology] * 10 ** 6, unit="Wh")
 
