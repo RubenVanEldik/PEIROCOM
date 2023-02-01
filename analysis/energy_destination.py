@@ -69,7 +69,8 @@ def energy_destination(output_directory):
         bottom += data[column_name]
 
     # Set some chart options
-    bar_chart.ax.legend()
+    handles, labels = bar_chart.ax.get_legend_handles_labels()
+    bar_chart.ax.legend(reversed(handles), reversed(labels))
     bar_chart.ax.set_ylim([0, 1])
     bar_chart.ax.set_xticklabels([utils.format_technology(technology_name) for technology_name in config["technologies"]["generation"]])
     bar_chart.format_yticklabels("{:,.0%}")

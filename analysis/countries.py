@@ -179,7 +179,8 @@ def countries(output_directory):
                     color = colors.technology(column_name) if validate.is_technology(column_name) else colors.random()
                     bar_chart.ax.bar(data.index, data[column_name], bar_width, bottom=bottom, label=utils.format_str(column_name), color=color)
                     bottom += data[column_name]
-                bar_chart.ax.legend()
+                handles, labels = bar_chart.ax.get_legend_handles_labels()
+                bar_chart.ax.legend(reversed(handles), reversed(labels))
             else:
                 bar_chart.ax.bar(data.index, data, bar_width, color=colors.primary())
 
