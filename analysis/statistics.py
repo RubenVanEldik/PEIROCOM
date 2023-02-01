@@ -75,10 +75,10 @@ def statistics(output_directory):
         generation_capacity = stats.generation_capacity(output_directory, country_codes=selected_country_codes)
 
         # Create the storage capacity columns
-        cols = st.columns(max(len(generation_capacity), 3))
+        cols = st.columns(max(len(generation_capacity.index), 3))
 
         # Create the metric for each generation technology
-        for index, technology in enumerate(generation_capacity):
+        for index, technology in enumerate(generation_capacity.index):
             # Set the metric value depending on the checkboxes
             if show_hourly_generation:
                 mean_hourly_generation = utils.merge_dataframes_on_column(temporal_results, f"generation_{technology}_MW").sum(axis=1).mean()
@@ -106,10 +106,10 @@ def statistics(output_directory):
         storage_capacity = stats.storage_capacity(output_directory, storage_type=storage_type, country_codes=selected_country_codes)
 
         # Create the storage capacity columns
-        cols = st.columns(max(len(storage_capacity), 3))
+        cols = st.columns(max(len(storage_capacity.index), 3))
 
         # Create the metric for each storage technology
-        for index, technology in enumerate(storage_capacity):
+        for index, technology in enumerate(storage_capacity.index):
             # Set the metric value depending on the checkbox
             if show_power_capacity:
                 if show_relative_storage_capacity:

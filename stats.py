@@ -81,8 +81,7 @@ def generation_capacity(output_directory, *, country_codes=None):
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
-    generation_capacity = utils.get_generation_capacity(output_directory, group="all", country_codes=country_codes)
-    return generation_capacity.to_dict()
+    return utils.get_generation_capacity(output_directory, group="all", country_codes=country_codes)
 
 
 def storage_capacity(output_directory, *, storage_type, country_codes=None):
@@ -94,12 +93,7 @@ def storage_capacity(output_directory, *, storage_type, country_codes=None):
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     storage_capacity = utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
-
-    # Return an empty dictionary if there is no storage
-    if storage_capacity is None:
-        return {}
-
-    return storage_capacity[storage_type].to_dict()
+    return storage_capacity[storage_type]
 
 
 def self_sufficiency(output_directory, *, country_codes=None):
