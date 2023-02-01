@@ -93,7 +93,7 @@ def statistics(output_directory):
                     metric_value = _format_value_with_unit(generation_capacity[technology] * 10 ** 6, unit="W")
 
             # Set the metric
-            cols[index].metric(utils.format_technology(technology), metric_value)
+            cols[index % 3].metric(utils.format_technology(technology), metric_value)
 
     # Show the storage capacities
     with st.expander("Storage capacity", expanded=True):
@@ -123,4 +123,4 @@ def statistics(output_directory):
                     metric_value = _format_value_with_unit(storage_capacity[technology] * 10 ** 6, unit="Wh")
 
             # Set the metric
-            cols[index].metric(f"{utils.format_technology(technology)} {storage_type}", metric_value)
+            cols[index % 3].metric(f"{utils.format_technology(technology)} {storage_type}", metric_value)
