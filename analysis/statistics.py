@@ -100,10 +100,10 @@ def statistics(output_directory):
         # Ask if the results should be shown relative to the mean demand
         show_relative_storage_capacity = st.checkbox("Relative to demand", key="storage")
         show_power_capacity = st.checkbox("Power capacity")
-        storage_type = "power" if show_power_capacity else "energy"
+        storage_capacity_attribute = "power" if show_power_capacity else "energy"
 
         # Get the storage capacities
-        storage_capacity = stats.storage_capacity(output_directory, storage_type=storage_type, country_codes=selected_country_codes)
+        storage_capacity = stats.storage_capacity(output_directory, attribute=storage_capacity_attribute, country_codes=selected_country_codes)
 
         # Create the storage capacity columns
         cols = st.columns(max(len(storage_capacity.index), 3))
@@ -123,4 +123,4 @@ def statistics(output_directory):
                     metric_value = _format_value_with_unit(storage_capacity[technology] * 10 ** 6, unit="Wh")
 
             # Set the metric
-            cols[index % 3].metric(f"{utils.format_technology(technology)} {storage_type}", metric_value)
+            cols[index % 3].metric(f"{utils.format_technology(technology)} {storage_capacity_attribute}", metric_value)
