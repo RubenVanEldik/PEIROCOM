@@ -291,7 +291,7 @@ def is_float(value, *, required=True, min_value=None, max_value=None):
     if value is None:
         return not required
 
-    if not type(value) is float and not isinstance(value, np.float64):
+    if not isinstance(value, (float, np.float64)):
         return False
 
     if min_value is not None and value < min_value:
@@ -338,7 +338,7 @@ def is_integer(value, *, required=True, min_value=None, max_value=None):
     if value is None:
         return not required
 
-    if not type(value) is int:
+    if not isinstance(value, (int, np.int64)):
         return False
 
     if min_value is not None and value < min_value:
