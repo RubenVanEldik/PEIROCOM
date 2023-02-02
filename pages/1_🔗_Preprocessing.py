@@ -30,10 +30,8 @@ elif not utils.validate_files(climate_filenames):
     if st.button("Download climate data"):
         climate_data_url = "https://eepublicdownloads.entsoe.eu/clean-documents/sdc-documents/ERAA/Climate%20Data.7z"
         preprocessing.download_eraa_data(climate_data_url, input_directory, climate_filenames)
-else:
-    bidding_zone_placeholder = st.empty()
-    if bidding_zone_placeholder.button("Validate and preprocess bidding zone data"):
-        preprocessing.preprocess_bidding_zone_data(scenario)
+elif st.button("Validate and preprocess bidding zone data"):
+    preprocessing.preprocess_bidding_zone_data(scenario)
 
 
 # Download and preprocess the interconnection files
@@ -46,7 +44,5 @@ if not utils.validate_files(interconnection_filenames):
     if st.button("Download interconnection data"):
         interconnection_data_url = "https://eepublicdownloads.azureedge.net/clean-documents/sdc-documents/ERAA/Net%20Transfer%20Capacities.7z"
         preprocessing.download_eraa_data(interconnection_data_url, input_directory, interconnection_filenames)
-else:
-    interconnection_placeholder = st.empty()
-    if interconnection_placeholder.button("Validate and preprocess interconnection data"):
-        preprocessing.preprocess_interconnection_data(scenarios)
+elif st.button("Validate and preprocess interconnection data"):
+    preprocessing.preprocess_interconnection_data(scenarios)
