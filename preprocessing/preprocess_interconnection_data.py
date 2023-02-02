@@ -26,13 +26,9 @@ def preprocess_interconnection_data(scenarios):
     """
     Preprocess all interconnection data
     """
-    interconnection_progress = st.progress(0.0)
-
     for scenario_index, scenario in enumerate(scenarios):
         interconnection_types = ["hvac", "hvdc", "limits"]
         for interconnection_type_index, interconnection_type in enumerate(interconnection_types):
-            interconnection_progress.progress(scenario_index / len(scenarios) + interconnection_type_index / len(scenarios) / len(interconnection_types))
-
             with st.spinner(f"Preprocessing {utils.format_str(interconnection_type)} interconnections ({scenario['name']})"):
                 # Get the interconnections filepath
                 input_directory = utils.path("input", "eraa", "Transfer Capacities")

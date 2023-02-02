@@ -129,12 +129,8 @@ def preprocess_bidding_zone_data(scenarios):
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
     bidding_zones = [bidding_zone for country in countries for bidding_zone in country["bidding_zones"]]
 
-    # Initialize a progress bar
-    bidding_zone_progress = st.progress(0.0)
-
     for scenario_index, scenario in enumerate(scenarios):
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
-            bidding_zone_progress.progress(scenario_index / len(scenarios) + bidding_zone_index / len(scenarios) / len(bidding_zones))
 
             with st.spinner(f"Preprocessing {bidding_zone} ({scenario['name']})"):
                 # Import demand data
