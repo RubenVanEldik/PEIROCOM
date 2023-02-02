@@ -82,7 +82,7 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
     for climate_zone in climate_zones:
         # Import the Excel sheet for a zone
         usecols_func = lambda col: col in ["Date", "Hour"] or isinstance(col, int)
-        sheet = pd.read_excel(filepath, sheet_name=zone, index_col=[0, 1], skiprows=10, usecols=usecols_func)
+        sheet = pd.read_excel(filepath, sheet_name=climate_zone, index_col=[0, 1], skiprows=10, usecols=usecols_func)
         formatted_column_name = column_name.replace("{climate_zone}", climate_zone.lower())
 
         # Transform the sheet DataFrame to a Series with appropriate index
