@@ -1,7 +1,7 @@
 import utils
 import validate
 
-word_dict = {"lcoe": "LCOE", "hvac": "HVAC", "hvdc": "HVDC", "soc": "SoC", "wacc": "WACC", "capex": "CAPEX", "om": "O&M"}
+word_dict = {"ires": "IRES", "lcoe": "LCOE", "hvac": "HVAC", "hvdc": "HVDC", "soc": "SoC", "wacc": "WACC", "capex": "CAPEX", "om": "O&M"}
 
 
 @utils.cache

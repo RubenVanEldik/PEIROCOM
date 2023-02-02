@@ -9,7 +9,7 @@ st.set_page_config(page_title="Input data - PEIROCOM", page_icon="📂")
 
 
 def run():
-    data_type = st.sidebar.radio("Data type", ["countries", "technologies", "bidding_zones", "interconnections"], format_func=utils.format_str)
+    data_type = st.sidebar.radio("Data type", ["countries", "technologies", "demand", "ires", "interconnections"], format_func=utils.format_str)
 
     if data_type == "countries":
         st.header("Countries")
@@ -69,24 +69,37 @@ def run():
             technologies_df.index = [utils.format_str(index) for index in technologies_df.index]
             st.dataframe(technologies_df)
 
-    if data_type == "bidding_zones":
+    if data_type == "demand":
+        # Select the model year
+        scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
+
+        st.header("Demand")
+
+        # Read the demand data
+        demand_df = utils.read_temporal_data(utils.path("input", "scenarios", scenario, "demand.csv"))
+
+        # Format the index and show the DataFrame
+        demand_df.index = demand_df.index.strftime("%Y-%m-%d %H:%M UTC")
+        st.dataframe(demand_df, height=600)
+
+    if data_type == "ires":
         # Select the model year
         scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
 
         # Select the bidding zone
-        input_path = utils.path("input", "scenarios", scenario, "bidding_zones")
+        input_path = utils.path("input", "scenarios", scenario, "ires")
         bidding_zones = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
         bidding_zone = st.sidebar.selectbox("Bidding zone", bidding_zones)
 
-        st.header(f"Bidding zone {bidding_zone}")
+        st.header(f"IRES capacity factors {bidding_zone}")
 
         # Read the temporal data
-        bidding_zone_df = utils.read_temporal_data(input_path / f"{bidding_zone}.csv")
+        ires_df = utils.read_temporal_data(input_path / f"{bidding_zone}.csv")
 
         # Format the index and column names and show the DataFrame
-        bidding_zone_df.index = bidding_zone_df.index.strftime("%Y-%m-%d %H:%M UTC")
-        bidding_zone_df.columns = [utils.format_column_name(column_name) for column_name in bidding_zone_df.columns]
-        st.dataframe(bidding_zone_df, height=600)
+        ires_df.index = ires_df.index.strftime("%Y-%m-%d %H:%M UTC")
+        ires_df.columns = [utils.format_column_name(column_name) for column_name in ires_df.columns]
+        st.dataframe(ires_df, height=600)
 
     if data_type == "interconnections":
         # Select the model year

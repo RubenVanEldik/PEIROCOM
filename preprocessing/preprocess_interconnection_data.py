@@ -26,6 +26,8 @@ def preprocess_interconnection_data(scenarios):
     """
     Preprocess all interconnection data
     """
+    assert validate.is_list_like(scenarios)
+
     for scenario_index, scenario in enumerate(scenarios):
         interconnection_types = ["hvac", "hvdc", "limits"]
         for interconnection_type_index, interconnection_type in enumerate(interconnection_types):

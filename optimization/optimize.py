@@ -45,10 +45,17 @@ def optimize(config, *, status, output_directory):
     model.setParam("NumericFocus", 1)
 
     """
-    Step 2: Initialize each bidding zone
+    Step 2: Get the temporal demand data
+    """
+    demand_filepath = utils.path("input", "scenarios", config["scenario"], "demand.csv")
+    temporal_demand = utils.read_temporal_data(demand_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
+    temporal_demand = temporal_demand[~((temporal_demand.index.month == 2) & (temporal_demand.index.day == 29))]
+
+    """
+    Step 3: Initialize each bidding zone
     """
     # Create dictionaries to store all the data per bidding zone
-    temporal_data = {}
+    temporal_ires = {}
     temporal_results = {}
     temporal_export = {}
     interconnection_capacity = {}
@@ -58,22 +65,20 @@ def optimize(config, *, status, output_directory):
     bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
     for index, bidding_zone in enumerate(bidding_zones):
         """
-        Step 2A: Import the temporal data
+        Step 3A: Import the temporal data
         """
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
         status.update(f"{country_flag} Importing data")
 
-        filepath = utils.path("input", "scenarios", config["scenario"], "bidding_zones", f"{bidding_zone}.csv")
-        start_year = config["climate_years"]["start"]
-        end_year = config["climate_years"]["end"]
         # Get the temporal data and resample to the required resolution
-        temporal_data[bidding_zone] = utils.read_temporal_data(filepath, start_year=start_year, end_year=end_year).resample(config["resolution"]).mean()
+        ires_filepath = utils.path("input", "scenarios", config["scenario"], "ires", f"{bidding_zone}.csv")
+        temporal_ires[bidding_zone] = utils.read_temporal_data(ires_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
         # Remove the leap days from the dataset that could have been introduced by the resample method
-        temporal_data[bidding_zone] = temporal_data[bidding_zone][~((temporal_data[bidding_zone].index.month == 2) & (temporal_data[bidding_zone].index.day == 29))]
+        temporal_ires[bidding_zone] = temporal_ires[bidding_zone][~((temporal_ires[bidding_zone].index.month == 2) & (temporal_ires[bidding_zone].index.day == 29))]
         # Create a temporal_results DataFrame with the demand_MW column
-        temporal_results[bidding_zone] = temporal_data[bidding_zone].loc[:, ["demand_MW"]]
+        temporal_results[bidding_zone] = temporal_demand[[bidding_zone]]
         # Calculate the energy covered by the baseload
-        temporal_results[bidding_zone]["baseload_MW"] = temporal_results[bidding_zone].demand_MW.mean() * config["technologies"]["relative_baseload"]
+        temporal_results[bidding_zone]["baseload_MW"] = temporal_demand[bidding_zone].mean() * config["technologies"]["relative_baseload"]
 
         # Create a DataFrame for the generation capacities
         generation_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["generation"])
@@ -91,14 +96,14 @@ def optimize(config, *, status, output_directory):
             interconnection_capacity["hvdc"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
 
         """
-        Step 2B: Define generation capacity variables
+        Step 3B: Define generation capacity variables
         """
         temporal_results[bidding_zone]["generation_total_MW"] = 0
         for generation_technology in config["technologies"]["generation"]:
             status.update(f"{country_flag} Adding {utils.format_technology(generation_technology, capitalize=False)} generation")
 
             # Create a capacity variable for each climate zone
-            climate_zones = [re.match(f"{generation_technology}_(.+)_cf", column).group(1) for column in temporal_data[bidding_zone].columns if column.startswith(f"{generation_technology}_")]
+            climate_zones = [re.match(f"{generation_technology}_(.+)_cf", column).group(1) for column in temporal_ires[bidding_zone].columns if column.startswith(f"{generation_technology}_")]
             generation_potential = utils.get_generation_potential_in_climate_zone(bidding_zone, generation_technology, config=config)
             current_capacity = utils.get_current_generation_capacity_in_climate_zone(bidding_zone, generation_technology, config=config)
             capacities = model.addVars(climate_zones, lb=current_capacity, ub=generation_potential)
@@ -108,12 +113,12 @@ def optimize(config, *, status, output_directory):
             for climate_zone, capacity in capacities.items():
                 generation_capacity[bidding_zone].loc[climate_zone, generation_technology] = capacity
                 # Apply is required, otherwise it will throw a ValueError if there are more than a few thousand rows (see https://stackoverflow.com/questions/64801287)
-                temporal_generation += temporal_data[bidding_zone][f"{generation_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
+                temporal_generation += temporal_ires[bidding_zone][f"{generation_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
             temporal_results[bidding_zone][f"generation_{generation_technology}_MW"] = temporal_generation
             temporal_results[bidding_zone]["generation_total_MW"] += temporal_generation
 
         """
-        Step 2C: Define storage variables and constraints
+        Step 3C: Define storage variables and constraints
         """
         # Create a DataFrame for the storage capacity in this bidding zone
         storage_capacity[bidding_zone] = pd.DataFrame(0, index=config["technologies"]["storage"], columns=["energy", "power"])
@@ -144,11 +149,11 @@ def optimize(config, *, status, output_directory):
 
             # Create the inflow and outflow variables
             if storage_potential == 0:
-                inflow = pd.Series({timestamp: 0 for timestamp in temporal_data[bidding_zone].index})
-                outflow = pd.Series({timestamp: 0 for timestamp in temporal_data[bidding_zone].index})
+                inflow = pd.Series({timestamp: 0 for timestamp in temporal_demand.index})
+                outflow = pd.Series({timestamp: 0 for timestamp in temporal_demand.index})
             else:
-                inflow = pd.Series(model.addVars(temporal_data[bidding_zone].index))
-                outflow = pd.Series(model.addVars(temporal_data[bidding_zone].index))
+                inflow = pd.Series(model.addVars(temporal_demand.index))
+                outflow = pd.Series(model.addVars(temporal_demand.index))
 
             # Add the net storage flow variables to the temporal_results DataFrame
             net_flow = inflow - outflow
@@ -160,12 +165,12 @@ def optimize(config, *, status, output_directory):
             power_capacity = storage_capacity[bidding_zone].loc[storage_technology, "power"]
 
             if storage_potential == 0:
-                temporal_energy_stored = pd.Series(0, index=temporal_data[bidding_zone].index)
+                temporal_energy_stored = pd.Series(0, index=temporal_demand.index)
             else:
                 # Loop over all hours
                 energy_stored_previous = None
                 temporal_energy_stored_dict = {}
-                for timestamp in temporal_data[bidding_zone].index:
+                for timestamp in temporal_demand.index:
                     # Create the state of charge variables
                     energy_stored_current = model.addVar()
 
@@ -198,7 +203,7 @@ def optimize(config, *, status, output_directory):
             temporal_results[bidding_zone]["energy_stored_total_MWh"] += temporal_energy_stored
 
         """
-        Step 2D: Define the interconnection variables
+        Step 3D: Define the interconnection variables
         """
         for connection_type in ["hvac", "hvdc"]:
             status.update(f"{country_flag} Adding {connection_type.upper()} interconnections")
@@ -231,7 +236,7 @@ def optimize(config, *, status, output_directory):
                     temporal_export[connection_type][temporal_export_limit_column_name] = pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_export_limit))
 
     """
-    Step 3: Define demand constraints
+    Step 4: Define demand constraints
     """
     for bidding_zone in bidding_zones:
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
@@ -276,7 +281,7 @@ def optimize(config, *, status, output_directory):
         temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_total_MW"), "curtailed_MW", curtailed_MW)
 
     """
-    Step 4: Define interconnection capacity constraint if the individual interconnections are optimized
+    Step 5: Define interconnection capacity constraint if the individual interconnections are optimized
     """
     if optimize_individual_interconnections:
         total_current_capacity = sum(interconnection_capacity[connection_type]["current"].sum() for connection_type in ["hvac", "hvdc"])
@@ -285,7 +290,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
 
     """
-    Step 5: Define the self-sufficiency constraints per country
+    Step 6: Define the self-sufficiency constraints per country
     """
     if config["interconnections"]["min_self_sufficiency"] > 0:
         for country_code in config["country_codes"]:
@@ -315,7 +320,7 @@ def optimize(config, *, status, output_directory):
                 model.addConstr((sum_baseload + sum_generation - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
 
     """
-    Step 6: Define the storage costs constraint
+    Step 7: Define the storage costs constraint
     """
     if config.get("fixed_storage") is not None:
         status.update("Adding the storage costs constraint")
@@ -332,7 +337,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr(storage_costs <= fixed_storage_costs)
 
     """
-    Step 7: Set objective function
+    Step 8: Set objective function
     """
     status.update("Setting the objective function")
     temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
@@ -344,7 +349,7 @@ def optimize(config, *, status, output_directory):
     duration["initializing"] = round((initializing_end - initializing_start).total_seconds())
 
     """
-    Step 8: Solve model
+    Step 9: Solve model
     """
     # Set the status message and create
     status.update("Optimizing")
@@ -435,7 +440,7 @@ def optimize(config, *, status, output_directory):
     duration["optimizing"] = round((optimizing_end - optimizing_start).total_seconds())
 
     """
-    Step 9: Check if the model could be solved
+    Step 10: Check if the model could be solved
     """
     if model.status == gp.GRB.OPTIMAL:
         error_message = None
@@ -469,7 +474,7 @@ def optimize(config, *, status, output_directory):
         return {"duration": duration, "error_message": error_message}
 
     """
-    Step 10: Store the results
+    Step 11: Store the results
     """
     storing_start = datetime.now()
 
@@ -509,4 +514,5 @@ def optimize(config, *, status, output_directory):
     storing_end = datetime.now()
     duration["storing"] = round((storing_end - storing_start).total_seconds())
 
+    # Return with the duration dictionary
     return {"duration": duration}

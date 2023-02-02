@@ -121,35 +121,46 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
     return data
 
 
-def preprocess_bidding_zone_data(scenarios):
+def preprocess_demand_and_ires_data(scenarios):
     """
     Preprocess all bidding zone data
     """
+    assert validate.is_list_like(scenarios)
+
     # Get a list with all bidding zones
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
     bidding_zones = [bidding_zone for country in countries for bidding_zone in country["bidding_zones"]]
 
     for scenario_index, scenario in enumerate(scenarios):
+        # Import the demand data
+        demand_data = None
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
-
-            with st.spinner(f"Preprocessing {bidding_zone} ({scenario['name']})"):
+            with st.spinner(f"Preprocessing demand data for {bidding_zone} ({scenario['name']})"):
                 # Import demand data
                 filepath_demand = utils.path("input", "eraa", "Demand Data", f"Demand_TimeSeries_{scenario['year']}_NationalEstimates.xlsx")
-                data = _import_data(None, filepath_demand, bidding_zone=bidding_zone, column_name="demand_MW",)
+                demand_data = _import_data(demand_data, filepath_demand, bidding_zone=bidding_zone, column_name=bidding_zone)
+        demand_data.to_csv(utils.path("input", "scenarios", scenario["name"], "demand.csv"))
+
+        # Import the IRES data
+        for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
+            with st.spinner(f"Preprocessing IRES data for {bidding_zone} ({scenario['name']})"):
+                # Import demand data
+                filepath_demand = utils.path("input", "eraa", "Demand Data", f"Demand_TimeSeries_{scenario['year']}_NationalEstimates.xlsx")
+                ires_data = _import_data(None, filepath_demand, bidding_zone=bidding_zone, column_name="demand_MW")
 
                 # Import PV data
                 filepath_pv = utils.path("input", "eraa", "Climate Data", f"PECD_LFSolarPV_{scenario['year']}_edition 2021.3.xlsx")
-                data = _import_data(data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{climate_zone}_cf",)
+                ires_data = _import_data(ires_data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{climate_zone}_cf")
 
                 # Import onshore wind data
                 filepath_onshore = utils.path("input", "eraa", "Climate Data", f"PECD_Onshore_{scenario['year']}_edition 2021.3.xlsx")
-                data = _import_data(data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{climate_zone}_cf",)
+                ires_data = _import_data(ires_data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{climate_zone}_cf")
 
                 # Import offshore wind data
                 filepath_offshore = utils.path("input", "eraa", "Climate Data", f"PECD_Offshore_{scenario['year']}_edition 2021.3.xlsx")
-                data = _import_data(data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{climate_zone}_cf",)
+                ires_data = _import_data(ires_data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{climate_zone}_cf")
 
                 # Store the data in a CSV file
-                data.to_csv(utils.path("input", "scenarios", scenario["name"], "bidding_zones", f"{bidding_zone}.csv"))
+                ires_data.to_csv(utils.path("input", "scenarios", scenario["name"], "ires", f"{bidding_zone}.csv"))
 
-    st.success("The data for all bidding zones is succesfully preprocessed")
+    st.success("The demand and IRES data for all bidding zones is succesfully preprocessed")
