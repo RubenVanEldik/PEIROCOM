@@ -106,7 +106,7 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
             print(f"  - Column {formatted_column_name} ({bidding_zone}) contains only zeroes and is not included")
             continue
 
-        if column_name != "demand_MW" and any(new_column.equals(data[data_column_name]) for data_column_name in data):
+        if column_name != "demand_MW" and data is not None and any(new_column.equals(data[data_column_name]) for data_column_name in data):
             print(f"  - Column {formatted_column_name} ({bidding_zone}) is exactly equal to another column and is not included")
             continue
 
