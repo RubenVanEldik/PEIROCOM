@@ -78,12 +78,12 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
     assert validate.is_bidding_zone(bidding_zone)
     assert validate.is_string(column_name)
 
-    relevant_zones = _get_relevant_sheet_names(filepath, bidding_zone)
-    for zone in relevant_zones:
+    climate_zones = _get_relevant_sheet_names(filepath, bidding_zone)
+    for climate_zone in climate_zones:
         # Import the Excel sheet for a zone
         usecols_func = lambda col: col in ["Date", "Hour"] or isinstance(col, int)
         sheet = pd.read_excel(filepath, sheet_name=zone, index_col=[0, 1], skiprows=10, usecols=usecols_func)
-        formatted_column_name = column_name.replace("{climate_zone}", zone[2:])
+        formatted_column_name = column_name.replace("{climate_zone}", climate_zone.lower())
 
         # Transform the sheet DataFrame to a Series with appropriate index
         new_column = pd.Series([], dtype="float64")
