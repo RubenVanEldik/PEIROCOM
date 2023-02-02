@@ -138,6 +138,10 @@ def preprocess_demand_and_ires_data(scenarios):
         output_directory = utils.path("input", "scenarios", scenario["name"])
         ires_directory = output_directory / "ires"
 
+        # Create the IRES directory if does not exist yet
+        if not ires_directory.is_dir():
+            ires_directory.mkdir(parents=True)
+
         # Import the demand data
         demand_data = None
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
