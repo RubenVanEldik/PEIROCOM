@@ -83,7 +83,7 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
         # Import the Excel sheet for a zone
         usecols_func = lambda col: col in ["Date", "Hour"] or isinstance(col, int)
         sheet = pd.read_excel(filepath, sheet_name=zone, index_col=[0, 1], skiprows=10, usecols=usecols_func)
-        formatted_column_name = column_name.replace("{bidding_zone}", zone[2:])
+        formatted_column_name = column_name.replace("{climate_zone}", zone[2:])
 
         # Transform the sheet DataFrame to a Series with appropriate index
         new_column = pd.Series([], dtype="float64")
@@ -143,15 +143,15 @@ def preprocess_bidding_zone_data(scenarios):
 
                 # Import PV data
                 filepath_pv = utils.path("input", "eraa", "Climate Data", f"PECD_LFSolarPV_{scenario['year']}_edition 2021.3.xlsx")
-                data = _import_data(data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{bidding_zone}_cf",)
+                data = _import_data(data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{climate_zone}_cf",)
 
                 # Import onshore wind data
                 filepath_onshore = utils.path("input", "eraa", "Climate Data", f"PECD_Onshore_{scenario['year']}_edition 2021.3.xlsx")
-                data = _import_data(data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{bidding_zone}_cf",)
+                data = _import_data(data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{climate_zone}_cf",)
 
                 # Import offshore wind data
                 filepath_offshore = utils.path("input", "eraa", "Climate Data", f"PECD_Offshore_{scenario['year']}_edition 2021.3.xlsx")
-                data = _import_data(data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{bidding_zone}_cf",)
+                data = _import_data(data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{climate_zone}_cf",)
 
                 # Store the data in a CSV file
                 data.to_csv(utils.path("input", "scenarios", scenario["name"], "bidding_zones", f"{bidding_zone}.csv"))
