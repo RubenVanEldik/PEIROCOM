@@ -103,7 +103,7 @@ def statistics(output_directory):
         storage_capacity_attribute = "power" if show_power_capacity else "energy"
 
         # Get the storage capacities
-        storage_capacity = stats.storage_capacity(output_directory, attribute=storage_capacity_attribute, country_codes=selected_country_codes)
+        storage_capacity = stats.storage_capacity(output_directory, country_codes=selected_country_codes)[storage_capacity_attribute]
 
         # Create the storage capacity columns
         cols = st.columns(max(len(storage_capacity.index), 3))

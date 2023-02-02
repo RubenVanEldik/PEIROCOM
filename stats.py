@@ -84,16 +84,14 @@ def generation_capacity(output_directory, *, country_codes=None):
     return utils.get_generation_capacity(output_directory, group="all", country_codes=country_codes)
 
 
-def storage_capacity(output_directory, *, attribute, country_codes=None):
+def storage_capacity(output_directory, *, country_codes=None):
     """
     Return a dictionary with the storage capacity per storage type for either 'energy' or 'power'
     """
     assert validate.is_directory_path(output_directory)
-    assert validate.is_string(attribute)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
-    storage_capacity = utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
-    return storage_capacity[attribute]
+    return utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
 
 
 def self_sufficiency(output_directory, *, country_codes=None):

@@ -130,7 +130,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         sensitivity_plot.ax.legend()
     if statistic_name == "storage_capacity":
         storage_capacity_attribute = st.sidebar.selectbox("Storage capacity attribute", ["energy", "power"], format_func=utils.format_str)
-        data = steps.apply(lambda step: stats.storage_capacity(output_directory / step, attribute=storage_capacity_attribute))
+        data = steps.apply(lambda step: stats.storage_capacity(output_directory / step)[storage_capacity_attribute])
         data = data / 10 ** 6 if storage_capacity_type == "energy" else data / 10 ** 3
         for storage_technology in data:
             sensitivity_plot.ax.plot(data[storage_technology], color=colors.technology(storage_technology), label=utils.format_technology(storage_technology))
