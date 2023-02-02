@@ -33,7 +33,7 @@ elif not utils.validate_files(climate_filenames):
 else:
     bidding_zone_placeholder = st.empty()
     if bidding_zone_placeholder.button("Validate and preprocess bidding zone data"):
-        preprocessing.validate_and_import_bidding_zone_data(scenario)
+        preprocessing.preprocess_bidding_zone_data(scenario)
 
 
 # Download and preprocess the interconnection files
@@ -49,4 +49,4 @@ if not utils.validate_files(interconnection_filenames):
 else:
     interconnection_placeholder = st.empty()
     if interconnection_placeholder.button("Validate and preprocess interconnection data"):
-        preprocessing.validate_and_import_interconnection_data(scenarios)
+        preprocessing.preprocess_interconnection_data(scenarios)

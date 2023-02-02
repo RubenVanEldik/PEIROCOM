@@ -1,3 +1,3 @@
 from .download_eraa_data import download_eraa_data
-from .validate_and_import_bidding_zone_data import validate_and_import_bidding_zone_data
-from .validate_and_import_interconnection_data import validate_and_import_interconnection_data
+from .preprocess_bidding_zone_data import preprocess_bidding_zone_data
+from .preprocess_interconnection_data import preprocess_interconnection_data
