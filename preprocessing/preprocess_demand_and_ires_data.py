@@ -144,10 +144,6 @@ def preprocess_demand_and_ires_data(scenarios):
         # Import the IRES data
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
             with st.spinner(f"Preprocessing IRES data for {bidding_zone} ({scenario['name']})"):
-                # Import demand data
-                filepath_demand = utils.path("input", "eraa", "Demand Data", f"Demand_TimeSeries_{scenario['year']}_NationalEstimates.xlsx")
-                ires_data = _import_data(None, filepath_demand, bidding_zone=bidding_zone, column_name="demand_MW")
-
                 # Import PV data
                 filepath_pv = utils.path("input", "eraa", "Climate Data", f"PECD_LFSolarPV_{scenario['year']}_edition 2021.3.xlsx")
                 ires_data = _import_data(ires_data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{climate_zone}_cf")
