@@ -132,6 +132,12 @@ def preprocess_demand_and_ires_data(scenarios):
     bidding_zones = [bidding_zone for country in countries for bidding_zone in country["bidding_zones"]]
 
     for scenario_index, scenario in enumerate(scenarios):
+        # Define the directory variables
+        demand_directory = utils.path("input", "eraa", "Demand Data")
+        climate_directory = utils.path("input", "eraa", "Climate Data")
+        output_directory = utils.path("input", "scenarios", scenario["name"])
+        ires_directory = output_directory / "ires"
+
         # Import the demand data
         demand_data = None
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
@@ -139,24 +145,24 @@ def preprocess_demand_and_ires_data(scenarios):
                 # Import demand data
                 filepath_demand = utils.path("input", "eraa", "Demand Data", f"Demand_TimeSeries_{scenario['year']}_NationalEstimates.xlsx")
                 demand_data = _import_data(demand_data, filepath_demand, bidding_zone=bidding_zone, column_name=bidding_zone)
-        demand_data.to_csv(utils.path("input", "scenarios", scenario["name"], "demand.csv"))
+        demand_data.to_csv(output_directory / "demand.csv")
 
         # Import the IRES data
         for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
             with st.spinner(f"Preprocessing IRES data for {bidding_zone} ({scenario['name']})"):
                 # Import PV data
-                filepath_pv = utils.path("input", "eraa", "Climate Data", f"PECD_LFSolarPV_{scenario['year']}_edition 2021.3.xlsx")
-                ires_data = _import_data(ires_data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{climate_zone}_cf")
+                filepath_pv = climate_directory / f"PECD_LFSolarPV_{scenario['year']}_edition 2021.3.xlsx"
+                ires_data = _import_data(None, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{climate_zone}_cf")
 
                 # Import onshore wind data
-                filepath_onshore = utils.path("input", "eraa", "Climate Data", f"PECD_Onshore_{scenario['year']}_edition 2021.3.xlsx")
+                filepath_onshore = climate_directory / f"PECD_Onshore_{scenario['year']}_edition 2021.3.xlsx"
                 ires_data = _import_data(ires_data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{climate_zone}_cf")
 
                 # Import offshore wind data
-                filepath_offshore = utils.path("input", "eraa", "Climate Data", f"PECD_Offshore_{scenario['year']}_edition 2021.3.xlsx")
+                filepath_offshore = climate_directory / f"PECD_Offshore_{scenario['year']}_edition 2021.3.xlsx"
                 ires_data = _import_data(ires_data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{climate_zone}_cf")
 
                 # Store the data in a CSV file
-                ires_data.to_csv(utils.path("input", "scenarios", scenario["name"], "ires", f"{bidding_zone}.csv"))
+                ires_data.to_csv(ires_directory / f"{bidding_zone}.csv")
 
     st.success("The demand and IRES data for all bidding zones is succesfully preprocessed")
