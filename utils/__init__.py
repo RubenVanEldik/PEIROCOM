@@ -31,8 +31,6 @@ from .get_temporal_results import get_temporal_results
 from .is_demo import is_demo
 from .merge_dataframes_on_column import merge_dataframes_on_column
 from .path import path
-from .preprocess_bidding_zone import preprocess_bidding_zone
-from .preprocess_interconnections import preprocess_interconnections
 from .read_csv import read_csv
 from .read_shapefile import read_shapefile
 from .read_temporal_data import read_temporal_data

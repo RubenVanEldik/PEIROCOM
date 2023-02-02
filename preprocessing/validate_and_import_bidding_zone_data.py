@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+import streamlit as st
 
 import utils
 import validate
@@ -120,28 +121,60 @@ def _import_data(data, filepath, *, bidding_zone, column_name=None):
     return data
 
 
-def preprocess_bidding_zone(bidding_zone, scenario):
+def validate_and_import_bidding_zone_data(scenarios):
     """
-    Merge all data for a specific bidding zone and save it as a CSV file
+    Validate and preprocess all bidding zone data
     """
-    assert validate.is_bidding_zone(bidding_zone)
-    assert validate.is_scenario(scenario)
+    # Get a list with all bidding zones
+    countries = utils.read_yaml(utils.path("input", "countries.yaml"))
+    bidding_zones = [bidding_zone for country in countries for bidding_zone in country["bidding_zones"]]
 
-    # Import demand data
-    filepath_demand = utils.path("input", "eraa", "Demand Data", f"Demand_TimeSeries_{scenario}_NationalEstimates.xlsx")
-    data = _import_data(None, filepath_demand, bidding_zone=bidding_zone, column_name="demand_MW",)
+    # Initialize a progress bar
+    bidding_zone_progress = st.progress(0.0)
 
-    # Import PV data
-    filepath_pv = utils.path("input", "eraa", "Climate Data", f"PECD_LFSolarPV_{scenario}_edition 2021.3.xlsx")
-    data = _import_data(data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{bidding_zone}_cf",)
+    for scenario_index, scenario in enumerate(scenarios):
+        for bidding_zone_index, bidding_zone in enumerate(bidding_zones):
+            bidding_zone_progress.progress(scenario_index / len(scenarios) + bidding_zone_index / len(scenarios) / len(bidding_zones))
 
-    # Import onshore wind data
-    filepath_onshore = utils.path("input", "eraa", "Climate Data", f"PECD_Onshore_{scenario}_edition 2021.3.xlsx")
-    data = _import_data(data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{bidding_zone}_cf",)
+            filename = utils.path("input", "scenarios", scenario["name"], "bidding_zones", f"{bidding_zone}.csv")
+            if filename.is_file():
+                is_valid_file = True
+                data = utils.read_temporal_data(filename)
 
-    # Import offshore wind data
-    filepath_offshore = utils.path("input", "eraa", "Climate Data", f"PECD_Offshore_{scenario}_edition 2021.3.xlsx")
-    data = _import_data(data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{bidding_zone}_cf",)
+                if not validate.is_dataframe(data):
+                    is_valid_file = False
 
-    # Store the data in a CSV file
-    data.to_csv(utils.path("input", "scenarios", scenario, "bidding_zones", f"{bidding_zone}.csv"))
+                if not "demand_MW" in data.columns or len(data.columns) < 2:
+                    is_valid_file = False
+
+                # Check if the DataFrame has any missing timestamps
+                start_date = pd.Timestamp(datetime.strptime("1982-01-01", "%Y-%m-%d").strftime("%Y-%m-%d 00:00:00+00:00"))
+                end_date = pd.Timestamp(datetime.strptime("2016-12-31", "%Y-%m-%d").strftime("%Y-%m-%d 00:00:00+00:00"))
+                required_timestamps = pd.date_range(start=start_date, end=end_date, freq="1H")
+                missing_timestamps = required_timestamps.difference(data.index)
+                has_missing_timestamps = len(missing_timestamps[~((missing_timestamps.month == 2) & (missing_timestamps.day == 29))]) != 0
+                if has_missing_timestamps:
+                    is_valid_file = False
+
+                if not is_valid_file:
+                    with st.spinner(f"Preprocessing {bidding_zone} ({scenario['name']})"):
+                        # Import demand data
+                        filepath_demand = utils.path("input", "eraa", "Demand Data", f"Demand_TimeSeries_{scenario['name']}_NationalEstimates.xlsx")
+                        data = _import_data(None, filepath_demand, bidding_zone=bidding_zone, column_name="demand_MW",)
+
+                        # Import PV data
+                        filepath_pv = utils.path("input", "eraa", "Climate Data", f"PECD_LFSolarPV_{scenario['name']}_edition 2021.3.xlsx")
+                        data = _import_data(data, filepath_pv, bidding_zone=bidding_zone, column_name="pv_{bidding_zone}_cf",)
+
+                        # Import onshore wind data
+                        filepath_onshore = utils.path("input", "eraa", "Climate Data", f"PECD_Onshore_{scenario['name']}_edition 2021.3.xlsx")
+                        data = _import_data(data, filepath_onshore, bidding_zone=bidding_zone, column_name="onshore_{bidding_zone}_cf",)
+
+                        # Import offshore wind data
+                        filepath_offshore = utils.path("input", "eraa", "Climate Data", f"PECD_Offshore_{scenario['name']}_edition 2021.3.xlsx")
+                        data = _import_data(data, filepath_offshore, bidding_zone=bidding_zone, column_name="offshore_{bidding_zone}_cf",)
+
+                        # Store the data in a CSV file
+                        data.to_csv(utils.path("input", "scenarios", scenario["name"], "bidding_zones", f"{bidding_zone}.csv"))
+
+    st.success("The data for all bidding zones is succesfully preprocessed")
