@@ -57,13 +57,6 @@ def is_chart(value, *, required=True):
     return isinstance(value, chart.Chart)
 
 
-def is_climate_zone(value, *, required=True):
-    if value is None:
-        return not required
-
-    return bool(re.search("^[a-z]+_[0-9A-Z]{2,3}_cf$", value))
-
-
 def is_color(value, *, required=True):
     if value is None:
         return not required
