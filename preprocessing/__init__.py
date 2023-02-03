@@ -1,3 +1,4 @@
 from .download_eraa_data import download_eraa_data
 from .preprocess_demand_and_ires_data import preprocess_demand_and_ires_data
+from .preprocess_hydropower_data import preprocess_hydropower_data
 from .preprocess_interconnection_data import preprocess_interconnection_data

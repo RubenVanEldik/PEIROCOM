@@ -43,6 +43,10 @@ st.header("Preprocess files")
 if st.button("Preprocess demand and IRES data", disabled=not demand_files_are_downloaded or not climate_files_are_downloaded):
     preprocessing.preprocess_demand_and_ires_data(scenarios)
 
+# Download and preprocess the hydropower files
+if st.button("Preprocess hydropower data", disabled=not climate_files_are_downloaded):
+    preprocessing.preprocess_hydropower_data(scenarios)
+
 # Download and preprocess the interconnection files
 if st.button("Preprocess interconnection data", disabled=not interconnection_files_are_downloaded):
     preprocessing.preprocess_interconnection_data(scenarios)
