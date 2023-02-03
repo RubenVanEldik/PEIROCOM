@@ -44,13 +44,13 @@ def preprocess_interconnection_data(scenarios):
                 if interconnection_type == "hvac":
                     hvac = pd.read_excel(filepath, sheet_name="HVAC", index_col=[0, 1], skiprows=10, header=[0, 1])
                     hvac = hvac[sorted(hvac.columns)]
-                    hvac.index = utils.create_datetime_index(hvac.index, scenario["name"])
+                    hvac.index = utils.create_datetime_index(hvac.index, scenario["year"])
                     hvac.to_csv(output_directory / "hvac.csv")
 
                 if interconnection_type == "hvdc":
                     hvdc = pd.read_excel(filepath, sheet_name="HVDC", index_col=[0, 1], skiprows=10, header=[0, 1])
                     hvdc = hvdc[sorted(hvdc.columns)]
-                    hvdc.index = utils.create_datetime_index(hvdc.index, scenario["name"])
+                    hvdc.index = utils.create_datetime_index(hvdc.index, scenario["year"])
                     hvdc.to_csv(output_directory / "hvdc.csv")
 
                 if interconnection_type == "limits":
@@ -59,7 +59,7 @@ def preprocess_interconnection_data(scenarios):
                     limits = limits.drop(index=("Country Level Maximum NTC ", "UTC"))
                     limits.columns = pd.MultiIndex.from_tuples([(bidding_zone, _format_export_limit_type(limit_type)) for bidding_zone, limit_type in limits.columns.str.split(" - ")])
                     limits = limits[sorted(limits.columns)]
-                    limits.index = utils.create_datetime_index(limits.index, scenario["name"])
+                    limits.index = utils.create_datetime_index(limits.index, scenario["year"])
                     limits.to_csv(output_directory / "limits.csv")
 
     st.success("The data for all interconnections is succesfully preprocessed")
