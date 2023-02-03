@@ -400,34 +400,34 @@ def optimize(config, *, status, output_directory):
     """
     Step 6: Define the self-sufficiency constraints per country
     """
-    if config["interconnections"]["min_self_sufficiency"] > 0:
-        for country_code in config["country_codes"]:
-            country_flag = utils.get_country_property(country_code, "flag")
-            status.update(f"{country_flag} Adding self-sufficiency constraint")
+    for country_code in config["country_codes"]:
+        country_flag = utils.get_country_property(country_code, "flag")
+        status.update(f"{country_flag} Adding self-sufficiency constraint")
 
-            # Set the variables required to calculate the cumulative results in the country
-            sum_demand = 0
-            sum_baseload = 0
-            sum_generation = 0
-            sum_curtailed = 0
-            sum_storage_flow = 0
-            sum_hydropower = 0
+        # Set the variables required to calculate the cumulative results in the country
+        sum_demand = 0
+        sum_baseload = 0
+        sum_generation = 0
+        sum_curtailed = 0
+        sum_storage_flow = 0
+        sum_hydropower = 0
 
-            # Loop over all bidding zones in the country
-            for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
-                # Calculate the total demand and non-curtailed generation in this country
-                sum_demand += temporal_results[bidding_zone].demand_MW.sum()
-                # The Gurobi .quicksum method is significantly faster than Panda's .sum method
-                sum_baseload += gp.quicksum(temporal_results[bidding_zone].baseload_MW)
-                sum_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_MW)
-                sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
-                sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
-                sum_hydropower += gp.quicksum(temporal_results[bidding_zone].net_generation_total_hydropower_MW)
+        # Loop over all bidding zones in the country
+        for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
+            # Calculate the total demand and non-curtailed generation in this country
+            sum_demand += temporal_results[bidding_zone].demand_MW.sum()
+            # The Gurobi .quicksum method is significantly faster than Panda's .sum method
+            sum_baseload += gp.quicksum(temporal_results[bidding_zone].baseload_MW)
+            sum_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_MW)
+            sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
+            sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
+            sum_hydropower += gp.quicksum(temporal_results[bidding_zone].net_generation_total_hydropower_MW)
 
-            # Add the self-sufficiency constraint if there is any demand in the country
-            if sum_demand > 0:
-                min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
-                model.addConstr((sum_baseload + sum_generation + sum_hydropower - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
+        # Add the self-sufficiency constraints if there is any demand in the country
+        if sum_demand > 0:
+            self_sufficiency = (sum_baseload + sum_generation + sum_hydropower - sum_curtailed - sum_storage_flow) / sum_demand
+            model.addConstr(self_sufficiency >= config["interconnections"]["min_self_sufficiency"])
+            model.addConstr(self_sufficiency <= config["interconnections"]["max_self_sufficiency"])
 
     """
     Step 7: Define the storage costs constraint

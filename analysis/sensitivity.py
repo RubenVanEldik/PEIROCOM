@@ -213,7 +213,7 @@ def sensitivity(output_directory):
         sensitivity_plot.ax.set_xlabel("Interconnection efficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "self_sufficiency":
-        sensitivity_plot.ax.set_xlabel("Minimum self sufficiency (%)")
+        sensitivity_plot.ax.set_xlabel("Minimum self-sufficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot

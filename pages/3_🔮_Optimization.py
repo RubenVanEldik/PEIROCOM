@@ -89,7 +89,9 @@ with st.sidebar.expander("Technologies"):
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):
     config["interconnections"] = {"efficiency": {}}
-    config["interconnections"]["min_self_sufficiency"] = st.slider("Minimum self sufficiency factor", value=0.8, max_value=1.0, step=0.05)
+    min_self_sufficiency, max_self_sufficiency = st.slider("Self-sufficiency range", value=(0.8, 1.5), max_value=2.0, step=0.05)
+    config["interconnections"]["min_self_sufficiency"] = min_self_sufficiency
+    config["interconnections"]["max_self_sufficiency"] = max_self_sufficiency
     config["interconnections"]["relative_capacity"] = st.slider("Relative capacity", value=1.0, max_value=1.5, step=0.05)
     config["interconnections"]["optimize_individual_interconnections"] = st.checkbox("Optimize individual interconnections")
     config["interconnections"]["efficiency"]["hvac"] = st.number_input("Efficiency HVAC", value=0.95, max_value=1.0)
@@ -98,7 +100,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "self_sufficiency"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -150,8 +152,13 @@ with st.sidebar.expander("Sensitivity analysis"):
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
-    elif sensitivity_analysis_type == "self_sufficiency":
-        sensitivity_start, sensitivity_stop = st.slider("Self sufficiency range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
+    elif sensitivity_analysis_type == "min_self_sufficiency":
+        sensitivity_start, sensitivity_stop = st.slider("Minimum self-sufficiency range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+    elif sensitivity_analysis_type == "max_self_sufficiency":
+        sensitivity_start, sensitivity_stop = st.slider("Maximum self-sufficiency range", value=(1.0, 2.0), min_value=1.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}

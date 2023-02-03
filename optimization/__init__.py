@@ -165,8 +165,10 @@ def run_sensitivity(config, sensitivity_config):
             elif sensitivity_config["analysis_type"] == "interconnection_efficiency":
                 utils.set_nested_key(step_config, "interconnections.efficiency.hvac", step_value)
                 utils.set_nested_key(step_config, "interconnections.efficiency.hvdc", step_value)
-            elif sensitivity_config["analysis_type"] == "self_sufficiency":
+            elif sensitivity_config["analysis_type"] == "min_self_sufficiency":
                 utils.set_nested_key(step_config, "interconnections.min_self_sufficiency", step_value)
+            elif sensitivity_config["analysis_type"] == "max_self_sufficiency":
+                utils.set_nested_key(step_config, "interconnections.max_self_sufficiency", step_value)
 
             # Run the optimization
             run(step_config, status=status, output_directory=output_directory / step_key)
