@@ -12,3 +12,4 @@ output/
 tuning/
 *.tar
 *.tar.gz
+*.zip
