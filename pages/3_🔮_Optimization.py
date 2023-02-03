@@ -48,7 +48,7 @@ with st.sidebar.expander("Scope"):
     config["climate_years"]["end"] = col2.selectbox("End year", climate_years, index=climate_years.index(2016))
 
     # Select the resolution
-    resolutions = [f"{i}H" for i in range(24, 0, -1)]
+    resolutions = [f"{i}H" for i in range(24, 0, -1) if 24 % i == 0]
     config["resolution"] = st.select_slider("Resolution", resolutions, value="1H", format_func=utils.format_resolution)
 
     # Check if the config exceeds the demo bounds
