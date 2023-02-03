@@ -13,6 +13,7 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     # Get the capacities and demand
     generation_capacity = utils.get_generation_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
+    hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
     temporal_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW")
     temporal_baseload = utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
@@ -21,7 +22,7 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Return the LCOE
-    return utils.calculate_lcoe(generation_capacity, storage_capacity, temporal_net_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=breakdown_level)
 
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
@@ -35,6 +36,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     # Get the capacities and demand
     generation_capacity = utils.get_generation_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
+    hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
     temporal_demand = utils.merge_dataframes_on_column(temporal_results, "generation_total_MW")
     config = utils.read_yaml(output_directory / "config.yaml")
@@ -44,7 +46,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
         storage_capacity[bidding_zone] = 0 * storage_capacity[bidding_zone]
 
     # Return the LCOE
-    return utils.calculate_lcoe(generation_capacity, storage_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
 
 
 def premium(output_directory, *, country_codes=None, breakdown_level=0):
@@ -76,7 +78,7 @@ def relative_curtailment(output_directory, *, country_codes=None):
 
 def generation_capacity(output_directory, *, country_codes=None):
     """
-    Return a dictionary with the generation capacity per generation type
+    Get the grouped generation capacity for a specific output_directory
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
@@ -86,12 +88,22 @@ def generation_capacity(output_directory, *, country_codes=None):
 
 def storage_capacity(output_directory, *, country_codes=None):
     """
-    Return a dictionary with the storage capacity per storage type for either 'energy' or 'power'
+    Get the grouped storage capacity for a specific output_directory
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     return utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
+
+
+def hydropower_capacity(output_directory, *, country_codes=None):
+    """
+    Get the grouped hydropower capacity for a specific output_directory
+    """
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
+
+    return utils.get_hydropower_capacity(output_directory, group="all", country_codes=country_codes)
 
 
 def self_sufficiency(output_directory, *, country_codes=None):

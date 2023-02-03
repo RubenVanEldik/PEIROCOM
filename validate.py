@@ -425,7 +425,8 @@ def is_technology(value, *, required=True):
 
     generation_technologies = ["pv", "onshore", "offshore"]
     storage_technologies = ["lion", "hydrogen"]
-    return value in generation_technologies or value in storage_technologies
+    hydropower_technologies = ["run_of_river", "reservoir", "pumped_storage_open", "pumped_storage_closed"]
+    return value in generation_technologies or value in storage_technologies or value in hydropower_technologies
 
 
 def is_technology_list(value, *, required=True):

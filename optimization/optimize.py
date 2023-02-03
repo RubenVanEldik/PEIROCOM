@@ -1,6 +1,7 @@
 import math
 from datetime import datetime, timedelta
 import gurobipy as gp
+import numpy as np
 import pandas as pd
 import re
 import streamlit as st
@@ -61,6 +62,7 @@ def optimize(config, *, status, output_directory):
     interconnection_capacity = {}
     generation_capacity = {}
     storage_capacity = {}
+    hydropower_capacity = {}
 
     bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
     for index, bidding_zone in enumerate(bidding_zones):
@@ -76,7 +78,7 @@ def optimize(config, *, status, output_directory):
         # Remove the leap days from the dataset that could have been introduced by the resample method
         temporal_ires[bidding_zone] = temporal_ires[bidding_zone][~((temporal_ires[bidding_zone].index.month == 2) & (temporal_ires[bidding_zone].index.day == 29))]
         # Create a temporal_results DataFrame with the demand_MW column
-        temporal_results[bidding_zone] = temporal_demand[[bidding_zone]]
+        temporal_results[bidding_zone] = pd.DataFrame(temporal_demand[bidding_zone].rename("demand_MW"))
         # Calculate the energy covered by the baseload
         temporal_results[bidding_zone]["baseload_MW"] = temporal_demand[bidding_zone].mean() * config["technologies"]["relative_baseload"]
 
@@ -203,7 +205,113 @@ def optimize(config, *, status, output_directory):
             temporal_results[bidding_zone]["energy_stored_total_MWh"] += temporal_energy_stored
 
         """
-        Step 3D: Define the interconnection variables
+        Step 3D: Define the hydropower variables and constraints
+        """
+        # Create a DataFrame for the hydropower capacity in this bidding zone
+        hydropower_capacity[bidding_zone] = pd.DataFrame(0, index=config["technologies"]["hydropower"], columns=["turbine", "pump", "reservoir"])
+
+        # Add the total net generation and total reservoir columns to the results DataFrame
+        temporal_results[bidding_zone]["net_generation_total_hydropower_MW"] = 0
+        temporal_results[bidding_zone]["reservoir_total_hydropower_MWh"] = 0
+
+        for hydropower_technology in config["technologies"]["hydropower"]:
+            status.update(f"{country_flag} Adding {utils.format_technology(hydropower_technology, capitalize=False)} hydropower")
+
+            # Get the specific hydropower assumptions and calculate the interval length
+            hydropower_assumptions = utils.get_technologies(technology_type="hydropower")[hydropower_technology]
+            efficiency = hydropower_assumptions["roundtrip_efficiency"] ** 0.5
+            interval_length = pd.Timedelta(config["resolution"]).total_seconds() / 3600
+
+            # Add the relevant capacity to the hydropower_capacity DataFrame, if the capacity is not defined, set the capacity to 0
+            hydropower_capacity_current_technology = utils.read_csv(utils.path("input", "scenarios", config["scenario"], "hydropower", hydropower_technology, "capacity.csv"), index_col=0)
+            default_hydropower_capacity = pd.Series(0, index=hydropower_capacity_current_technology.columns)
+            installed_hydropower_capacity = hydropower_capacity_current_technology.transpose().get(bidding_zone, default_hydropower_capacity)
+            relative_hydropower_capacity = config["technologies"].get("relative_hydropower_capacity", 1)
+            hydropower_capacity[bidding_zone].loc[hydropower_technology] = relative_hydropower_capacity * installed_hydropower_capacity
+
+            # Get the turbine, pump, and reservoir capacity
+            turbine_capacity = hydropower_capacity[bidding_zone].loc[hydropower_technology, "turbine"]
+            pump_capacity = hydropower_capacity[bidding_zone].loc[hydropower_technology, "pump"]
+            reservoir_capacity = hydropower_capacity[bidding_zone].loc[hydropower_technology, "reservoir"]
+
+            # Skip this hydropower technology if it does not have any turbine capacity in this bidding zone
+            if turbine_capacity == 0:
+                temporal_results[bidding_zone][f"net_generation_{hydropower_technology}_hydropower_MW"] = 0
+                temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = 0
+                continue
+
+            # Get the temporal hydropower data
+            filepath = utils.path("input", "scenarios", config["scenario"], "hydropower", hydropower_technology, f"{bidding_zone}.csv")
+            temporal_hydropower_data = utils.read_temporal_data(filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"])
+            # Calculate the interval length of the hydropower data
+            hydropower_interval_length = (temporal_hydropower_data.index[1] - temporal_hydropower_data.index[0]).total_seconds() / 3600
+            # Resample the hydropower data to the selected resolution
+            temporal_hydropower_data = temporal_hydropower_data.resample(config["resolution"]).mean()
+            # Remove the leap days from the dataset that could have been introduced by the resample method
+            temporal_hydropower_data = temporal_hydropower_data[~((temporal_hydropower_data.index.month == 2) & (temporal_hydropower_data.index.day == 29))]
+            # Find and add the rows that are missing in the previous results (the resample method does not add rows after the last timestamp and some weeks don't start on January 1st)
+            for timestamp in temporal_results[bidding_zone].index.difference(temporal_hydropower_data.index):
+                temporal_hydropower_data.loc[timestamp] = pd.Series([], dtype="float64")  # Sets None to all columns in the new row
+            # Sort the DataFrame on its index (the first days of January, when missing, are added to the end of the DataFrame)
+            temporal_hydropower_data = temporal_hydropower_data.sort_index()
+
+            # Calculate the average inflow in MW
+            inflow_MW = temporal_hydropower_data["inflow_MWh"].ffill().bfill() / hydropower_interval_length
+
+            # Set the net hydropower generation to the inflow if there is no reservoir capacity
+            if reservoir_capacity == 0:
+                temporal_results[bidding_zone][f"net_generation_{hydropower_technology}_hydropower_MW"] = inflow_MW
+                temporal_results[bidding_zone]["net_generation_total_hydropower_MW"] += inflow_MW
+                temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = 0
+                continue
+
+            # Create temporal variables for the turbine flow
+            min_turbine_flow = temporal_hydropower_data.min_generation_MW.ffill().bfill().fillna(0)
+            max_turbine_flow = temporal_hydropower_data.max_generation_MW.ffill().bfill().fillna(turbine_capacity)
+            turbine_flow = pd.Series(model.addVars(temporal_hydropower_data.index, lb=min_turbine_flow, ub=max_turbine_flow))
+
+            # Create temporal variables for the pump flow
+            min_pump_flow = temporal_hydropower_data.min_pumping_MW.ffill().bfill().fillna(0)
+            max_pump_flow = temporal_hydropower_data.max_pumping_MW.ffill().bfill().fillna(pump_capacity)
+            pump_flow = pd.Series(model.addVars(temporal_hydropower_data.index, lb=min_pump_flow, ub=max_pump_flow))
+
+            # Add the net hydropower generation variables to the temporal_results DataFrame
+            net_flow = turbine_flow - pump_flow
+            temporal_results[bidding_zone][f"net_generation_{hydropower_technology}_hydropower_MW"] = net_flow
+            temporal_results[bidding_zone]["net_generation_total_hydropower_MW"] += net_flow
+
+            # Loop over all hours
+            reservoir_previous = None
+            temporal_reservoir_dict = {}
+            for timestamp in temporal_demand.index:
+                # Create the reservoir level variable
+                current_reservoir_soc = temporal_hydropower_data.loc[timestamp, "reservoir_soc"]
+                if np.isnan(current_reservoir_soc):
+                    current_min_reservoir_soc = temporal_hydropower_data.loc[timestamp, "min_reservoir_soc"]
+                    current_max_reservoir_soc = temporal_hydropower_data.loc[timestamp, "max_reservoir_soc"]
+                    min_reservoir_soc = 0 if np.isnan(current_min_reservoir_soc) else current_min_reservoir_soc
+                    max_reservoir_soc = 1 if np.isnan(current_max_reservoir_soc) else current_max_reservoir_soc
+                    reservoir_current = model.addVar(lb=min_reservoir_soc, ub=max_reservoir_soc) * reservoir_capacity
+                else:
+                    reservoir_current = current_reservoir_soc * reservoir_capacity
+
+                # Add the reservoir level constraint with regard to the previous timestamp
+                if reservoir_previous:
+                    model.addConstr(reservoir_current == reservoir_previous + (inflow_MW[timestamp] - turbine_flow[timestamp] / efficiency + pump_flow[timestamp] * efficiency) * interval_length)
+
+                # Add the current reservoir level to temporal_reservoir_dict
+                temporal_reservoir_dict[timestamp] = reservoir_current
+
+                # Update reservoir_previous
+                reservoir_previous = reservoir_current
+
+            # Add the temporal reservoir levels to the temporal_results DataFrame
+            temporal_reservoir = pd.Series(temporal_reservoir_dict)
+            temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = temporal_reservoir
+            temporal_results[bidding_zone]["reservoir_total_hydropower_MWh"] += temporal_reservoir
+
+        """
+        Step 3E: Define the interconnection variables
         """
         for connection_type in ["hvac", "hvdc"]:
             status.update(f"{country_flag} Adding {connection_type.upper()} interconnections")
@@ -274,10 +382,10 @@ def optimize(config, *, status, output_directory):
                 temporal_results[bidding_zone]["net_export_MW"] += temporal_results[bidding_zone][column_name]
 
         # Add the demand constraint
-        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_total_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
+        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_total_MW + row.net_generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
 
         # Calculate the curtailed energy per hour
-        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_total_MW - temporal_results[bidding_zone].demand_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
+        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_total_MW - temporal_results[bidding_zone].demand_MW + temporal_results[bidding_zone].net_generation_total_hydropower_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
         temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_total_MW"), "curtailed_MW", curtailed_MW)
 
     """
@@ -303,6 +411,7 @@ def optimize(config, *, status, output_directory):
             sum_generation = 0
             sum_curtailed = 0
             sum_storage_flow = 0
+            sum_hydropower = 0
 
             # Loop over all bidding zones in the country
             for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
@@ -313,11 +422,12 @@ def optimize(config, *, status, output_directory):
                 sum_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_MW)
                 sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
                 sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
+                sum_hydropower += gp.quicksum(temporal_results[bidding_zone].net_generation_total_hydropower_MW)
 
             # Add the self-sufficiency constraint if there is any demand in the country
             if sum_demand > 0:
                 min_self_sufficiency = config["interconnections"]["min_self_sufficiency"]
-                model.addConstr((sum_baseload + sum_generation - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
+                model.addConstr((sum_baseload + sum_generation + sum_hydropower - sum_curtailed - sum_storage_flow) / sum_demand >= min_self_sufficiency)
 
     """
     Step 7: Define the storage costs constraint
@@ -327,7 +437,7 @@ def optimize(config, *, status, output_directory):
 
         # Calculate the storage costs
         temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
-        storage_costs = utils.calculate_lcoe(generation_capacity, storage_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
+        storage_costs = utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_storage_costs = config["fixed_storage"]["costs"]
@@ -341,7 +451,7 @@ def optimize(config, *, status, output_directory):
     """
     status.update("Setting the objective function")
     temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
-    firm_lcoe = utils.calculate_lcoe(generation_capacity, storage_capacity, temporal_net_demand, config=config)
+    firm_lcoe = utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config)
     model.setObjective(firm_lcoe * objective_scale_factor, gp.GRB.MINIMIZE)
 
     # Add the initializing duration to the dictionary
@@ -479,7 +589,7 @@ def optimize(config, *, status, output_directory):
     storing_start = datetime.now()
 
     # Make a directory for each type of output
-    for sub_directory in ["temporal_results", "temporal_export", "generation_capacity", "storage_capacity", "interconnection_capacity"]:
+    for sub_directory in ["temporal_results", "temporal_export", "generation_capacity", "storage_capacity", "hydropower_capacity", "interconnection_capacity"]:
         (output_directory / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
@@ -499,6 +609,9 @@ def optimize(config, *, status, output_directory):
         # Convert and store the storage capacity
         storage_capacity_bidding_zone = utils.convert_variables_recursively(storage_capacity[bidding_zone])
         storage_capacity_bidding_zone.to_csv(output_directory / "storage_capacity" / f"{bidding_zone}.csv")
+
+        # Convert and store the storage capacity
+        hydropower_capacity[bidding_zone].to_csv(output_directory / "hydropower_capacity" / f"{bidding_zone}.csv")
 
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:

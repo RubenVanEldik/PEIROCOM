@@ -77,6 +77,14 @@ with st.sidebar.expander("Technologies"):
     for technology in st.multiselect("Storage technologies", storage_technologies_options, default=storage_technologies_options, format_func=utils.format_technology):
         config["technologies"]["storage"][technology] = scenario_level
 
+    # Select the hydropower technologies
+    config["technologies"]["hydropower"] = {}
+    hydropower_technologies_options = utils.get_technologies(technology_type="hydropower").keys()
+    # Only show the hydropower multiselect when there are hydropower technologies defined
+    if hydropower_technologies_options:
+        for technology in st.multiselect("Hydropower technologies", hydropower_technologies_options, default=hydropower_technologies_options, format_func=utils.format_technology):
+            config["technologies"]["hydropower"][technology] = scenario_level
+
 
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):

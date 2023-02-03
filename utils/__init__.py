@@ -20,6 +20,7 @@ from .get_export_limits import get_export_limits
 from .get_generation_capacity import get_generation_capacity
 from .get_generation_potential_in_climate_zone import get_generation_potential_in_climate_zone
 from .get_geometries_of_countries import get_geometries_of_countries
+from .get_hydropower_capacity import get_hydropower_capacity
 from .get_nested_key import get_nested_key
 from .get_next_run_name import get_next_run_name
 from .get_previous_runs import get_previous_runs
