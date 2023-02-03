@@ -124,3 +124,27 @@ def statistics(output_directory):
 
             # Set the metric
             cols[index % 3].metric(f"{utils.format_technology(technology)} {storage_capacity_attribute}", metric_value)
+
+    if config["technologies"]["hydropower"]:
+        with st.expander("Hydropower capacity", expanded=True):
+            # Ask if the results should be shown relative to the mean demand
+            show_relative_hydropower_capacity = st.checkbox("Relative to demand", key="hydropower")
+
+            # Get the capacities
+            hydropower_capacity = stats.hydropower_capacity(output_directory, country_codes=selected_country_codes)
+            turbine_capacity = hydropower_capacity.turbine.sum()
+            pump_capacity = hydropower_capacity.pump.sum()
+            reservoir_capacity = hydropower_capacity.reservoir.sum()
+
+            # Create the hydropower capacity columns
+            col1, col2, col3 = st.columns(3)
+
+            # Display the capacities
+            if show_relative_hydropower_capacity:
+                col1.metric("Turbine capacity", f"{turbine_capacity / mean_demand:.1%}")
+                col2.metric("Pumping capacity", f"{pump_capacity / mean_demand:.1%}")
+                col3.metric("Reservoir capacity", f"{reservoir_capacity / mean_demand:.1f}H")
+            else:
+                col1.metric("Turbine capacity", _format_value_with_unit(turbine_capacity * 10 ** 6, unit="W"))
+                col2.metric("Pumping capacity", _format_value_with_unit(pump_capacity * 10 ** 6, unit="W"))
+                col3.metric("Reservoir capacity", _format_value_with_unit(reservoir_capacity * 10 ** 6, unit="Wh"))
