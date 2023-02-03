@@ -92,10 +92,11 @@ with st.sidebar.expander("Interconnections"):
     min_self_sufficiency, max_self_sufficiency = st.slider("Self-sufficiency range", value=(0.8, 1.5), max_value=2.0, step=0.05)
     config["interconnections"]["min_self_sufficiency"] = min_self_sufficiency
     config["interconnections"]["max_self_sufficiency"] = max_self_sufficiency
-    config["interconnections"]["relative_capacity"] = st.slider("Relative capacity", value=1.0, max_value=1.5, step=0.05)
+    config["interconnections"]["relative_capacity"] = st.slider("Relative interconnection capacity", value=1.0, max_value=1.5, step=0.05)
     config["interconnections"]["optimize_individual_interconnections"] = st.checkbox("Optimize individual interconnections")
-    config["interconnections"]["efficiency"]["hvac"] = st.number_input("Efficiency HVAC", value=0.95, max_value=1.0)
-    config["interconnections"]["efficiency"]["hvdc"] = st.number_input("Efficiency HVDC", value=0.95, max_value=1.0)
+    col1, col2 = st.columns(2)
+    config["interconnections"]["efficiency"]["hvac"] = col1.number_input("Efficiency HVAC", value=0.95, max_value=1.0)
+    config["interconnections"]["efficiency"]["hvdc"] = col2.number_input("Efficiency HVDC", value=0.95, max_value=1.0)
 
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
