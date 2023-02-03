@@ -90,8 +90,8 @@ def preprocess_hydropower_data(scenarios):
                     temporal_data["max_pumping_MWh"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=160, max_col=195, interval=hydropower_technology["interval"]) * 1000
                     temporal_data["min_generation_MW"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=196, max_col=231, interval=hydropower_technology["interval"])
                     temporal_data["max_generation_MW"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=232, max_col=267, interval=hydropower_technology["interval"])
-                    temporal_data["min_pumping_MW"] = -_get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=268, max_col=303, interval=hydropower_technology["interval"])
-                    temporal_data["max_pumping_MW"] = -_get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=304, max_col=339, interval=hydropower_technology["interval"])
+                    temporal_data["min_pumping_MW"] = -_get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=268, max_col=303, interval=hydropower_technology["interval"]).abs()  # Absolute is required as some countries specify negative and other positive values
+                    temporal_data["max_pumping_MW"] = -_get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=304, max_col=339, interval=hydropower_technology["interval"]).abs()  # Absolute is required as some countries specify negative and other positive values
                     temporal_data["reservoir_soc"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=340, max_col=375, interval=hydropower_technology["interval"])
                     temporal_data["min_reservoir_soc"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=376, max_col=411, interval=hydropower_technology["interval"])
                     temporal_data["max_reservoir_soc"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=412, max_col=447, interval=hydropower_technology["interval"])
