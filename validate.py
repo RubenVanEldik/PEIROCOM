@@ -449,7 +449,7 @@ def is_technology_type(value, *, required=True):
     if value is None:
         return not required
 
-    return value in ["generation", "storage"]
+    return value in ["generation", "storage", "hydropower"]
 
 
 def is_url(value, *, required=True):

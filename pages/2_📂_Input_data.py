@@ -9,7 +9,7 @@ st.set_page_config(page_title="Input data - PEIROCOM", page_icon="📂")
 
 
 def run():
-    data_type = st.sidebar.radio("Data type", ["countries", "technologies", "demand", "ires", "interconnections"], format_func=utils.format_str)
+    data_type = st.sidebar.radio("Data type", ["countries", "technologies", "demand", "ires", "hydropower", "interconnections"], format_func=utils.format_str)
 
     if data_type == "countries":
         st.header("Countries")
@@ -45,7 +45,7 @@ def run():
         st.dataframe(countries_df, height=600)
 
     if data_type == "technologies":
-        for technology_type in ["generation", "storage"]:
+        for technology_type in ["generation", "storage", "hydropower"]:
             st.header(utils.format_str(f"{technology_type}_technologies"))
 
             # Read the technology data and convert it to a DataFrame
@@ -100,6 +100,35 @@ def run():
         ires_df.index = ires_df.index.strftime("%Y-%m-%d %H:%M UTC")
         ires_df.columns = [utils.format_column_name(column_name) for column_name in ires_df.columns]
         st.dataframe(ires_df, height=600)
+
+    if data_type == "hydropower":
+        # Select the model year
+        scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
+
+        hydropower_technologies = pd.DataFrame(utils.get_technologies(technology_type="hydropower")).columns
+        hydropower_technology = st.sidebar.selectbox("Technology", hydropower_technologies, format_func=utils.format_str)
+
+        # Select the bidding zone
+        input_path = utils.path("input", "scenarios", scenario, "hydropower", hydropower_technology)
+        bidding_zones = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
+        bidding_zone = st.sidebar.selectbox("Bidding zone", bidding_zones)
+
+        st.header(f"Bidding zone {bidding_zone}")
+
+        # Read and show the capacity data
+        capacity = utils.read_csv(input_path / "capacity.csv", index_col=0).loc[bidding_zone]
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Turbine capacity", f"{capacity['turbine']:,.0f}MW")
+        col2.metric("Pump capacity", f"{capacity['pump']:,.0f}MW")
+        col3.metric("Reservoir capacity", f"{capacity['reservoir'] / 1000:,.0f}GWh")
+
+        # Read the temporal data
+        bidding_zone_df = utils.read_temporal_data(input_path / f"{bidding_zone}.csv")
+
+        # Format the index and column names and show the DataFrame
+        bidding_zone_df.index = bidding_zone_df.index.strftime("%Y-%m-%d %H:%M UTC")
+        bidding_zone_df.columns = [utils.format_column_name(column_name) for column_name in bidding_zone_df.columns]
+        st.dataframe(bidding_zone_df, height=600)
 
     if data_type == "interconnections":
         # Select the model year
