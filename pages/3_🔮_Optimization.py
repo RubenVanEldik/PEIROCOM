@@ -65,25 +65,34 @@ with st.sidebar.expander("Technologies"):
     # Select the relative share of baseload
     config["technologies"]["relative_baseload"] = st.slider("Relative baseload", min_value=0.0, max_value=0.95, step=0.05)
 
+    # Get the technology names
+    generation_technology_options = utils.get_technologies(technology_type="generation").keys()
+    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
+    hydropower_technologies_options = utils.get_technologies(technology_type="hydropower").keys()
+
+    # Create the technology tabs
+    if hydropower_technologies_options:
+        generation_tab, storage_tab, hydropower_tab = st.tabs(["Generation", "Storage", "Hydropower"])
+    else:
+        generation_tab, storage_tab = st.tabs(["Generation", "Storage"])
+
     # Select the generation technologies
     config["technologies"]["generation"] = {}
-    generation_technology_options = utils.get_technologies(technology_type="generation").keys()
-    for technology in st.multiselect("Generation technologies", generation_technology_options, default=generation_technology_options, format_func=utils.format_technology):
-        config["technologies"]["generation"][technology] = scenario_level
+    for technology in generation_technology_options:
+        if generation_tab.checkbox(utils.format_technology(technology)):
+            config["technologies"]["generation"][technology] = scenario_level
 
     # Select the storage technologies
     config["technologies"]["storage"] = {}
-    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
-    for technology in st.multiselect("Storage technologies", storage_technologies_options, default=storage_technologies_options, format_func=utils.format_technology):
-        config["technologies"]["storage"][technology] = scenario_level
+    for technology in storage_technologies_options:
+        if storage_tab.checkbox(utils.format_technology(technology)):
+            config["technologies"]["storage"][technology] = scenario_level
 
     # Select the hydropower technologies
     config["technologies"]["hydropower"] = {}
-    hydropower_technologies_options = utils.get_technologies(technology_type="hydropower").keys()
-    # Only show the hydropower multiselect when there are hydropower technologies defined
-    if hydropower_technologies_options:
-        for technology in st.multiselect("Hydropower technologies", hydropower_technologies_options, default=hydropower_technologies_options, format_func=utils.format_technology):
-            config["technologies"]["hydropower"][technology] = scenario_level
+    for technology in hydropower_technologies_options:
+        if hydropower_tab.checkbox(utils.format_technology(technology)):
+            config["technologies"]["hydropower_tab"][technology] = scenario_level
 
 
 # Set the interconnection options
