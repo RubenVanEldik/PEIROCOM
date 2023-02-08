@@ -211,7 +211,7 @@ def optimize(config, *, status, output_directory):
         hydropower_capacity[bidding_zone] = pd.DataFrame(0, index=config["technologies"]["hydropower"], columns=["turbine", "pump", "reservoir"])
 
         # Add the total net generation and total reservoir columns to the results DataFrame
-        temporal_results[bidding_zone]["net_generation_total_hydropower_MW"] = 0
+        temporal_results[bidding_zone]["generation_total_hydropower_MW"] = 0
         temporal_results[bidding_zone]["reservoir_total_hydropower_MWh"] = 0
 
         for hydropower_technology in config["technologies"]["hydropower"]:
@@ -236,7 +236,7 @@ def optimize(config, *, status, output_directory):
 
             # Skip this hydropower technology if it does not have any turbine capacity in this bidding zone
             if turbine_capacity == 0:
-                temporal_results[bidding_zone][f"net_generation_{hydropower_technology}_hydropower_MW"] = 0
+                temporal_results[bidding_zone][f"generation_{hydropower_technology}_hydropower_MW"] = 0
                 temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = 0
                 continue
 
@@ -260,8 +260,8 @@ def optimize(config, *, status, output_directory):
 
             # Set the net hydropower generation to the inflow if there is no reservoir capacity
             if reservoir_capacity == 0:
-                temporal_results[bidding_zone][f"net_generation_{hydropower_technology}_hydropower_MW"] = inflow_MW
-                temporal_results[bidding_zone]["net_generation_total_hydropower_MW"] += inflow_MW
+                temporal_results[bidding_zone][f"generation_{hydropower_technology}_hydropower_MW"] = inflow_MW
+                temporal_results[bidding_zone]["generation_total_hydropower_MW"] += inflow_MW
                 temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = 0
                 continue
 
@@ -277,8 +277,8 @@ def optimize(config, *, status, output_directory):
 
             # Add the net hydropower generation variables to the temporal_results DataFrame
             net_flow = turbine_flow - pump_flow
-            temporal_results[bidding_zone][f"net_generation_{hydropower_technology}_hydropower_MW"] = net_flow
-            temporal_results[bidding_zone]["net_generation_total_hydropower_MW"] += net_flow
+            temporal_results[bidding_zone][f"generation_{hydropower_technology}_hydropower_MW"] = net_flow
+            temporal_results[bidding_zone]["generation_total_hydropower_MW"] += net_flow
 
             # Loop over all hours
             reservoir_previous = None
@@ -382,10 +382,10 @@ def optimize(config, *, status, output_directory):
                 temporal_results[bidding_zone]["net_export_MW"] += temporal_results[bidding_zone][column_name]
 
         # Add the demand constraint
-        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_total_MW + row.net_generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
+        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_total_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
 
         # Calculate the curtailed energy per hour
-        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_total_MW - temporal_results[bidding_zone].demand_MW + temporal_results[bidding_zone].net_generation_total_hydropower_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
+        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_total_MW - temporal_results[bidding_zone].demand_MW + temporal_results[bidding_zone].generation_total_hydropower_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
         temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_total_MW"), "curtailed_MW", curtailed_MW)
 
     """
@@ -421,7 +421,7 @@ def optimize(config, *, status, output_directory):
             sum_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_MW)
             sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
             sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
-            sum_hydropower += gp.quicksum(temporal_results[bidding_zone].net_generation_total_hydropower_MW)
+            sum_hydropower += gp.quicksum(temporal_results[bidding_zone].generation_total_hydropower_MW)
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand > 0:
