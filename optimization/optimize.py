@@ -127,7 +127,7 @@ def optimize(config, *, status, output_directory):
 
         # Add the total net generation and total reservoir columns to the results DataFrame
         temporal_results[bidding_zone]["generation_total_hydropower_MW"] = 0
-        temporal_results[bidding_zone]["reservoir_total_hydropower_MWh"] = 0
+        temporal_results[bidding_zone]["energy_stored_total_hydropower_MWh"] = 0
 
         for hydropower_technology in config["technologies"]["hydropower"]:
             status.update(f"{country_flag} Adding {utils.format_technology(hydropower_technology, capitalize=False)} hydropower")
@@ -152,7 +152,7 @@ def optimize(config, *, status, output_directory):
             # Skip this hydropower technology if it does not have any turbine capacity in this bidding zone
             if turbine_capacity == 0:
                 temporal_results[bidding_zone][f"generation_{hydropower_technology}_hydropower_MW"] = 0
-                temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = 0
+                temporal_results[bidding_zone][f"energy_stored_{hydropower_technology}_hydropower_MWh"] = 0
                 continue
 
             # Get the temporal hydropower data
@@ -177,7 +177,7 @@ def optimize(config, *, status, output_directory):
             if reservoir_capacity == 0:
                 temporal_results[bidding_zone][f"generation_{hydropower_technology}_hydropower_MW"] = inflow_MW
                 temporal_results[bidding_zone]["generation_total_hydropower_MW"] += inflow_MW
-                temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = 0
+                temporal_results[bidding_zone][f"energy_stored_{hydropower_technology}_hydropower_MWh"] = 0
                 continue
 
             # Create temporal variables for the turbine flow
@@ -222,8 +222,8 @@ def optimize(config, *, status, output_directory):
 
             # Add the temporal reservoir levels to the temporal_results DataFrame
             temporal_reservoir = pd.Series(temporal_reservoir_dict)
-            temporal_results[bidding_zone][f"reservoir_{hydropower_technology}_hydropower_MWh"] = temporal_reservoir
-            temporal_results[bidding_zone]["reservoir_total_hydropower_MWh"] += temporal_reservoir
+            temporal_results[bidding_zone][f"energy_stored_{hydropower_technology}_hydropower_MWh"] = temporal_reservoir
+            temporal_results[bidding_zone]["energy_stored_total_hydropower_MWh"] += temporal_reservoir
 
         """
         Step 3D: Define storage variables and constraints
