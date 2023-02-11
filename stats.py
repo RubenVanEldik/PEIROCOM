@@ -38,7 +38,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    temporal_demand = utils.merge_dataframes_on_column(temporal_results, "generation_total_MW")
+    temporal_demand = utils.merge_dataframes_on_column(temporal_results, "generation_ires_MW") + utils.merge_dataframes_on_column(temporal_results, "generation_total_hydropower_MW")
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Set the storage capacity to zero
@@ -73,7 +73,7 @@ def relative_curtailment(output_directory, *, country_codes=None):
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     temporal_results = utils.get_temporal_results(output_directory, group="all", country_codes=country_codes)
-    return temporal_results.curtailed_MW.sum() / temporal_results.generation_total_MW.sum()
+    return temporal_results.curtailed_MW.sum() / (temporal_results.generation_ires_MW.sum() + temporal_results.generation_total_hydropower_MW.sum())
 
 
 def generation_capacity(output_directory, *, country_codes=None):
@@ -116,8 +116,9 @@ def self_sufficiency(output_directory, *, country_codes=None):
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
     mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW").mean(axis=1)
     mean_baseload = utils.merge_dataframes_on_column(temporal_results, "baseload_MW").mean(axis=1)
-    mean_generation = utils.merge_dataframes_on_column(temporal_results, "generation_total_MW").mean(axis=1)
+    mean_ires_generation = utils.merge_dataframes_on_column(temporal_results, "generation_ires_MW").mean(axis=1)
+    mean_hydropower_generation = utils.merge_dataframes_on_column(temporal_results, "generation_total_hydropower_MW").mean(axis=1)
     mean_curtailment = utils.merge_dataframes_on_column(temporal_results, "curtailed_MW").mean(axis=1)
     mean_storage_flow = utils.merge_dataframes_on_column(temporal_results, "net_storage_flow_total_MW").mean(axis=1)
 
-    return (mean_baseload + mean_generation - mean_curtailment - mean_storage_flow).mean() / mean_demand.mean()
+    return (mean_baseload + mean_ires_generation + mean_hydropower_generation - mean_curtailment - mean_storage_flow).mean() / mean_demand.mean()

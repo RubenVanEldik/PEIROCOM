@@ -100,7 +100,7 @@ def optimize(config, *, status, output_directory):
         """
         Step 3B: Define generation capacity variables
         """
-        temporal_results[bidding_zone]["generation_total_MW"] = 0
+        temporal_results[bidding_zone]["generation_ires_MW"] = 0
         for generation_technology in config["technologies"]["generation"]:
             status.update(f"{country_flag} Adding {utils.format_technology(generation_technology, capitalize=False)} generation")
 
@@ -117,7 +117,7 @@ def optimize(config, *, status, output_directory):
                 # Apply is required, otherwise it will throw a ValueError if there are more than a few thousand rows (see https://stackoverflow.com/questions/64801287)
                 temporal_generation += temporal_ires[bidding_zone][f"{generation_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
             temporal_results[bidding_zone][f"generation_{generation_technology}_MW"] = temporal_generation
-            temporal_results[bidding_zone]["generation_total_MW"] += temporal_generation
+            temporal_results[bidding_zone]["generation_ires_MW"] += temporal_generation
 
         """
         Step 3C: Define storage variables and constraints
@@ -382,11 +382,11 @@ def optimize(config, *, status, output_directory):
                 temporal_results[bidding_zone]["net_export_MW"] += temporal_results[bidding_zone][column_name]
 
         # Add the demand constraint
-        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_total_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
+        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.baseload_MW + row.generation_ires_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
 
         # Calculate the curtailed energy per hour
-        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_total_MW - temporal_results[bidding_zone].demand_MW + temporal_results[bidding_zone].generation_total_hydropower_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
-        temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_total_MW"), "curtailed_MW", curtailed_MW)
+        curtailed_MW = temporal_results[bidding_zone].baseload_MW + temporal_results[bidding_zone].generation_ires_MW + temporal_results[bidding_zone].generation_total_hydropower_MW - temporal_results[bidding_zone].demand_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
+        temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_ires_MW"), "curtailed_MW", curtailed_MW)
 
     """
     Step 5: Define interconnection capacity constraint if the individual interconnections are optimized
@@ -407,10 +407,10 @@ def optimize(config, *, status, output_directory):
         # Set the variables required to calculate the cumulative results in the country
         sum_demand = 0
         sum_baseload = 0
-        sum_generation = 0
+        sum_ires_generation = 0
+        sum_hydropower_generation = 0
         sum_curtailed = 0
         sum_storage_flow = 0
-        sum_hydropower = 0
 
         # Loop over all bidding zones in the country
         for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
@@ -418,14 +418,14 @@ def optimize(config, *, status, output_directory):
             sum_demand += temporal_results[bidding_zone].demand_MW.sum()
             # The Gurobi .quicksum method is significantly faster than Panda's .sum method
             sum_baseload += gp.quicksum(temporal_results[bidding_zone].baseload_MW)
-            sum_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_MW)
+            sum_ires_generation += gp.quicksum(temporal_results[bidding_zone].generation_ires_MW)
+            sum_hydropower_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_hydropower_MW)
             sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
             sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
-            sum_hydropower += gp.quicksum(temporal_results[bidding_zone].generation_total_hydropower_MW)
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand > 0:
-            self_sufficiency = (sum_baseload + sum_generation + sum_hydropower - sum_curtailed - sum_storage_flow) / sum_demand
+            self_sufficiency = (sum_baseload + sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand
             model.addConstr(self_sufficiency >= config["interconnections"]["min_self_sufficiency"])
             model.addConstr(self_sufficiency <= config["interconnections"]["max_self_sufficiency"])
 
