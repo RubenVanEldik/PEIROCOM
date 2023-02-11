@@ -92,7 +92,7 @@ with st.sidebar.expander("Technologies"):
     config["technologies"]["hydropower"] = {}
     for technology in hydropower_technologies_options:
         if hydropower_tab.checkbox(utils.format_technology(technology)):
-            config["technologies"]["hydropower_tab"][technology] = scenario_level
+            config["technologies"]["hydropower"][technology] = scenario_level
 
 
 # Set the interconnection options
