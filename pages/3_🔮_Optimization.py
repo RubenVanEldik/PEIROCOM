@@ -79,19 +79,19 @@ with st.sidebar.expander("Technologies"):
     # Select the generation technologies
     config["technologies"]["generation"] = {}
     for technology in generation_technology_options:
-        if generation_tab.checkbox(utils.format_technology(technology)):
+        if generation_tab.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["generation"][technology] = scenario_level
 
     # Select the storage technologies
     config["technologies"]["storage"] = {}
     for technology in storage_technologies_options:
-        if storage_tab.checkbox(utils.format_technology(technology)):
+        if storage_tab.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["storage"][technology] = scenario_level
 
     # Select the hydropower technologies
     config["technologies"]["hydropower"] = {}
     for technology in hydropower_technologies_options:
-        if hydropower_tab.checkbox(utils.format_technology(technology)):
+        if hydropower_tab.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["hydropower"][technology] = scenario_level
 
 
