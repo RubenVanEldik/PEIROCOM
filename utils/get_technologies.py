@@ -15,10 +15,10 @@ def get_technologies(*, technology_type=None):
     # Return the requested technologies if a technology type was specfied
     if technology_type == "generation":
         return technologies.get("generation", {})
-    if technology_type == "storage":
-        return technologies.get("storage", {})
     if technology_type == "hydropower":
         return technologies.get("hydropower", {})
+    if technology_type == "storage":
+        return technologies.get("storage", {})
 
     # Return all technologies when no technology type was specified
-    return {**technologies.get("generation", {}), **technologies.get("storage", {}), **technologies.get("hydropower", {})}
+    return {**technologies.get("generation", {}), **technologies.get("hydropower", {}), **technologies.get("storage", {})}

@@ -47,57 +47,6 @@ generation:
     advanced:
       capex: 1583
       fixed_om: 61
-storage:
-  lion:
-    name: "Li-ion"
-    color:
-      name: 'rose'
-      value: 500
-    soc_min: 0.2
-    soc_max: 1
-    roundtrip_efficiency: 0.85
-    economic_lifetime: 15
-    wacc: 0.05
-    conservative:
-      capex_energy: 143
-      capex_power: 260
-      fixed_om_energy: 3.575
-      fixed_om_power: 6.5
-    moderate:
-      capex_energy: 81
-      capex_power: 243
-      fixed_om_energy: 2.025
-      fixed_om_power: 6.075
-    advanced:
-      capex_energy: 57
-      capex_power: 104
-      fixed_om_energy: 1.425
-      fixed_om_power: 2.6
-  hydrogen:
-    name: "hydrogen"
-    color:
-      name: 'indigo'
-      value: 600
-    soc_min: 0.0
-    soc_max: 1
-    roundtrip_efficiency: 0.40
-    economic_lifetime: 18
-    wacc: 0.05
-    conservative:
-      capex_energy: 1.5
-      capex_power: 1950
-      fixed_om_energy: 0.0375
-      fixed_om_power: 48.75
-    moderate:
-      capex_energy: 1
-      capex_power: 1300
-      fixed_om_energy: 0.025
-      fixed_om_power: 32.5
-    advanced:
-      capex_energy: 0.5
-      capex_power: 650
-      fixed_om_energy: 0.0125
-      fixed_om_power: 16.25
 hydropower:
   run_of_river:
     name: "run-of-river"
@@ -167,3 +116,54 @@ hydropower:
     advanced:
       capex_power: 2471.098
       fixed_om_power: 61.83
+storage:
+  lion:
+    name: "Li-ion"
+    color:
+      name: 'rose'
+      value: 500
+    soc_min: 0.2
+    soc_max: 1
+    roundtrip_efficiency: 0.85
+    economic_lifetime: 15
+    wacc: 0.05
+    conservative:
+      capex_energy: 143
+      capex_power: 260
+      fixed_om_energy: 3.575
+      fixed_om_power: 6.5
+    moderate:
+      capex_energy: 81
+      capex_power: 243
+      fixed_om_energy: 2.025
+      fixed_om_power: 6.075
+    advanced:
+      capex_energy: 57
+      capex_power: 104
+      fixed_om_energy: 1.425
+      fixed_om_power: 2.6
+  hydrogen:
+    name: "hydrogen"
+    color:
+      name: 'indigo'
+      value: 600
+    soc_min: 0.0
+    soc_max: 1
+    roundtrip_efficiency: 0.40
+    economic_lifetime: 18
+    wacc: 0.05
+    conservative:
+      capex_energy: 1.5
+      capex_power: 1950
+      fixed_om_energy: 0.0375
+      fixed_om_power: 48.75
+    moderate:
+      capex_energy: 1
+      capex_power: 1300
+      fixed_om_energy: 0.025
+      fixed_om_power: 32.5
+    advanced:
+      capex_energy: 0.5
+      capex_power: 650
+      fixed_om_energy: 0.0125
+      fixed_om_power: 16.25

@@ -67,12 +67,12 @@ with st.sidebar.expander("Technologies"):
 
     # Get the technology names
     generation_technology_options = utils.get_technologies(technology_type="generation").keys()
-    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
     hydropower_technologies_options = utils.get_technologies(technology_type="hydropower").keys()
+    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
 
     # Create the technology tabs
     if hydropower_technologies_options:
-        generation_tab, storage_tab, hydropower_tab = st.tabs(["Generation", "Storage", "Hydropower"])
+        generation_tab, storage_tab, hydropower_tab = st.tabs(["Generation", "Hydropower", "Storage"])
     else:
         generation_tab, storage_tab = st.tabs(["Generation", "Storage"])
 
@@ -82,17 +82,17 @@ with st.sidebar.expander("Technologies"):
         if generation_tab.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["generation"][technology] = scenario_level
 
-    # Select the storage technologies
-    config["technologies"]["storage"] = {}
-    for technology in storage_technologies_options:
-        if storage_tab.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["storage"][technology] = scenario_level
-
     # Select the hydropower technologies
     config["technologies"]["hydropower"] = {}
     for technology in hydropower_technologies_options:
         if hydropower_tab.checkbox(utils.format_technology(technology), value=True):
             config["technologies"]["hydropower"][technology] = scenario_level
+
+    # Select the storage technologies
+    config["technologies"]["storage"] = {}
+    for technology in storage_technologies_options:
+        if storage_tab.checkbox(utils.format_technology(technology), value=True):
+            config["technologies"]["storage"][technology] = scenario_level
 
 
 # Set the interconnection options

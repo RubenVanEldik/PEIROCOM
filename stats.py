@@ -86,16 +86,6 @@ def generation_capacity(output_directory, *, country_codes=None):
     return utils.get_generation_capacity(output_directory, group="all", country_codes=country_codes)
 
 
-def storage_capacity(output_directory, *, country_codes=None):
-    """
-    Get the grouped storage capacity for a specific output_directory
-    """
-    assert validate.is_directory_path(output_directory)
-    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
-
-    return utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
-
-
 def hydropower_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped hydropower capacity for a specific output_directory
@@ -104,6 +94,16 @@ def hydropower_capacity(output_directory, *, country_codes=None):
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     return utils.get_hydropower_capacity(output_directory, group="all", country_codes=country_codes)
+
+
+def storage_capacity(output_directory, *, country_codes=None):
+    """
+    Get the grouped storage capacity for a specific output_directory
+    """
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
+
+    return utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
 
 
 def self_sufficiency(output_directory, *, country_codes=None):
