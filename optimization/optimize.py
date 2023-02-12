@@ -51,9 +51,13 @@ def optimize(config, *, status, output_directory):
     """
     Step 2: Get the temporal demand data
     """
+    # Get the temporal demand and remove leap days
     demand_filepath = utils.path("input", "scenarios", config["scenario"], "demand.csv")
     temporal_demand = utils.read_temporal_data(demand_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
     temporal_demand = temporal_demand[~((temporal_demand.index.month == 2) & (temporal_demand.index.day == 29))]
+    # Remove all bidding zones that are not part of the optimization
+    bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
+    temporal_demand = temporal_demand[bidding_zones]
 
     """
     Step 3: Initialize each bidding zone
@@ -67,7 +71,6 @@ def optimize(config, *, status, output_directory):
     storage_capacity = {}
     hydropower_capacity = {}
 
-    bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
     for index, bidding_zone in enumerate(bidding_zones):
         """
         Step 3A: Import the temporal data
