@@ -65,35 +65,25 @@ with st.sidebar.expander("Technologies"):
     # Select the relative share of baseload
     config["technologies"]["relative_baseload"] = st.slider("Relative baseload", min_value=0.0, max_value=0.95, step=0.05)
 
-    # Get the technology names
-    ires_technology_options = utils.get_technologies(technology_type="ires").keys()
-    hydropower_technologies_options = utils.get_technologies(technology_type="hydropower").keys()
-    storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
+    # Select the technologies
+    technology_types = ["ires", "hydropower", "storage"]
+    technology_type_tabs = st.tabs([utils.format_str(technology_type) for technology_type in technology_types])
+    for technology_type, technology_type_tab in zip(technology_types, technology_type_tabs):
+        # Initialize the dictionary for the technology
+        config["technologies"][technology_type] = {}
 
-    # Create the technology tabs
-    if hydropower_technologies_options:
-        ires_tab, storage_tab, hydropower_tab = st.tabs(["IRES", "Hydropower", "Storage"])
-    else:
-        ires_tab, storage_tab = st.tabs(["IRES", "Storage"])
+        # Get all technology options for this technology
+        technology_options = utils.get_technologies(technology_type=technology_type).keys()
 
-    # Select the IRES technologies
-    config["technologies"]["ires"] = {}
-    for technology in ires_technology_options:
-        if ires_tab.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["ires"][technology] = scenario_level
+        # Show a warning message if a technology type has no technologies defined
+        if len(technology_options) == 0:
+            technology_type_tab.warning("This technology type does not have any options defined")
+            continue
 
-    # Select the hydropower technologies
-    config["technologies"]["hydropower"] = {}
-    for technology in hydropower_technologies_options:
-        if hydropower_tab.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["hydropower"][technology] = scenario_level
-
-    # Select the storage technologies
-    config["technologies"]["storage"] = {}
-    for technology in storage_technologies_options:
-        if storage_tab.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["storage"][technology] = scenario_level
-
+        # Create a checkbox for each technology option
+        for technology in technology_options:
+            if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
+                config["technologies"][technology_type][technology] = scenario_level
 
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):
