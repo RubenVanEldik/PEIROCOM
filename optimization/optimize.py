@@ -24,6 +24,9 @@ def optimize(config, *, status, output_directory):
     # Check if the interconnections should be optimized individually
     optimize_individual_interconnections = config["interconnections"]["optimize_individual_interconnections"] == True and config["interconnections"]["relative_capacity"] != 1
 
+    # Calculate the interval length in hours
+    interval_length = pd.Timedelta(config["resolution"]).total_seconds() / 3600
+
     """
     Step 1: Create the model and set the parameters
     """
@@ -135,7 +138,6 @@ def optimize(config, *, status, output_directory):
             # Get the specific hydropower assumptions and calculate the interval length
             hydropower_assumptions = utils.get_technologies(technology_type="hydropower")[hydropower_technology]
             efficiency = hydropower_assumptions["roundtrip_efficiency"] ** 0.5
-            interval_length = pd.Timedelta(config["resolution"]).total_seconds() / 3600
 
             # Add the relevant capacity to the hydropower_capacity DataFrame, if the capacity is not defined, set the capacity to 0
             hydropower_capacity_current_technology = utils.read_csv(utils.path("input", "scenarios", config["scenario"], "hydropower", hydropower_technology, "capacity.csv"), index_col=0)
@@ -242,7 +244,6 @@ def optimize(config, *, status, output_directory):
             # Get the specific storage assumptions
             storage_assumptions = utils.get_technologies(technology_type="storage")[storage_technology]
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
-            interval_length = pd.Timedelta(config["resolution"]).total_seconds() / 3600
 
             # Create a variable for the energy and power storage capacity
             storage_capacity[bidding_zone].loc[storage_technology, "energy"] = model.addVar()
