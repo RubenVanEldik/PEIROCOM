@@ -60,7 +60,7 @@ def optimize(config, *, status, output_directory):
     temporal_results = {}
     temporal_export = {}
     interconnection_capacity = {}
-    generation_capacity = {}
+    ires_capacity = {}
     storage_capacity = {}
     hydropower_capacity = {}
 
@@ -82,8 +82,8 @@ def optimize(config, *, status, output_directory):
         # Calculate the energy covered by the baseload
         temporal_results[bidding_zone]["baseload_MW"] = temporal_demand[bidding_zone].mean() * config["technologies"]["relative_baseload"]
 
-        # Create a DataFrame for the generation capacities
-        generation_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["generation"])
+        # Create a DataFrame for the IRES capacities
+        ires_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["ires"])
 
         # Create empty DataFrames for the interconnections, if they don't exist yet
         if not len(temporal_export):
@@ -98,26 +98,26 @@ def optimize(config, *, status, output_directory):
             interconnection_capacity["hvdc"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
 
         """
-        Step 3B: Define generation capacity variables
+        Step 3B: Define ires capacity variables
         """
         temporal_results[bidding_zone]["generation_ires_MW"] = 0
-        for generation_technology in config["technologies"]["generation"]:
-            status.update(f"{country_flag} Adding {utils.format_technology(generation_technology, capitalize=False)} generation")
+        for ires_technology in config["technologies"]["ires"]:
+            status.update(f"{country_flag} Adding {utils.format_technology(ires_technology, capitalize=False)} generation")
 
             # Create a capacity variable for each climate zone
-            climate_zones = [re.match(f"{generation_technology}_(.+)_cf", column).group(1) for column in temporal_ires[bidding_zone].columns if column.startswith(f"{generation_technology}_")]
-            generation_potential = utils.get_generation_potential_in_climate_zone(bidding_zone, generation_technology, config=config)
-            current_capacity = utils.get_current_generation_capacity_in_climate_zone(bidding_zone, generation_technology, config=config)
-            capacities = model.addVars(climate_zones, lb=current_capacity, ub=generation_potential)
+            climate_zones = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in temporal_ires[bidding_zone].columns if column.startswith(f"{ires_technology}_")]
+            ires_potential = utils.get_ires_potential_in_climate_zone(bidding_zone, ires_technology, config=config)
+            current_capacity = utils.get_current_ires_capacity_in_climate_zone(bidding_zone, ires_technology, config=config)
+            capacities = model.addVars(climate_zones, lb=current_capacity, ub=ires_potential)
 
-            # Add the capacities to the generation_capacity DataFrame and calculate the temporal generation for a specific technology
-            temporal_generation = 0
+            # Add the capacities to the ires_capacity DataFrame and calculate the temporal generation for a specific technology
+            temporal_ires_generation = 0
             for climate_zone, capacity in capacities.items():
-                generation_capacity[bidding_zone].loc[climate_zone, generation_technology] = capacity
+                ires_capacity[bidding_zone].loc[climate_zone, ires_technology] = capacity
                 # Apply is required, otherwise it will throw a ValueError if there are more than a few thousand rows (see https://stackoverflow.com/questions/64801287)
-                temporal_generation += temporal_ires[bidding_zone][f"{generation_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
-            temporal_results[bidding_zone][f"generation_{generation_technology}_MW"] = temporal_generation
-            temporal_results[bidding_zone]["generation_ires_MW"] += temporal_generation
+                temporal_ires_generation += temporal_ires[bidding_zone][f"{ires_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
+            temporal_results[bidding_zone][f"generation_{ires_technology}_MW"] = temporal_ires_generation
+            temporal_results[bidding_zone]["generation_ires_MW"] += temporal_ires_generation
 
         """
         Step 3C: Define the hydropower variables and constraints
@@ -437,7 +437,7 @@ def optimize(config, *, status, output_directory):
 
         # Calculate the storage costs
         temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
-        storage_costs = utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
+        storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_storage_costs = config["fixed_storage"]["costs"]
@@ -451,7 +451,7 @@ def optimize(config, *, status, output_directory):
     """
     status.update("Setting the objective function")
     temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW") - utils.merge_dataframes_on_column(temporal_results, "baseload_MW")
-    firm_lcoe = utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config)
+    firm_lcoe = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config)
     model.setObjective(firm_lcoe * objective_scale_factor, gp.GRB.MINIMIZE)
 
     # Add the initializing duration to the dictionary
@@ -589,7 +589,7 @@ def optimize(config, *, status, output_directory):
     storing_start = datetime.now()
 
     # Make a directory for each type of output
-    for sub_directory in ["temporal_results", "temporal_export", "generation_capacity", "storage_capacity", "hydropower_capacity", "interconnection_capacity"]:
+    for sub_directory in ["temporal_results", "temporal_export", "ires_capacity", "storage_capacity", "hydropower_capacity", "interconnection_capacity"]:
         (output_directory / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
@@ -602,9 +602,9 @@ def optimize(config, *, status, output_directory):
         # Store the temporal results to a CSV file
         temporal_results_bidding_zone.to_csv(output_directory / "temporal_results" / f"{bidding_zone}.csv")
 
-        # Convert and store the generation capacity
-        generation_capacity_bidding_zone = utils.convert_variables_recursively(generation_capacity[bidding_zone])
-        generation_capacity_bidding_zone.to_csv(output_directory / "generation_capacity" / f"{bidding_zone}.csv")
+        # Convert and store the IRES capacity
+        ires_capacity_bidding_zone = utils.convert_variables_recursively(ires_capacity[bidding_zone])
+        ires_capacity_bidding_zone.to_csv(output_directory / "ires_capacity" / f"{bidding_zone}.csv")
 
         # Convert and store the storage capacity
         storage_capacity_bidding_zone = utils.convert_variables_recursively(storage_capacity[bidding_zone])

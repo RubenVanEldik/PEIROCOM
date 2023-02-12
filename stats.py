@@ -11,7 +11,7 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
-    generation_capacity = utils.get_generation_capacity(output_directory, country_codes=country_codes)
+    ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
@@ -22,7 +22,7 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Return the LCOE
-    return utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=breakdown_level)
 
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
@@ -34,7 +34,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
-    generation_capacity = utils.get_generation_capacity(output_directory, country_codes=country_codes)
+    ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
@@ -46,7 +46,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
         storage_capacity[bidding_zone] = 0 * storage_capacity[bidding_zone]
 
     # Return the LCOE
-    return utils.calculate_lcoe(generation_capacity, storage_capacity, hydropower_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
 
 
 def premium(output_directory, *, country_codes=None, breakdown_level=0):
@@ -76,14 +76,14 @@ def relative_curtailment(output_directory, *, country_codes=None):
     return temporal_results.curtailed_MW.sum() / (temporal_results.generation_ires_MW.sum() + temporal_results.generation_total_hydropower_MW.sum())
 
 
-def generation_capacity(output_directory, *, country_codes=None):
+def ires_capacity(output_directory, *, country_codes=None):
     """
-    Get the grouped generation capacity for a specific output_directory
+    Get the grouped IRES capacity for a specific output_directory
     """
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
-    return utils.get_generation_capacity(output_directory, group="all", country_codes=country_codes)
+    return utils.get_ires_capacity(output_directory, group="all", country_codes=country_codes)
 
 
 def hydropower_capacity(output_directory, *, country_codes=None):

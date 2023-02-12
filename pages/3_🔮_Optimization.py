@@ -66,21 +66,21 @@ with st.sidebar.expander("Technologies"):
     config["technologies"]["relative_baseload"] = st.slider("Relative baseload", min_value=0.0, max_value=0.95, step=0.05)
 
     # Get the technology names
-    generation_technology_options = utils.get_technologies(technology_type="generation").keys()
+    ires_technology_options = utils.get_technologies(technology_type="ires").keys()
     hydropower_technologies_options = utils.get_technologies(technology_type="hydropower").keys()
     storage_technologies_options = utils.get_technologies(technology_type="storage").keys()
 
     # Create the technology tabs
     if hydropower_technologies_options:
-        generation_tab, storage_tab, hydropower_tab = st.tabs(["Generation", "Hydropower", "Storage"])
+        ires_tab, storage_tab, hydropower_tab = st.tabs(["IRES", "Hydropower", "Storage"])
     else:
-        generation_tab, storage_tab = st.tabs(["Generation", "Storage"])
+        ires_tab, storage_tab = st.tabs(["IRES", "Storage"])
 
-    # Select the generation technologies
-    config["technologies"]["generation"] = {}
-    for technology in generation_technology_options:
-        if generation_tab.checkbox(utils.format_technology(technology), value=True):
-            config["technologies"]["generation"][technology] = scenario_level
+    # Select the IRES technologies
+    config["technologies"]["ires"] = {}
+    for technology in ires_technology_options:
+        if ires_tab.checkbox(utils.format_technology(technology), value=True):
+            config["technologies"]["ires"][technology] = scenario_level
 
     # Select the hydropower technologies
     config["technologies"]["hydropower"] = {}
@@ -144,7 +144,7 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitity_steps = np.linspace(start=-1, stop=1, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
         # Select the technologies
-        technology_names = {technology_name: technology_type for technology_type in ["generation", "storage"] for technology_name in config["technologies"][technology_type]}
+        technology_names = {technology_name: technology_type for technology_type in ["ires", "storage"] for technology_name in config["technologies"][technology_type]}
         selected_technologies = st.multiselect("Technologies", technology_names, format_func=utils.format_technology)
         sensitivity_config["technologies"] = {technology_name: technology_names[technology_name] for technology_name in selected_technologies}
     elif sensitivity_analysis_type == "hydropower_capacity":

@@ -18,7 +18,7 @@ def _select_data(output_directory, *, name):
 
     # Get the source of the data
     col1, col2 = st.sidebar.columns(2)
-    data_source_options = ["Statistics", "Temporal results", "Country info", "Generation capacity", "Storage capacity (energy)", "Storage capacity (power)"]
+    data_source_options = ["Statistics", "Temporal results", "Country info", "IRES capacity", "Storage capacity (energy)", "Storage capacity (power)"]
     data_source = col1.selectbox(name.capitalize(), data_source_options)
 
     # Read the config file
@@ -65,16 +65,16 @@ def _select_data(output_directory, *, name):
         data[data == 0] = None
         return data
 
-    if data_source == "Generation capacity":
-        # Get the Generation capacity
-        generation_capacity = utils.get_generation_capacity(output_directory, group="country")
+    if data_source == "IRES capacity":
+        # Get the IRES capacity
+        ires_capacity = utils.get_ires_capacity(output_directory, group="country")
 
         # Get the specific technologies
-        selected_generation_types = col2.multiselect("Type", generation_capacity.columns, format_func=utils.format_technology, key=name)
+        selected_ires_types = col2.multiselect("Type", ires_capacity.columns, format_func=utils.format_technology, key=name)
 
         # Return the sum the capacities of all selected technologies
-        if selected_generation_types:
-            return generation_capacity[selected_generation_types]
+        if selected_ires_types:
+            return ires_capacity[selected_ires_types]
 
     storage_capacity_match = re.search("Storage capacity \((.+)\)$", data_source)
     if storage_capacity_match:
