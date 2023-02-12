@@ -14,7 +14,6 @@
     potential:
       onshore: 16368.52499
       offshore: 0
-      hydrogen: 50000000
 - name: Austria
   nuts2: AT
   alpha3: AUT
@@ -30,7 +29,6 @@
       offshore: 0
     potential:
       onshore: 111695.2452
-      hydrogen: 0
 - name: Bosnia and Herzegovina
   nuts2: BA
   alpha3: BIH
@@ -46,7 +44,6 @@
       offshore: 0
     potential:
       onshore: 92454.61278
-      hydrogen: 800000000
 - name: Belgium
   nuts2: BE
   alpha3: BEL
@@ -63,7 +60,6 @@
     potential:
       onshore: 13548.88149
       offshore: 4720
-      hydrogen: 0
 - name: Bulgaria
   nuts2: BG
   alpha3: BGR
@@ -80,7 +76,6 @@
     potential:
       onshore: 8487.873066
       offshore: 0
-      hydrogen: 0
 - name: Switzerland
   nuts2: CH
   alpha3: CHE
@@ -96,7 +91,6 @@
       offshore: 0
     potential:
       onshore: 13684.3703
-      hydrogen: 0
 - name: Cyprus
   nuts2: CY
   alpha3: CYP
@@ -111,7 +105,6 @@
       onshore: 0
       offshore: 0
     potential:
-      hydrogen: 0
 - name: Czechia
   nuts2: CZ
   alpha3: CZE
@@ -127,7 +120,6 @@
       offshore: 0
     potential:
       onshore: 40886.12328
-      hydrogen: 0
 - name: Germany
   nuts2: DE
   alpha3: DEU
@@ -144,7 +136,6 @@
     potential:
       onshore: 117392.8253
       offshore: 40980
-      hydrogen: 9450000000
 - name: Denmark
   nuts2: DK
   alpha3: DNK
@@ -161,7 +152,6 @@
     potential:
       onshore: 150548.3151
       offshore: 172350
-      hydrogen: 600000000
 - name: Estonia
   nuts2: EE
   alpha3: EST
@@ -178,7 +168,6 @@
     potential:
       onshore: 144673.9717
       offshore: 81810
-      hydrogen: 0
 - name: Spain
   nuts2: ES
   alpha3: ESP
@@ -196,7 +185,6 @@
     potential:
       onshore: 391316.1594
       offshore: 25710
-      hydrogen: 1260000000
 - name: Finland
   nuts2: FI
   alpha3: FIN
@@ -213,7 +201,6 @@
     potential:
       onshore: 777503.8953
       offshore: 46920
-      hydrogen: 0
 - name: France
   nuts2: FR
   alpha3: FRA
@@ -230,7 +217,6 @@
     potential:
       onshore: 1079711.951
       offshore: 177110
-      hydrogen: 510000000
 - name: Greece
   nuts2: GR
   alpha3: GRC
@@ -247,7 +233,6 @@
     potential:
       onshore: 72093.18945
       offshore: 9500
-      hydrogen: 110000000
 - name: Croatia
   nuts2: HR
   alpha3: HRV
@@ -264,7 +249,6 @@
     potential:
       onshore: 34181.50698
       offshore: 0
-      hydrogen: 0
 - name: Hungary
   nuts2: HU
   alpha3: HUN
@@ -280,7 +264,6 @@
       offshore: 0
     potential:
       onshore: 17033.15274
-      hydrogen: 0
 - name: Ireland
   nuts2: IE
   alpha3: IRL
@@ -297,7 +280,6 @@
     potential:
       onshore: 317525.7372
       offshore: 648740
-      hydrogen: 0
 - name: Italy
   nuts2: IT
   alpha3: ITA
@@ -314,7 +296,6 @@
     potential:
       onshore: 109494.4076
       offshore: 0
-      hydrogen: 0
 - name: Lithuania
   nuts2: LT
   alpha3: LTU
@@ -331,7 +312,6 @@
     potential:
       onshore: 221926.6599
       offshore: 14090
-      hydrogen: 0
 - name: Luxembourg
   nuts2: LU
   alpha3: LUX
@@ -347,7 +327,6 @@
       offshore: 0
     potential:
       onshore: 167
-      hydrogen: 0
 - name: Latvia
   nuts2: LV
   alpha3: LVA
@@ -364,7 +343,6 @@
     potential:
       onshore: 155110.0796
       offshore: 85160
-      hydrogen: 0
 - name: Montenegro
   nuts2: ME
   alpha3: MNE
@@ -381,7 +359,6 @@
     potential:
       onshore: 28013.26503
       offshore: 0
-      hydrogen: 0
 - name: North Macedonia
   nuts2: MK
   alpha3: MKD
@@ -397,7 +374,6 @@
       offshore: 0
     potential:
       onshore: 5757.915653
-      hydrogen: 0
 - name: Malta
   nuts2: MT
   alpha3: MLT
@@ -412,7 +388,6 @@
       onshore: 0
       offshore: 0
     potential:
-      hydrogen: 0
 - name: Netherlands
   nuts2: NL
   alpha3: NLD
@@ -429,7 +404,6 @@
     potential:
       onshore: 78847.25957
       offshore: 77070
-      hydrogen: 300000000
 - name: Norway
   nuts2: "NO" # Strings are required, otherwise the YAML parser will parse it as a boolean False value
   alpha3: NOR
@@ -446,7 +420,6 @@
     potential:
       onshore: 747165.9611
       offshore: 641030
-      hydrogen: 0
 - name: Poland
   nuts2: PL
   alpha3: POL
@@ -463,7 +436,6 @@
     potential:
       onshore: 419543.8884
       offshore: 79680
-      hydrogen: 7240000000
 - name: Portugal
   nuts2: PT
   alpha3: PRT
@@ -480,7 +452,6 @@
     potential:
       onshore: 59674.41051
       offshore: 2830
-      hydrogen: 250000000
 - name: Romania
   nuts2: RO
   alpha3: ROU
@@ -497,7 +468,6 @@
     potential:
       onshore: 38135.22537
       offshore: 0
-      hydrogen: 1100000000
 - name: Serbia
   nuts2: RS
   alpha3: SRB
@@ -513,7 +483,6 @@
       offshore: 0
     potential:
       onshore: 23653.77034
-      hydrogen: 0
 - name: Sweden
   nuts2: SE
   alpha3: SWE
@@ -530,7 +499,6 @@
     potential:
       onshore: 841925.3066
       offshore: 166650
-      hydrogen: 0
 - name: Slovenia
   nuts2: SI
   alpha3: SVN
@@ -547,7 +515,6 @@
     potential:
       onshore: 4580.086726
       offshore: 0
-      hydrogen: 0
 - name: Slovakia
   nuts2: SK
   alpha3: SVK
@@ -563,7 +530,6 @@
       offshore: 0
     potential:
       onshore: 17375.51911
-      hydrogen: 0
 - name: Turkey
   nuts2: TR
   alpha3: TUR
@@ -580,7 +546,6 @@
     potential:
       onshore: 468071.8363
       offshore: 460
-      hydrogen: 0
 - name: Ukraine
   nuts2: UA
   alpha3: UKR
@@ -595,7 +560,6 @@
       onshore: 1111
       offshore: 0
     potential:
-      hydrogen: 0
 - name: United Kingdom
   nuts2: UK
   alpha3: GBR
@@ -612,4 +576,3 @@
     potential:
       onshore: 689995.2295
       offshore: 1028930
-      hydrogen: 1040000000
