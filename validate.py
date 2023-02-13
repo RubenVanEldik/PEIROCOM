@@ -461,18 +461,18 @@ def is_url(value, *, required=True):
     return bool(re.search(url_regex, value))
 
 
-def is_variable(value, *, required=True):
+def is_gurobi_variable(value, *, required=True):
     if value is None:
         return not required
 
     return isinstance(value, (gp.Var, gp.LinExpr, gp.QuadExpr)):
 
 
-def is_variable_tupledict(value, *, required=True):
+def is_gurobi_variable_tupledict(value, *, required=True):
     if value is None:
         return not required
 
     if not isinstance(value, gurobipy.tupledict):
         return False
 
-    return all(is_variable(x) for x in value.values())
+    return all(is_gurobi_variable(x) for x in value.values())
