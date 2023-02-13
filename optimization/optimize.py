@@ -68,8 +68,8 @@ def optimize(config, *, status, output_directory):
     temporal_export = {}
     interconnection_capacity = {}
     ires_capacity = {}
-    storage_capacity = {}
     hydropower_capacity = {}
+    storage_capacity = {}
 
     for index, bidding_zone in enumerate(bidding_zones):
         """
@@ -88,24 +88,12 @@ def optimize(config, *, status, output_directory):
         # Calculate the energy covered by the baseload
         temporal_results[bidding_zone]["baseload_MW"] = temporal_demand[bidding_zone].mean() * config["technologies"]["relative_baseload"]
 
-        # Create a DataFrame for the IRES capacities
-        ires_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["ires"])
-
-        # Create empty DataFrames for the interconnections, if they don't exist yet
-        if not len(temporal_export):
-            temporal_export_columns = pd.MultiIndex.from_tuples([], names=["from", "to"])
-            temporal_export["hvac"] = pd.DataFrame(index=temporal_results[bidding_zone].index, columns=temporal_export_columns)
-            temporal_export["hvdc"] = pd.DataFrame(index=temporal_results[bidding_zone].index, columns=temporal_export_columns)
-
-        # Create empty DataFrames for the extra interconnection capacity, if they don't exist yet
-        if not len(interconnection_capacity):
-            interconnection_capacity_index = pd.MultiIndex.from_arrays([[], []], names=("from", "to"))
-            interconnection_capacity["hvac"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
-            interconnection_capacity["hvdc"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
-
         """
         Step 3B: Define ires capacity variables
         """
+        # Create an empty DataFrame for the IRES capacities
+        ires_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["ires"])
+
         temporal_results[bidding_zone]["generation_ires_MW"] = 0
         for ires_technology in config["technologies"]["ires"]:
             status.update(f"{country_flag} Adding {utils.format_technology(ires_technology, capitalize=False)} generation")
@@ -303,6 +291,18 @@ def optimize(config, *, status, output_directory):
         """
         Step 3E: Define the interconnection variables
         """
+        # Create empty DataFrames for the interconnections, if they don't exist yet
+        if not len(temporal_export):
+            temporal_export_columns = pd.MultiIndex.from_tuples([], names=["from", "to"])
+            temporal_export["hvac"] = pd.DataFrame(index=temporal_results[bidding_zone].index, columns=temporal_export_columns)
+            temporal_export["hvdc"] = pd.DataFrame(index=temporal_results[bidding_zone].index, columns=temporal_export_columns)
+
+        # Create empty DataFrames for the extra interconnection capacity, if they don't exist yet
+        if not len(interconnection_capacity):
+            interconnection_capacity_index = pd.MultiIndex.from_arrays([[], []], names=("from", "to"))
+            interconnection_capacity["hvac"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
+            interconnection_capacity["hvdc"] = pd.DataFrame(index=interconnection_capacity_index, columns=["current", "extra"])
+
         for connection_type in ["hvac", "hvdc"]:
             status.update(f"{country_flag} Adding {connection_type.upper()} interconnections")
             # Get the export limits
