@@ -62,9 +62,6 @@ with st.sidebar.expander("Technologies"):
     scenario_levels = {-1: "Conservative", 0: "Moderate", 1: "Advanced"}
     scenario_level = st.select_slider("Scenario", options=scenario_levels.keys(), value=0, format_func=lambda key: scenario_levels[key])
 
-    # Select the relative share of baseload
-    config["technologies"]["relative_baseload"] = st.slider("Relative baseload", min_value=0.0, max_value=0.95, step=0.05)
-
     # Select the technologies
     technology_types = ["ires", "hydropower", "storage"]
     technology_type_tabs = st.tabs([utils.format_str(technology_type) for technology_type in technology_types])
@@ -100,7 +97,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "baseload", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -124,11 +121,6 @@ with st.sidebar.expander("Sensitivity analysis"):
             step_size = st.select_slider("Number of steps", step_size_options[::-1], value=1, format_func=lambda step_size: int(((number_of_climate_years - 1) / step_size) + 1))
             # Use the step size to calculate the sensitivity steps and add them to the config
             sensitivity_config["steps"] = {str(step): step for step in range(1, number_of_climate_years + 1, step_size)}
-    elif sensitivity_analysis_type == "baseload":
-        sensitivity_start, sensitivity_stop = st.slider("Relative baseload range", value=(0.0, 0.95), min_value=0.0, max_value=0.95, step=0.05)
-        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
     elif sensitivity_analysis_type == "technology_scenario":
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=-1, stop=1, num=number_steps)

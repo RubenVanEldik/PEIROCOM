@@ -202,10 +202,6 @@ def sensitivity(output_directory):
         sensitivity_plot.ax.legend()
         sensitivity_plot.ax.set_xlabel("Technology scenario")
         sensitivity_plot.ax.set_xticks([-1, 0, 1], ["Conservative", "Moderate", "Advanced"])
-    elif sensitivity_config["analysis_type"] == "baseload":
-        sensitivity_plot.ax.set_xlabel("Relative baseload (%)")
-        sensitivity_plot.format_xticklabels("{:,.0%}")
-        sensitivity_plot.ax.set_xlim([0, 1])
     elif sensitivity_config["analysis_type"] == "interconnection_capacity":
         sensitivity_plot.ax.set_xlabel("Relative interconnection capacity (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
