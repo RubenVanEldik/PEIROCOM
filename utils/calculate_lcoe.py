@@ -4,17 +4,6 @@ import utils
 import validate
 
 
-def _calculate_crf(assumptions):
-    """
-    Calculate the Capital Recovery Factor for a specic set of technology assumptions
-    """
-    assert validate.is_dict(assumptions)
-
-    wacc = assumptions["wacc"]
-    economic_lifetime = assumptions["economic_lifetime"]
-    return wacc / (1 - (1 + wacc) ** (-economic_lifetime))
-
-
 def _calculate_scenario_costs(assumptions, variable, scenario_level):
     """
     Calculate the costs for a given scenario level
@@ -51,7 +40,7 @@ def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW):
         capacity_kW = ires_capacity_MW[technology].sum() * 1000
         capex = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "capex", scenario_level)
         fixed_om = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "fixed_om", scenario_level)
-        crf = _calculate_crf(ires_assumptions[technology])
+        crf = utils.calculate_crf(ires_assumptions[technology]["wacc"], ires_assumptions[technology]["economic_lifetime"])
         annualized_costs_ires[technology] = crf * capex + fixed_om
 
     return annualized_costs_ires
@@ -76,7 +65,7 @@ def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_c
         fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om_power", scenario_level)
 
         # Calculate the total annualized costs
-        crf = _calculate_crf(hydropower_assumptions[technology])
+        crf = utils.calculate_crf(hydropower_assumptions[technology]["wacc"], hydropower_assumptions[technology]["economic_lifetime"])
         annualized_costs_hydropower[technology] = crf * capex + fixed_om
 
     return annualized_costs_hydropower
@@ -109,7 +98,7 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
         fixed_om = fixed_om_energy + fixed_om_power
 
         # Calculate the total annualized costs
-        crf = _calculate_crf(storage_assumptions[technology])
+        crf = utils.calculate_crf(storage_assumptions[technology]["wacc"], storage_assumptions[technology]["economic_lifetime"])
         annualized_costs_storage[technology] = crf * capex + fixed_om
 
     return annualized_costs_storage
@@ -130,7 +119,7 @@ def _calculate_annual_demand(demand_MW):
 
 def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_per_bidding_zone, *, config, breakdown_level=0):
     """
-    Calculate the average LCOE for all bidding zones
+    Calculate the average Levelized Costs of Electricity for all bidding zones
     """
     assert validate.is_bidding_zone_dict(ires_capacity)
     assert validate.is_bidding_zone_dict(storage_capacity)
