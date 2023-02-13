@@ -1,5 +1,5 @@
 import datetime
-import gurobipy
+import gurobipy as gp
 import numpy as np
 import pandas as pd
 import pathlib
@@ -37,7 +37,7 @@ def is_bidding_zone_dict(value, *, required=True):
     if value is None:
         return not required
 
-    if not type(value) is dict and not isinstance(value, gurobipy.tupledict):
+    if not type(value) is dict and not isinstance(value, gp.tupledict):
         return False
 
     return all(is_bidding_zone(x) for x in value.keys())
@@ -354,7 +354,7 @@ def is_model(value, *, required=True):
     if value is None:
         return not required
 
-    return isinstance(value, gurobipy.Model)
+    return isinstance(value, gp.Model)
 
 
 def is_number(value, *, required=True, min_value=None, max_value=None):
@@ -465,7 +465,7 @@ def is_variable(value, *, required=True):
     if value is None:
         return not required
 
-    return isinstance(value, gurobipy.Var)
+    return isinstance(value, (gp.Var, gp.LinExpr, gp.QuadExpr)):
 
 
 def is_variable_tupledict(value, *, required=True):
