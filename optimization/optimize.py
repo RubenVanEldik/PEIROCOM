@@ -53,11 +53,11 @@ def optimize(config, *, status, output_directory):
     """
     # Get the temporal demand and remove leap days
     demand_filepath = utils.path("input", "scenarios", config["scenario"], "demand.csv")
-    temporal_demand = utils.read_temporal_data(demand_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
-    temporal_demand = temporal_demand[~((temporal_demand.index.month == 2) & (temporal_demand.index.day == 29))]
+    temporal_fixed_demand = utils.read_temporal_data(demand_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
+    temporal_fixed_demand = temporal_fixed_demand[~((temporal_fixed_demand.index.month == 2) & (temporal_fixed_demand.index.day == 29))]
     # Remove all bidding zones that are not part of the optimization
     bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
-    temporal_demand = temporal_demand[bidding_zones]
+    temporal_fixed_demand = temporal_fixed_demand[bidding_zones]
 
     """
     Step 3: Initialize each bidding zone
@@ -84,7 +84,7 @@ def optimize(config, *, status, output_directory):
         # Remove the leap days from the dataset that could have been introduced by the resample method
         temporal_ires[bidding_zone] = temporal_ires[bidding_zone][~((temporal_ires[bidding_zone].index.month == 2) & (temporal_ires[bidding_zone].index.day == 29))]
         # Create a temporal_results DataFrame with the demand_MW column
-        temporal_results[bidding_zone] = pd.DataFrame(temporal_demand[bidding_zone].rename("demand_MW"))
+        temporal_results[bidding_zone] = pd.DataFrame(temporal_fixed_demand[bidding_zone].rename("demand_MW"))
 
         """
         Step 3B: Define ires capacity variables
@@ -189,7 +189,7 @@ def optimize(config, *, status, output_directory):
             # Loop over all hours
             reservoir_previous = None
             temporal_reservoir_dict = {}
-            for timestamp in temporal_demand.index:
+            for timestamp in temporal_fixed_demand.index:
                 # Create the reservoir level variable
                 current_reservoir_soc = temporal_hydropower_data.loc[timestamp, "reservoir_soc"]
                 if np.isnan(current_reservoir_soc):
@@ -239,8 +239,8 @@ def optimize(config, *, status, output_directory):
             storage_capacity[bidding_zone].loc[storage_technology, "power"] = model.addVar()
 
             # Create the inflow and outflow variables
-            inflow = pd.Series(model.addVars(temporal_demand.index))
-            outflow = pd.Series(model.addVars(temporal_demand.index))
+            inflow = pd.Series(model.addVars(temporal_fixed_demand.index))
+            outflow = pd.Series(model.addVars(temporal_fixed_demand.index))
 
             # Add the net storage flow variables to the temporal_results DataFrame
             net_flow = inflow - outflow
@@ -254,7 +254,7 @@ def optimize(config, *, status, output_directory):
             # Loop over all hours
             energy_stored_previous = None
             temporal_energy_stored_dict = {}
-            for timestamp in temporal_demand.index:
+            for timestamp in temporal_fixed_demand.index:
                 # Create the state of charge variables
                 energy_stored_current = model.addVar()
 
