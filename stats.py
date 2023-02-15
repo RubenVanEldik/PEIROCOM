@@ -15,7 +15,7 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    temporal_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW")
+    temporal_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW")
     temporal_export = utils.merge_dataframes_on_column(temporal_results, "net_export_MW")
     temporal_net_demand = temporal_demand + temporal_export
     config = utils.read_yaml(output_directory / "config.yaml")
@@ -113,7 +113,7 @@ def self_sufficiency(output_directory, *, country_codes=None):
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW").mean(axis=1)
+    mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW").mean(axis=1)
     mean_ires_generation = utils.merge_dataframes_on_column(temporal_results, "generation_ires_MW").mean(axis=1)
     mean_hydropower_generation = utils.merge_dataframes_on_column(temporal_results, "generation_total_hydropower_MW").mean(axis=1)
     mean_curtailment = utils.merge_dataframes_on_column(temporal_results, "curtailed_MW").mean(axis=1)

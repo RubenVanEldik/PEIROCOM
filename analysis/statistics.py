@@ -41,7 +41,7 @@ def statistics(output_directory):
 
     # Calculate the mean demand over all selected countries
     temporal_results = utils.get_temporal_results(output_directory, country_codes=selected_country_codes)
-    mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW").sum(axis=1).mean()
+    mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW").sum(axis=1).mean()
 
     # Show the KPI's
     with st.expander("KPI's", expanded=True):

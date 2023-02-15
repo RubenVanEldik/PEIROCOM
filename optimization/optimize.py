@@ -83,8 +83,9 @@ def optimize(config, *, status, output_directory):
         temporal_ires[bidding_zone] = utils.read_temporal_data(ires_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
         # Remove the leap days from the dataset that could have been introduced by the resample method
         temporal_ires[bidding_zone] = temporal_ires[bidding_zone][~((temporal_ires[bidding_zone].index.month == 2) & (temporal_ires[bidding_zone].index.day == 29))]
-        # Create a temporal_results DataFrame with the demand_MW column
-        temporal_results[bidding_zone] = pd.DataFrame(temporal_fixed_demand[bidding_zone].rename("demand_MW"))
+        # Create a temporal_results DataFrame with the demand_total_MW and demand_fixed_MW columns
+        temporal_results[bidding_zone] = pd.DataFrame(temporal_fixed_demand[bidding_zone].rename("demand_total_MW"))
+        temporal_results[bidding_zone]["demand_fixed_MW"] = temporal_results[bidding_zone].demand_total_MW
 
         """
         Step 3B: Define ires capacity variables
@@ -370,10 +371,10 @@ def optimize(config, *, status, output_directory):
                 temporal_results[bidding_zone]["net_export_MW"] += temporal_results[bidding_zone][column_name]
 
         # Add the demand constraint
-        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_MW), axis=1)
+        temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_total_MW), axis=1)
 
         # Calculate the curtailed energy per hour
-        curtailed_MW = temporal_results[bidding_zone].generation_ires_MW + temporal_results[bidding_zone].generation_total_hydropower_MW - temporal_results[bidding_zone].demand_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
+        curtailed_MW = temporal_results[bidding_zone].generation_ires_MW + temporal_results[bidding_zone].generation_total_hydropower_MW - temporal_results[bidding_zone].demand_total_MW - temporal_results[bidding_zone].net_storage_flow_total_MW - temporal_results[bidding_zone].net_export_MW
         temporal_results[bidding_zone].insert(temporal_results[bidding_zone].columns.get_loc("generation_ires_MW"), "curtailed_MW", curtailed_MW)
 
     """
@@ -402,7 +403,7 @@ def optimize(config, *, status, output_directory):
         # Loop over all bidding zones in the country
         for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
             # Calculate the total demand and non-curtailed generation in this country
-            sum_demand += temporal_results[bidding_zone].demand_MW.sum()
+            sum_demand += temporal_results[bidding_zone].demand_total_MW.sum()
             # The Gurobi .quicksum method is significantly faster than Panda's .sum method
             sum_ires_generation += gp.quicksum(temporal_results[bidding_zone].generation_ires_MW)
             sum_hydropower_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_hydropower_MW)
@@ -422,8 +423,8 @@ def optimize(config, *, status, output_directory):
         status.update("Adding the storage costs constraint")
 
         # Calculate the storage costs
-        temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW")
-        storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=1)["storage"]
+        temporal_total_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW")
+        storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_total_demand, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_storage_costs = config["fixed_storage"]["costs"]
@@ -436,7 +437,7 @@ def optimize(config, *, status, output_directory):
     Step 8: Set objective function
     """
     status.update("Setting the objective function")
-    temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_MW")
+    temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW")
     firm_lcoe = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config)
     model.setObjective(firm_lcoe * objective_scale_factor, gp.GRB.MINIMIZE)
 
