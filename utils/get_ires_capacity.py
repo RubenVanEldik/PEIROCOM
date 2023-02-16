@@ -21,7 +21,7 @@ def get_ires_capacity(output_directory, *, group=None, country_codes=None):
     # Get the capacity for each bidding zone
     ires_capacity = {}
     for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / "ires_capacity" / f"{bidding_zone}.csv"
+        filepath = output_directory / "capacity" / "ires" / f"{bidding_zone}.csv"
         ires_capacity[bidding_zone] = utils.read_csv(filepath, index_col=0)
 
     # Return a dictionary with the capacity per bidding zone DataFrame if not grouped

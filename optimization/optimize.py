@@ -630,9 +630,15 @@ def optimize(config, *, status, output_directory):
     """
     storing_start = datetime.now()
 
-    # Make a directory for each type of output
-    for sub_directory in ["temporal_results", "temporal_export", "ires_capacity", "storage_capacity", "hydropower_capacity", "interconnection_capacity"]:
-        (output_directory / sub_directory).mkdir()
+    # Make the temporal subdirectories
+    (output_directory / "temporal").mkdir()
+    for sub_directory in ["bidding_zones", "interconnections"]:
+        (output_directory / "temporal" / sub_directory).mkdir()
+
+    # Make the capacity subdirectories
+    (output_directory / "capacity").mkdir()
+    for sub_directory in ["ires", "storage", "hydropower", "interconnections"]:
+        (output_directory / "capacity" / sub_directory).mkdir()
 
     # Store the actual values per bidding zone for the temporal results and capacities
     for bidding_zone in bidding_zones:
@@ -641,33 +647,33 @@ def optimize(config, *, status, output_directory):
         # Convert the temporal results variables
         temporal_results_bidding_zone = utils.convert_variables_recursively(temporal_results[bidding_zone])
         # Store the temporal results to a CSV file
-        temporal_results_bidding_zone.to_csv(output_directory / "temporal_results" / f"{bidding_zone}.csv")
+        temporal_results_bidding_zone.to_csv(output_directory / "temporal" / "bidding_zones" / f"{bidding_zone}.csv")
 
         # Convert and store the IRES capacity
         ires_capacity_bidding_zone = utils.convert_variables_recursively(ires_capacity[bidding_zone])
-        ires_capacity_bidding_zone.to_csv(output_directory / "ires_capacity" / f"{bidding_zone}.csv")
+        ires_capacity_bidding_zone.to_csv(output_directory / "capacity" / "ires" / f"{bidding_zone}.csv")
 
         # Convert and store the storage capacity
         storage_capacity_bidding_zone = utils.convert_variables_recursively(storage_capacity[bidding_zone])
-        storage_capacity_bidding_zone.to_csv(output_directory / "storage_capacity" / f"{bidding_zone}.csv")
+        storage_capacity_bidding_zone.to_csv(output_directory / "capacity" / "storage" / f"{bidding_zone}.csv")
 
         # Convert and store the storage capacity
-        hydropower_capacity[bidding_zone].to_csv(output_directory / "hydropower_capacity" / f"{bidding_zone}.csv")
+        hydropower_capacity[bidding_zone].to_csv(output_directory / "capacity" / "hydropower" / f"{bidding_zone}.csv")
 
     # Convert and store the electrolysis capacity if hydrogen production is included
     if include_hydrogen_production:
         electrolysis_capacity = utils.convert_variables_recursively(electrolysis_capacity)
-        electrolysis_capacity.to_csv(output_directory / f"electrolysis_capacity.csv")
+        electrolysis_capacity.to_csv(output_directory / "capacity" / "electrolysis.csv")
 
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:
         status.update(f"Converting and storing the {connection_type.upper()} interconnection results")
         # Convert and store the temporal interconnection flows
         temporal_export_connection_type = utils.convert_variables_recursively(temporal_export[connection_type])
-        temporal_export_connection_type.to_csv(output_directory / "temporal_export" / f"{connection_type}.csv")
+        temporal_export_connection_type.to_csv(output_directory / "temporal" / "interconnections" / f"{connection_type}.csv")
         # Convert and store the interconnection capacities
         interconnection_capacity_connection_type = utils.convert_variables_recursively(interconnection_capacity[connection_type])
-        interconnection_capacity_connection_type.to_csv(output_directory / "interconnection_capacity" / f"{connection_type}.csv")
+        interconnection_capacity_connection_type.to_csv(output_directory / "capacity" / "interconnections" / f"{connection_type}.csv")
 
     # Add the storing duration to the dictionary
     storing_end = datetime.now()

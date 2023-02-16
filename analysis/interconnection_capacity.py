@@ -24,7 +24,7 @@ def interconnection_capacity(output_directory):
     interconnection_type = st.sidebar.selectbox("Interconnection type", ["hvac", "hvdc"], format_func=utils.format_str)
 
     # Read the interconnection capacity
-    data = utils.read_csv(output_directory / "interconnection_capacity" / f"{interconnection_type}.csv")
+    data = utils.read_csv(output_directory / "capacity" / "interconnections" / f"{interconnection_type}.csv")
 
     # Change the bidding zones to countries
     data["from"] = data["from"].apply(lambda bidding_zone: utils.get_country_property(bidding_zone[:2], "name"))

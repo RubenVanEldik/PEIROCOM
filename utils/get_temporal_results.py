@@ -21,7 +21,7 @@ def get_temporal_results(output_directory, *, group=None, country_codes=None):
     # Get the temporal data for each bidding zone
     temporal_results = {}
     for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / "temporal_results" / f"{bidding_zone}.csv"
+        filepath = output_directory / "temporal" / "bidding_zones" / f"{bidding_zone}.csv"
         temporal_results[bidding_zone] = utils.read_temporal_data(filepath)
 
         if temporal_results[bidding_zone].isnull().values.any():
