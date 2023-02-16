@@ -51,6 +51,7 @@ def optimize(config, *, status, output_directory):
     """
     Step 2: Get the temporal demand data
     """
+    status.update("Importing demand data")
     # Get the temporal demand and remove leap days
     demand_filepath = utils.path("input", "scenarios", config["scenario"], "demand.csv")
     temporal_fixed_demand = utils.read_temporal_data(demand_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
@@ -79,7 +80,7 @@ def optimize(config, *, status, output_directory):
         Step 3A: Import the temporal data
         """
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
-        status.update(f"{country_flag} Importing data")
+        status.update(f"{country_flag} Importing IRES data")
 
         # Get the temporal data and resample to the required resolution
         ires_filepath = utils.path("input", "scenarios", config["scenario"], "ires", f"{bidding_zone}.csv")
