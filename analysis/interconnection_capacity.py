@@ -14,6 +14,12 @@ def interconnection_capacity(output_directory):
 
     st.title("🪢 Interconnection capacity")
 
+    # Only show a warning message if the interconnections were not optimized individually
+    config = utils.read_yaml(output_directory / "config.yaml")
+    if not config["interconnections"]["optimize_individual_interconnections"]:
+        st.warning("This analysis is only available for runs where the interconnections are individually optimized")
+        return
+
     # Select the interconnection type
     interconnection_type = st.sidebar.selectbox("Interconnection type", ["hvac", "hvdc"], format_func=utils.format_str)
 
