@@ -22,6 +22,7 @@ def optimize(config, *, status, output_directory):
     initializing_start = datetime.now()
 
     # Check if the interconnections should be optimized individually
+    include_hydrogen_production = len(config["technologies"]["electrolysis"]) > 0
     optimize_individual_interconnections = config["interconnections"]["optimize_individual_interconnections"] == True and config["interconnections"]["relative_capacity"] != 1
 
     # Calculate the interval length in hours
@@ -41,7 +42,6 @@ def optimize(config, *, status, output_directory):
         model.setParam("BarIterLimit", config["optimization"]["max_barrier_iterations"])
 
     # Disable crossover and set BarHomogeneous and Aggregate
-    objective_scale_factor = 10 ** 6
     model.setParam("Crossover", 0)
     model.setParam("BarHomogeneous", 1)  # Don't know what this does, but it speeds up some more complex models
     model.setParam("Aggregate", 0)  # Don't know what this does, but it speeds up some more complex models
@@ -58,6 +58,8 @@ def optimize(config, *, status, output_directory):
     # Remove all bidding zones that are not part of the optimization
     bidding_zones = utils.get_bidding_zones_for_countries(config["country_codes"])
     temporal_fixed_demand = temporal_fixed_demand[bidding_zones]
+    # Create a copy of the fixed demand (later on the mean electrolysis demand will be added to it)
+    temporal_demand_assumed = temporal_fixed_demand.copy()
 
     """
     Step 3: Initialize each bidding zone
@@ -70,6 +72,7 @@ def optimize(config, *, status, output_directory):
     ires_capacity = {}
     hydropower_capacity = {}
     storage_capacity = {}
+    electrolysis_capacity = pd.DataFrame()
 
     for index, bidding_zone in enumerate(bidding_zones):
         """
@@ -88,7 +91,36 @@ def optimize(config, *, status, output_directory):
         temporal_results[bidding_zone]["demand_fixed_MW"] = temporal_results[bidding_zone].demand_total_MW
 
         """
-        Step 3B: Define ires capacity variables
+        Step 3B: Define the electrolysis variables
+        """
+        if include_hydrogen_production:
+            # Calculate the mean hourly electricity demand for hydrogen production
+            # (This is both the hourly mean and the non-weighted mean of the efficiency; the mean of efficiency is used as its mathemetically impossible in this LP to use the variables)
+            country_code = utils.get_country_of_bidding_zone(bidding_zone)
+            annual_hydrogen_demand_country = utils.get_country_property(country_code, "annual_hydrogen_demand")
+            number_of_bidding_zones_in_country = len(utils.get_bidding_zones_for_countries([country_code]))
+            annual_hydrogen_demand_bidding_zone = annual_hydrogen_demand_country / number_of_bidding_zones_in_country
+            mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
+            mean_temporal_electrolysis_demand = annual_hydrogen_demand_bidding_zone / mean_electrolysis_efficiency / 8760
+            temporal_demand_assumed += mean_temporal_electrolysis_demand
+
+            for electrolysis_technology in config["technologies"]["electrolysis"]:
+                status.update(f"{country_flag} Adding {utils.format_technology(electrolysis_technology)} electrolysis")
+
+                # Create the variable for the electrolysis production capacity
+                electrolysis_capacity_bidding_zone = model.addVar()
+                electrolysis_capacity.loc[bidding_zone, electrolysis_technology] = electrolysis_capacity_bidding_zone
+
+                # Create the temporal electrolysis demand variables
+                temporal_electrolysis_demand = model.addVars(temporal_fixed_demand.index)
+                temporal_results[bidding_zone][f"demand_{electrolysis_technology}_MW"] = pd.Series(temporal_electrolysis_demand)
+                temporal_results[bidding_zone]["demand_total_MW"] += pd.Series(temporal_electrolysis_demand)
+
+                # Ensure that the temporal demand does not exceed the electrolysis capacity
+                model.addConstrs(temporal_electrolysis_demand[timestamp] <= electrolysis_capacity_bidding_zone for timestamp in temporal_fixed_demand.index)
+
+        """
+        Step 3C: Define IRES capacity variables
         """
         # Create an empty DataFrame for the IRES capacities
         ires_capacity[bidding_zone] = pd.DataFrame(columns=config["technologies"]["ires"])
@@ -113,7 +145,7 @@ def optimize(config, *, status, output_directory):
             temporal_results[bidding_zone]["generation_ires_MW"] += temporal_ires_generation
 
         """
-        Step 3C: Define the hydropower variables and constraints
+        Step 3D: Define the hydropower variables and constraints
         """
         # Create a DataFrame for the hydropower capacity in this bidding zone
         hydropower_capacity[bidding_zone] = pd.DataFrame(0, index=config["technologies"]["hydropower"], columns=["turbine", "pump", "reservoir"])
@@ -218,7 +250,7 @@ def optimize(config, *, status, output_directory):
             temporal_results[bidding_zone]["energy_stored_total_hydropower_MWh"] += temporal_reservoir
 
         """
-        Step 3D: Define storage variables and constraints
+        Step 3E: Define storage variables and constraints
         """
         # Create a DataFrame for the storage capacity in this bidding zone
         storage_capacity[bidding_zone] = pd.DataFrame(0, index=config["technologies"]["storage"], columns=["energy", "power"])
@@ -288,7 +320,7 @@ def optimize(config, *, status, output_directory):
             temporal_results[bidding_zone]["energy_stored_total_MWh"] += temporal_energy_stored
 
         """
-        Step 3E: Define the interconnection variables
+        Step 3F: Define the interconnection variables
         """
         # Create empty DataFrames for the interconnections, if they don't exist yet
         if not len(temporal_export):
@@ -387,34 +419,46 @@ def optimize(config, *, status, output_directory):
             model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
 
     """
-    Step 6: Define the self-sufficiency constraints per country
+    Step 6: Define the self-sufficiency and hydrogen constraints per country
     """
     for country_code in config["country_codes"]:
         country_flag = utils.get_country_property(country_code, "flag")
         status.update(f"{country_flag} Adding self-sufficiency constraint")
 
         # Set the variables required to calculate the cumulative results in the country
-        sum_demand = 0
+        sum_demand_total = 0
         sum_ires_generation = 0
         sum_hydropower_generation = 0
         sum_curtailed = 0
         sum_storage_flow = 0
+        sum_hydrogen_production = 0
 
         # Loop over all bidding zones in the country
         for bidding_zone in utils.get_bidding_zones_for_countries([country_code]):
             # Calculate the total demand and non-curtailed generation in this country
-            sum_demand += temporal_results[bidding_zone].demand_total_MW.sum()
+            sum_demand_total += temporal_demand_assumed[bidding_zone].sum()
             # The Gurobi .quicksum method is significantly faster than Panda's .sum method
             sum_ires_generation += gp.quicksum(temporal_results[bidding_zone].generation_ires_MW)
             sum_hydropower_generation += gp.quicksum(temporal_results[bidding_zone].generation_total_hydropower_MW)
             sum_curtailed += gp.quicksum(temporal_results[bidding_zone].curtailed_MW)
             sum_storage_flow += gp.quicksum(temporal_results[bidding_zone].net_storage_flow_total_MW)
 
+            # Calculate the total hydrogen production
+            for electrolysis_technology in config["technologies"]["electrolysis"]:
+                electrolyzer_efficiency = utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"]
+                sum_hydrogen_production += gp.quicksum(temporal_results[bidding_zone][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
+
         # Add the self-sufficiency constraints if there is any demand in the country
-        if sum_demand > 0:
-            self_sufficiency = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand
+        if sum_demand_total > 0:
+            self_sufficiency = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
             model.addConstr(self_sufficiency >= config["interconnections"]["min_self_sufficiency"])
             model.addConstr(self_sufficiency <= config["interconnections"]["max_self_sufficiency"])
+
+        # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
+        if include_hydrogen_production:
+            annual_hydrogen_demand = utils.get_country_property(country_code, "annual_hydrogen_demand")
+            number_of_years_modeled = 1 + (config["climate_years"]["end"] - config["climate_years"]["start"])
+            model.addConstr(sum_hydrogen_production == annual_hydrogen_demand * number_of_years_modeled)
 
     """
     Step 7: Define the storage costs constraint
@@ -437,9 +481,19 @@ def optimize(config, *, status, output_directory):
     Step 8: Set objective function
     """
     status.update("Setting the objective function")
-    temporal_net_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW")
-    firm_lcoe = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config)
-    model.setObjective(firm_lcoe * objective_scale_factor, gp.GRB.MINIMIZE)
+
+    # Calculate the annual electricity costs
+    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_demand_assumed, config=config, annual_costs=True)
+
+    # Calculate the annual electrolyzer costs (don't include electricity costs as this is already included in the electricity costs calculation above)
+    if include_hydrogen_production:
+        annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=1, annual_costs=True).electrolyzer
+    else:
+        annual_electrolyzer_costs = 0
+
+    # Set the objective to the annual system costs
+    annualized_system_costs = annual_electricity_costs + annual_electrolyzer_costs
+    model.setObjective(annualized_system_costs, gp.GRB.MINIMIZE)
 
     # Add the initializing duration to the dictionary
     initializing_end = datetime.now()
@@ -469,17 +523,17 @@ def optimize(config, *, status, output_directory):
         """
         if where == gp.GRB.Callback.BARRIER:
             iteration = model.cbGet(gp.GRB.Callback.BARRIER_ITRCNT)
-            objective_value = model.cbGet(gp.GRB.Callback.BARRIER_PRIMOBJ) / objective_scale_factor
+            objective_value = model.cbGet(gp.GRB.Callback.BARRIER_PRIMOBJ)
             barrier_convergence = model.cbGet(gp.GRB.Callback.BARRIER_PRIMOBJ) / model.cbGet(gp.GRB.Callback.BARRIER_DUALOBJ) - 1
             stat1.metric("Iteration (barrier)", f"{iteration:,}")
-            stat2.metric("Objective", f"{objective_value:,.2f}€/MWh")
-            stat3.metric("Convergence", f"{barrier_convergence:.2e}")
+            stat2.metric("Objective", f"{objective_value:,.2E}")
+            stat3.metric("Convergence", f"{barrier_convergence:.2E}")
         if where == gp.GRB.Callback.SIMPLEX and model.cbGet(gp.GRB.Callback.SPX_ITRCNT) % 1000 == 0:
             iteration = model.cbGet(int(gp.GRB.Callback.SPX_ITRCNT))
-            objective_value = model.cbGet(gp.GRB.Callback.SPX_OBJVAL) / objective_scale_factor
+            objective_value = model.cbGet(gp.GRB.Callback.SPX_OBJVAL)
             infeasibility = model.cbGet(gp.GRB.Callback.SPX_PRIMINF)
             stat1.metric("Iteration (simplex)", f"{int(iteration):,}")
-            stat2.metric("Objective", f"{objective_value:,.2f}€/MWh")
+            stat2.metric("Objective", f"{objective_value:,.2E}")
             stat3.metric("Infeasibility", f"{infeasibility:.2E}")
         if where == gp.GRB.Callback.MESSAGE:
             log_message = model.cbGet(gp.GRB.Callback.MSG_STRING)
@@ -585,7 +639,6 @@ def optimize(config, *, status, output_directory):
         status.update(f"{country_flag} Converting and storing the results")
         # Convert the temporal results variables
         temporal_results_bidding_zone = utils.convert_variables_recursively(temporal_results[bidding_zone])
-
         # Store the temporal results to a CSV file
         temporal_results_bidding_zone.to_csv(output_directory / "temporal_results" / f"{bidding_zone}.csv")
 
@@ -599,6 +652,11 @@ def optimize(config, *, status, output_directory):
 
         # Convert and store the storage capacity
         hydropower_capacity[bidding_zone].to_csv(output_directory / "hydropower_capacity" / f"{bidding_zone}.csv")
+
+    # Convert and store the electrolysis capacity if hydrogen production is included
+    if include_hydrogen_production:
+        electrolysis_capacity = utils.convert_variables_recursively(electrolysis_capacity)
+        electrolysis_capacity.to_csv(output_directory / f"electrolysis_capacity.csv")
 
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:

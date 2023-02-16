@@ -440,10 +440,16 @@ def is_technology(value, *, required=True):
     if value is None:
         return not required
 
-    ires_technologies = ["pv", "onshore", "offshore"]
-    hydropower_technologies = ["run_of_river", "reservoir", "pumped_storage_open", "pumped_storage_closed"]
-    storage_technologies = ["lion", "hydrogen"]
-    return value in ires_technologies or value in hydropower_technologies or value in storage_technologies
+    if value in ["pv", "onshore", "offshore"]:
+        return True
+    if value in ["run_of_river", "reservoir", "pumped_storage_open", "pumped_storage_closed"]:
+        return True
+    if value in ["lion"]:
+        return True
+    if value in ["pem"]:
+        return True
+
+    return False
 
 
 def is_technology_list(value, *, required=True):
@@ -467,7 +473,7 @@ def is_technology_type(value, *, required=True):
     if value is None:
         return not required
 
-    return value in ["ires", "hydropower", "storage"]
+    return value in ["ires", "hydropower", "storage", "electrolysis"]
 
 
 def is_url(value, *, required=True):

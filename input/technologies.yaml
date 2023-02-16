@@ -142,3 +142,21 @@ storage:
       capex_power: 104
       fixed_om_energy: 1.425
       fixed_om_power: 2.6
+electrolysis:
+  pem:
+    name: "PEM"
+    color:
+      name: 'rose'
+      value: 500
+    efficiency: 0.6
+    economic_lifetime: 20
+    wacc: 0.044
+    conservative:
+      capex: 800
+      fixed_om: 10
+    moderate:
+      capex: 500
+      fixed_om: 10
+    advanced:
+      capex: 300
+      fixed_om: 10
