@@ -11,8 +11,8 @@ def read_temporal_data(filepath, *, start_year=None, end_year=None, timezone=Non
     Returns the temporal data, if specified only for a specific date range
     """
     assert validate.is_filepath(filepath, suffix=".csv", existing=True)
-    assert validate.is_integer(start_year, min_value=1982, max_value=2016, required=False)
-    assert validate.is_integer(end_year, min_value=1982, max_value=2016, required=False)
+    assert validate.is_integer(start_year, required=False)
+    assert validate.is_integer(end_year, required=False)
     assert validate.is_string(timezone, required=False)
     assert validate.is_integer(header, min_value=0) or validate.is_list_like(header)
 

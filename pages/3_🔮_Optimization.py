@@ -41,11 +41,14 @@ with st.sidebar.expander("Scope"):
     config["country_codes"] = sorted(config["country_codes"], key=map_country_name_to_code)
 
     # Select the range of years that should be modeled
-    climate_years = range(1982, 2017)
+    demand_timestamps = utils.read_temporal_data(utils.path("input", "scenarios", config["scenario"], "demand.csv")).index
+    first_year = demand_timestamps.min().year
+    last_year = demand_timestamps.max().year
+    climate_years = range(first_year, last_year + 1)
     config["climate_years"] = {}
     col1, col2 = st.columns(2)
-    config["climate_years"]["start"] = col1.selectbox("Start year", climate_years, index=climate_years.index(2016))
-    config["climate_years"]["end"] = col2.selectbox("End year", climate_years, index=climate_years.index(2016))
+    config["climate_years"]["start"] = col1.selectbox("Start year", climate_years, index=len(climate_years) - 1)
+    config["climate_years"]["end"] = col2.selectbox("End year", climate_years, index=len(climate_years) - 1)
 
     # Select the resolution
     resolutions = [f"{i}H" for i in range(24, 0, -1) if 24 % i == 0]

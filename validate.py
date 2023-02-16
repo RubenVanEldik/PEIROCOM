@@ -104,9 +104,9 @@ def is_config(value, *, required=True):
         return False
     if not is_dict(value.get("climate_years")):
         return False
-    if not is_integer(value["climate_years"].get("start"), min_value=1982, max_value=2016):
+    if not is_integer(value["climate_years"].get("start")):
         return False
-    if not is_integer(value["climate_years"].get("end"), min_value=1982, max_value=2016):
+    if not is_integer(value["climate_years"].get("end")):
         return False
     if value["climate_years"]["start"] > value["climate_years"]["end"]:
         return False
