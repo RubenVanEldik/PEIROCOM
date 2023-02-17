@@ -478,7 +478,7 @@ def optimize(config, *, status, output_directory):
     status.update("Setting the objective function")
 
     # Calculate the annual electricity costs
-    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_demand_assumed, config=config, annual_costs=True)
+    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, None, config=config, annual_costs=True)
 
     # Calculate the annual electrolyzer costs (don't include electricity costs as this is already included in the electricity costs calculation above)
     if include_hydrogen_production:
