@@ -441,7 +441,7 @@ def optimize(config, *, status, output_directory):
             # Calculate the total hydrogen production
             for electrolysis_technology in config["technologies"]["electrolysis"]:
                 electrolyzer_efficiency = utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"]
-                sum_hydrogen_production += gp.quicksum(temporal_results[bidding_zone][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
+                sum_hydrogen_production += gp.quicksum(temporal_results[bidding_zone][f"demand_{electrolysis_technology}_MW"]) * interval_length * electrolyzer_efficiency
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand_total > 0:
