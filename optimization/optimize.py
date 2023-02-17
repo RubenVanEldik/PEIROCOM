@@ -132,7 +132,10 @@ def optimize(config, *, status, output_directory):
 
             # Create a capacity variable for each climate zone
             climate_zones = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in temporal_ires[bidding_zone].columns if column.startswith(f"{ires_technology}_")]
-            ires_potential = utils.get_ires_potential_in_climate_zone(bidding_zone, ires_technology, config=config)
+            if bidding_zone.startswith("LB") and ires_technology == "pv":
+                ires_potential = utils.read_csv(utils.path("input", "scenarios", config["scenario"], "pv_capacity.csv"), index_col=0).loc[bidding_zone]
+            else:
+                ires_potential = utils.get_ires_potential_in_climate_zone(bidding_zone, ires_technology, config=config)
             current_capacity = utils.get_current_ires_capacity_in_climate_zone(bidding_zone, ires_technology, config=config)
             capacities = model.addVars(climate_zones, lb=current_capacity, ub=ires_potential)
 
