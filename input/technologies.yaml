@@ -47,75 +47,7 @@ ires:
     advanced:
       capex: 1583
       fixed_om: 61
-hydropower:
-  run_of_river:
-    name: "run-of-river"
-    color:
-      name: 'blue'
-      value: 500
-    roundtrip_efficiency: 0.85
-    economic_lifetime: 60
-    wacc: 0.05
-    conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-  reservoir:
-    name: "reservoir"
-    color:
-      name: 'blue'
-      value: 500
-    roundtrip_efficiency: 0.85
-    economic_lifetime: 60
-    wacc: 0.05
-    conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-  pumped_storage_open:
-    name: "pumped storage (open)"
-    color:
-      name: 'blue'
-      value: 500
-    roundtrip_efficiency: 0.85
-    economic_lifetime: 60
-    wacc: 0.05
-    conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-  pumped_storage_closed:
-    name: "pumped storage (closed)"
-    color:
-      name: 'blue'
-      value: 500
-    roundtrip_efficiency: 0.85
-    economic_lifetime: 60
-    wacc: 0.05
-    conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
-    advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+hydropower: {}
 storage:
   lion:
     name: "Li-ion"
