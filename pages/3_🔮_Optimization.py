@@ -100,7 +100,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -132,6 +132,11 @@ with st.sidebar.expander("Sensitivity analysis"):
         technology_names = {technology_name: technology_type for technology_type in ["ires", "storage"] for technology_name in config["technologies"][technology_type]}
         selected_technologies = st.multiselect("Technologies", technology_names, format_func=utils.format_technology)
         sensitivity_config["technologies"] = {technology_name: technology_names[technology_name] for technology_name in selected_technologies}
+    elif sensitivity_analysis_type == "hydrogen_demand":
+        sensitivity_start, sensitivity_stop = st.slider("Relative hydrogen demand range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
     elif sensitivity_analysis_type == "hydropower_capacity":
         sensitivity_start, sensitivity_stop = st.slider("Hydropower capacity range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)

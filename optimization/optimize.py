@@ -98,7 +98,7 @@ def optimize(config, *, status, output_directory):
             # Calculate the mean hourly electricity demand for hydrogen production
             # (This is both the hourly mean and the non-weighted mean of the efficiency; the mean of efficiency is used as its mathemetically impossible in this LP to use the variables)
             country_code = utils.get_country_of_bidding_zone(bidding_zone)
-            annual_hydrogen_demand_country = utils.get_country_property(country_code, "annual_hydrogen_demand")
+            annual_hydrogen_demand_country = config.get("relative_hydrogen_demand", 1) * utils.get_country_property(country_code, "annual_hydrogen_demand")
             number_of_bidding_zones_in_country = len(utils.get_bidding_zones_for_countries([country_code]))
             annual_hydrogen_demand_bidding_zone = annual_hydrogen_demand_country / number_of_bidding_zones_in_country
             mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
@@ -451,7 +451,7 @@ def optimize(config, *, status, output_directory):
 
         # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
         if include_hydrogen_production:
-            annual_hydrogen_demand = utils.get_country_property(country_code, "annual_hydrogen_demand")
+            annual_hydrogen_demand = config.get("relative_hydrogen_demand", 1) * utils.get_country_property(country_code, "annual_hydrogen_demand")
             number_of_years_modeled = 1 + (config["climate_years"]["end"] - config["climate_years"]["start"])
             model.addConstr(sum_hydrogen_production == annual_hydrogen_demand * number_of_years_modeled)
 

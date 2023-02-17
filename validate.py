@@ -416,7 +416,7 @@ def is_sensitivity_config(value, *, required=True):
     if not type(value) is dict:
         return False
 
-    return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
+    return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
 
 
 def is_series(value, *, required=True):

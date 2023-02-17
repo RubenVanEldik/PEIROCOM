@@ -156,6 +156,8 @@ def run_sensitivity(config, sensitivity_config):
             if sensitivity_config["analysis_type"] == "climate_years":
                 last_climate_year = utils.get_nested_key(step_config, "climate_years.end")
                 utils.set_nested_key(step_config, "climate_years.start", last_climate_year - (step_value - 1))
+            elif sensitivity_config["analysis_type"] == "hydrogen_demand":
+                utils.set_nested_key(step_config, "relative_hydrogen_demand", step_value)
             elif sensitivity_config["analysis_type"] == "hydropower_capacity":
                 utils.set_nested_key(step_config, "technologies.relative_hydropower_capacity", step_value)
             elif sensitivity_config["analysis_type"] == "interconnection_capacity":
