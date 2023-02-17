@@ -1,15 +1,24 @@
+# Miscellaneous
 .DS_Store
 __pycache__/
-
-.env
-gurobi.lic
 todo.txt
 
+# ENV variables
+.env
+gurobi.lic
+
+# Virtual environment
 env/
-input/eraa/
-input/scenarios/
+
+# Input and output directory
+input/
+!input/gis/
+!input/countries.yaml
+!input/technologies.yaml
 output/
 tuning/
+
+# Compressed files
 *.tar
 *.tar.gz
 *.zip
