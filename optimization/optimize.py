@@ -447,10 +447,10 @@ def optimize(config, *, status, output_directory):
                 sum_hydrogen_production += gp.quicksum(temporal_results[bidding_zone][f"demand_{electrolysis_technology}_MW"]) * interval_length * electrolyzer_efficiency
 
         # Add the self-sufficiency constraints if there is any demand in the country
-        if sum_demand_total > 0:
-            self_sufficiency = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
-            model.addConstr(self_sufficiency >= config["interconnections"]["min_self_sufficiency"])
-            model.addConstr(self_sufficiency <= config["interconnections"]["max_self_sufficiency"])
+        # if sum_demand_total > 0:
+        #     self_sufficiency = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
+        #     model.addConstr(self_sufficiency >= config["interconnections"]["min_self_sufficiency"])
+        #     model.addConstr(self_sufficiency <= config["interconnections"]["max_self_sufficiency"])
 
         # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
         if include_hydrogen_production:
