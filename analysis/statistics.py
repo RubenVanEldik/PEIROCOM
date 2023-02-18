@@ -1,3 +1,4 @@
+import numpy as np
 import streamlit as st
 
 import stats
@@ -44,7 +45,7 @@ def statistics(output_directory):
     mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW").sum(axis=1).mean()
 
     # Show the KPI's
-    with st.expander("KPI's", expanded=True):
+    with st.expander("Electricity", expanded=True):
         col1, col2, col3 = st.columns(3)
 
         # LCOE
@@ -64,6 +65,30 @@ def statistics(output_directory):
         curtailment_all = stats.relative_curtailment(output_directory)
         curtailment_delta = f"{(curtailment_selected / curtailment_all) - 1:.0%}" if selected_country_codes else None
         col3.metric("Curtailment", f"{curtailment_selected:.1%}", curtailment_delta, delta_color="inverse")
+
+    with st.expander("Hydrogen", expanded=True):
+        col1, col2, col3 = st.columns(3)
+
+        for electrolysis_technology in config["technologies"]["electrolysis"]:
+            electrolysis_technology_name = utils.format_technology(electrolysis_technology)
+
+            # LCOH
+            lcoh_selected = stats.lcoh(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
+            lcoh_all = stats.lcoh(output_directory, electrolysis_technology=electrolysis_technology)
+            lcoh_delta = f"{(lcoh_selected / lcoh_all) - 1:.0%}" if selected_country_codes else None
+            if np.isnan(lcoh_selected):
+                col1.metric(f"LCOH ({electrolysis_technology_name})", "—")
+            else:
+                col1.metric(f"LCOH ({electrolysis_technology_name})", f"{int(lcoh_selected)}€/MWh", lcoh_delta, delta_color="inverse")
+
+            # Electrolyzer capacity factor
+            electrolyzer_capacity_factor_selected = stats.electrolyzer_capacity_factor(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
+            electrolyzer_capacity_factor_all = stats.electrolyzer_capacity_factor(output_directory, electrolysis_technology=electrolysis_technology)
+            electrolyzer_capactity_factor_delta = f"{(electrolyzer_capacity_factor_selected / electrolyzer_capacity_factor_all) - 1:.0%}" if selected_country_codes else None
+            if np.isnan(electrolyzer_capacity_factor_selected):
+                col2.metric(f"Capacity factor ({electrolysis_technology_name})", "—")
+            else:
+                col2.metric(f"Capacity factor ({electrolysis_technology_name})", f"{electrolyzer_capacity_factor_selected:.0%}", electrolyzer_capactity_factor_delta)
 
     # Show the IRES capacities
     with st.expander("IRES capacity", expanded=True):

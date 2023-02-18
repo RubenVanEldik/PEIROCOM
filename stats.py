@@ -75,6 +75,43 @@ def relative_curtailment(output_directory, *, country_codes=None):
     return temporal_results.curtailed_MW.sum() / (temporal_results.generation_ires_MW.sum() + temporal_results.generation_total_hydropower_MW.sum())
 
 
+def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
+    """
+    Calculate the LCOH for a specific run
+    """
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
+    assert validate.is_breakdown_level(breakdown_level)
+    assert validate.is_technology(electrolysis_technology)
+
+    # Get the capacities and electrolysis demand and electricity costs
+    config = utils.read_yaml(output_directory / "config.yaml")
+    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)[[electrolysis_technology]]
+    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
+    electrolysis_demand = {bidding_zone: temporal_results[bidding_zone][[f"demand_{electrolysis_technology}_MW"]] for bidding_zone in temporal_results}
+    electricity_costs = firm_lcoe(output_directory, country_codes=country_codes, breakdown_level=breakdown_level)
+
+    # Return the LCOE
+    return utils.calculate_lcoh(electrolysis_capacity, electrolysis_demand, electricity_costs, config=config, breakdown_level=breakdown_level)
+
+
+def electrolyzer_capacity_factor(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
+    """
+    Calculate the electrolyzer capacity factor for a specific run
+    """
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
+    assert validate.is_breakdown_level(breakdown_level)
+    assert validate.is_technology(electrolysis_technology)
+
+    # Get the capacities and electrolysis demand
+    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)[electrolysis_technology].sum()
+    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
+    mean_electrolysis_demand = utils.merge_dataframes_on_column(temporal_results, f"demand_{electrolysis_technology}_MW").sum(axis=1).mean()
+
+    return mean_electrolysis_demand / electrolysis_capacity
+
+
 def ires_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped IRES capacity for a specific output_directory
