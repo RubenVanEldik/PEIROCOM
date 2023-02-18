@@ -30,7 +30,7 @@ def run(config, *, status=None, output_directory):
     results = optimize(config, status=status, output_directory=output_directory)
 
     # Store the duration after the optimization
-    utils.write_yaml(output_directory / "duration.yaml", results["duration"], exist_ok=True)
+    results["duration"].to_csv(output_directory / "duration.csv")
 
     # Stop the run if an error occured during the optimization
     error_message = results.get("error_message")
