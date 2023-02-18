@@ -148,15 +148,15 @@ electrolysis:
     color:
       name: 'rose'
       value: 500
-    efficiency: 0.6
+    efficiency: 0.82
     economic_lifetime: 20
     wacc: 0.044
     conservative:
-      capex: 800
-      fixed_om: 10
+      capex: 700
+      fixed_om: 30
     moderate:
       capex: 500
-      fixed_om: 10
+      fixed_om: 20
     advanced:
       capex: 300
-      fixed_om: 10
+      fixed_om: 15
