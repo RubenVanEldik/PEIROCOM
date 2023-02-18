@@ -7,4 +7,4 @@ from .is_demo import is_demo
 ttl = 60 if is_demo else None
 
 # Remove the spinner and set the TTL of the Streamlit memo cache
-cache = st.experimental_memo(show_spinner=False, ttl=ttl)
+cache = st.cache_data(show_spinner=False, ttl=ttl)
