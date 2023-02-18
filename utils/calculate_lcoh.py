@@ -1,5 +1,5 @@
-import streamlit as st
 import pandas as pd
+import re
 
 import utils
 import validate
@@ -58,7 +58,8 @@ def _calculate_annual_electricity_demand(demand_MW, electricity_costs):
     demand_end_date = demand_MW.index.max()
     share_of_year_modelled = (demand_end_date - demand_start_date) / pd.Timedelta(365, "days")
     timestep_hours = (demand_MW.index[1] - demand_MW.index[0]).total_seconds() / 3600
-    return demand_MW.sum() * timestep_hours / share_of_year_modelled
+    annual_demand = demand_MW.sum() * timestep_hours / share_of_year_modelled
+    return annual_demand.rename(index={row: re.match("demand_(.+)_MW", row).group(1) for row in annual_demand.index})
 
 
 def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs, *, config, breakdown_level=0, annual_costs=False):

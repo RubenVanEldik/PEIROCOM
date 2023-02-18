@@ -17,6 +17,7 @@ from .get_bidding_zones_for_countries import get_bidding_zones_for_countries
 from .get_country_of_bidding_zone import get_country_of_bidding_zone
 from .get_country_property import get_country_property
 from .get_current_ires_capacity_in_climate_zone import get_current_ires_capacity_in_climate_zone
+from .get_electrolysis_capacity import get_electrolysis_capacity
 from .get_env import get_env
 from .get_export_limits import get_export_limits
 from .get_geometries_of_countries import get_geometries_of_countries
