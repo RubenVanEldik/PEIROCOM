@@ -18,7 +18,7 @@ def optimize(config, *, status, output_directory):
     assert validate.is_directory_path(output_directory)
 
     # Create a dictionary to store the run duration of the different phases
-    duration = {}
+    duration = pd.Series(dtype="float64")
     initializing_start = datetime.now()
 
     # Check if the interconnections should be optimized individually
@@ -492,7 +492,7 @@ def optimize(config, *, status, output_directory):
 
     # Add the initializing duration to the dictionary
     initializing_end = datetime.now()
-    duration["initializing"] = round((initializing_end - initializing_start).total_seconds())
+    duration["initializing"] = (initializing_end - initializing_start).total_seconds()
 
     """
     Step 9: Solve model
@@ -583,7 +583,7 @@ def optimize(config, *, status, output_directory):
 
     # Add the optimizing duration to the dictionary
     optimizing_end = datetime.now()
-    duration["optimizing"] = round((optimizing_end - optimizing_start).total_seconds())
+    duration["optimizing"] = (optimizing_end - optimizing_start).total_seconds()
 
     """
     Step 10: Check if the model could be solved
@@ -671,7 +671,7 @@ def optimize(config, *, status, output_directory):
 
     # Add the storing duration to the dictionary
     storing_end = datetime.now()
-    duration["storing"] = round((storing_end - storing_start).total_seconds())
+    duration["storing"] = (storing_end - storing_start).total_seconds()
 
     # Return with the duration dictionary
     return {"duration": duration}
