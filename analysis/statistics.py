@@ -79,7 +79,8 @@ def statistics(output_directory):
             if np.isnan(lcoh_selected):
                 col1.metric(f"LCOH ({electrolysis_technology_name})", "—")
             else:
-                col1.metric(f"LCOH ({electrolysis_technology_name})", f"{int(lcoh_selected)}€/MWh", lcoh_delta, delta_color="inverse")
+                hydrogen_mwh_kg = 0.033333
+                col1.metric(f"LCOH ({electrolysis_technology_name})", f"{lcoh_selected * hydrogen_mwh_kg:.2f}€/kg", lcoh_delta, delta_color="inverse")
 
             # Electrolyzer capacity factor
             electrolyzer_capacity_factor_selected = stats.electrolyzer_capacity_factor(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
