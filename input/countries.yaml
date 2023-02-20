@@ -89,6 +89,7 @@
   included_geographic_units: [CHE]
   population: 8697723
   land_area: 39516.03
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 0
@@ -110,7 +111,7 @@
       pv: 0
       onshore: 0
       offshore: 0
-    potential:
+    potential: {}
 - name: Czechia
   nuts2: CZ
   alpha3: CZE
@@ -119,6 +120,7 @@
   included_geographic_units: [CZE]
   population: 10703446
   land_area: 77198.53
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 2053
@@ -186,6 +188,7 @@
   excluded_geographic_subunits: [ESC]
   population: 47326687
   land_area: 499556.645
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 14640
@@ -337,6 +340,7 @@
   included_geographic_units: [LUX]
   population: 639070
   land_area: 2574.46
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 258
@@ -408,7 +412,7 @@
       pv: 0
       onshore: 0
       offshore: 0
-    potential:
+    potential: {}
 - name: Netherlands
   nuts2: NL
   alpha3: NLD
@@ -468,6 +472,7 @@
   included_geographic_units: [PRX]
   population: 10299423
   land_area: 91605.6
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 1032
@@ -517,6 +522,7 @@
   included_geographic_units: [SWE]
   population: 10415811
   land_area: 407283.532
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 0
@@ -533,6 +539,7 @@
   included_geographic_units: [SVN]
   population: 2107007
   land_area: 20136.4
+  annual_hydrogen_demand: 10000
   capacity:
     current:
       pv: 286
@@ -588,7 +595,7 @@
       pv: 5363
       onshore: 1111
       offshore: 0
-    potential:
+    potential: {}
 - name: United Kingdom
   nuts2: UK
   alpha3: GBR
