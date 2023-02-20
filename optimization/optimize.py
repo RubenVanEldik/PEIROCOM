@@ -617,7 +617,7 @@ def optimize(config, *, status, output_directory):
 
     # Don't store the results if the optimization ended with an error
     if error_message is not None:
-        return {"duration": duration, "error_message": error_message}
+        return error_message
 
     """
     Step 11: Store the results
@@ -673,5 +673,5 @@ def optimize(config, *, status, output_directory):
     storing_end = datetime.now()
     duration["storing"] = (storing_end - storing_start).total_seconds()
 
-    # Return with the duration dictionary
-    return {"duration": duration}
+    # Store the duration after the optimization
+    duration.to_csv(output_directory / "duration.csv")
