@@ -27,14 +27,10 @@ def run(config, *, status=None, output_directory):
     if status is None:
         status = Status()
 
-    results = optimize(config, status=status, output_directory=output_directory)
-
-    # Store the duration after the optimization
-    results["duration"].to_csv(output_directory / "duration.csv")
+    error_message = optimize(config, status=status, output_directory=output_directory)
 
     # Stop the run if an error occured during the optimization
-    error_message = results.get("error_message")
-    if error_message:
+    if error_message is not None:
         status.update(error_message, status_type="error")
         if config["send_notification"]:
             utils.send_notification(error_message)
