@@ -14,6 +14,7 @@ class Chart:
         figure_width = 12 if wide else 6
         figure_height = 4
         self.fig, self.ax = plt.subplots(figsize=(figure_width, figure_height))
+        self.fig.tight_layout()
 
         # Set the axes' labels and scale and remove the top and right spine
         self.ax.set(xlabel=xlabel)
