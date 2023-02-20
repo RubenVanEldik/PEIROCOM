@@ -564,11 +564,14 @@ def optimize(config, *, status, output_directory):
     # Run the optimization
     run_optimization(model)
 
+    # Initialize the 'model' subdirectory
+    (output_directory / "model").mkdir()
+
     # Store the LP model and optimization log
-    utils.write_text(output_directory / "log.txt", "".join(log_messages))
+    utils.write_text(output_directory / "model" / "log.txt", "".join(log_messages))
     if config["optimization"]["store_model"]:
-        model.write(f"{output_directory}/model.mps")
-        model.write(f"{output_directory}/parameters.prm")
+        model.write(f"{output_directory}/model/model.mps")
+        model.write(f"{output_directory}/model/parameters.prm")
 
     # Store the quality attributes
     quality = {}
@@ -579,7 +582,7 @@ def optimize(config, *, status, output_directory):
                 quality[column_name][quality_attribute] = model.getAttr(f"{quality_attribute}{appendix}")
             except AttributeError:
                 quality[column_name][quality_attribute] = None
-    pd.DataFrame(quality).to_csv(output_directory / "quality.csv")
+    pd.DataFrame(quality).to_csv(output_directory / "model" / "quality.csv")
 
     # Add the optimizing duration to the dictionary
     optimizing_end = datetime.now()
@@ -674,4 +677,4 @@ def optimize(config, *, status, output_directory):
     duration["storing"] = (storing_end - storing_start).total_seconds()
 
     # Store the duration after the optimization
-    duration.to_csv(output_directory / "duration.csv")
+    duration.to_csv(output_directory / "model" / "duration.csv")

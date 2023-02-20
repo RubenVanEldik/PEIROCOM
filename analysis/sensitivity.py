@@ -138,7 +138,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         sensitivity_plot.ax.set_ylabel(f"Storage capacity ({unit})")
         sensitivity_plot.ax.legend()
     if statistic_name == "optimization_duration":
-        data = steps.apply(lambda step: utils.read_csv(output_directory / step / "duration.csv", index_col=0).sum(axis=1)) / 3600
+        data = steps.apply(lambda step: utils.read_csv(output_directory / step / "model" / "duration.csv", index_col=0).sum(axis=1)) / 3600
         cumulative_data = 0
         for index, column_name in enumerate(data.columns):
             cumulative_data += data[column_name]

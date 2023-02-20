@@ -13,7 +13,7 @@ def optimization_log(output_directory):
     st.title("📜 Optimization log")
 
     # Read the log
-    log = utils.read_text(output_directory / "log.txt")
+    log = utils.read_text(output_directory / "model" / "log.txt")
 
     # Display the log as a code block
     st.code(log)
