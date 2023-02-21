@@ -369,8 +369,8 @@ def optimize(config, *, status, output_directory):
         country_flag = utils.get_country_property(utils.get_country_of_bidding_zone(bidding_zone), "flag")
         status.update(f"{country_flag} Adding demand constraints")
 
-        # Create a dictionary to keep track of the net export per interconnection type
-        net_export_per_interconnection_type = {interconnection_type: 0 for interconnection_type in temporal_export}
+        # Add a column for the total temporal export
+        temporal_results[bidding_zone]["net_export_MW"] = 0
 
         # Add a column for the temporal export to each country
         for interconnection_type in temporal_export:
@@ -381,7 +381,7 @@ def optimize(config, *, status, output_directory):
                 export_flow = direction * temporal_export[interconnection_type][bidding_zone1, bidding_zone2]
 
                 # Add the export flow to the interconnection type dictionary
-                net_export_per_interconnection_type[interconnection_type] += export_flow
+                temporal_results[bidding_zone]["net_export_MW"] += export_flow
 
                 # Add the export flow to the relevant bidding zone column
                 other_bidding_zone = bidding_zone1 if bidding_zone2 == bidding_zone else bidding_zone2
@@ -389,16 +389,6 @@ def optimize(config, *, status, output_directory):
                 if column_name not in temporal_results:
                     temporal_results[bidding_zone][column_name] = 0
                 temporal_results[bidding_zone][column_name] += export_flow
-
-        # Add a column for each of the interconnection types
-        for interconnection_type in net_export_per_interconnection_type:
-            temporal_results[bidding_zone][f"net_export_{interconnection_type}_MW"] = net_export_per_interconnection_type[interconnection_type]
-
-        # Add a column for the total temporal export
-        temporal_results[bidding_zone]["net_export_MW"] = 0
-        for column_name in temporal_results[bidding_zone]:
-            if re.search("^net_export_[A-Z]{2}[0-9a-zA-Z]{2}_MW$", column_name):
-                temporal_results[bidding_zone]["net_export_MW"] += temporal_results[bidding_zone][column_name]
 
         # Add the demand constraint
         temporal_results[bidding_zone].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_total_MW), axis=1)
