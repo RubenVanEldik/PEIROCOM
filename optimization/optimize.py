@@ -491,6 +491,9 @@ def optimize(config, *, status, output_directory):
     status.update("Optimizing")
     optimizing_start = datetime.now()
 
+    # Initialize the 'model' subdirectory
+    (output_directory / "model").mkdir()
+
     # Create the optimization log expander
     with st.expander("Optimization log"):
         # Create three columns for statistics
@@ -527,6 +530,9 @@ def optimize(config, *, status, output_directory):
             # Show the log message in the UI or console
             info.code("".join(log_messages))
 
+            # Add the log message line to log.txt
+            utils.write_text(output_directory / "model" / "log.txt", log_message, mode="a", exist_ok=True)
+
     def run_optimization(model):
         """
         Run the optimization model recursively
@@ -554,11 +560,7 @@ def optimize(config, *, status, output_directory):
     # Run the optimization
     run_optimization(model)
 
-    # Initialize the 'model' subdirectory
-    (output_directory / "model").mkdir()
-
     # Store the LP model and optimization log
-    utils.write_text(output_directory / "model" / "log.txt", "".join(log_messages))
     if config["optimization"]["store_model"]:
         model.write(f"{output_directory}/model/model.mps")
         model.write(f"{output_directory}/model/parameters.prm")
