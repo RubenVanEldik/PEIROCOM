@@ -65,7 +65,7 @@ def optimize(config, *, status, output_directory):
     """
     Step 3: Initialize each bidding zone
     """
-    # Create dictionaries to store all the data per bidding zone
+    # Create the variables to store the various data per bidding zone
     temporal_ires = {}
     temporal_results = {}
     temporal_export = {}
@@ -153,6 +153,7 @@ def optimize(config, *, status, output_directory):
 
         # Add the total net generation and total reservoir columns to the results DataFrame
         temporal_results[bidding_zone]["generation_total_hydropower_MW"] = 0
+        temporal_results[bidding_zone]["spillage_total_hydropower_MW"] = 0
         temporal_results[bidding_zone]["energy_stored_total_hydropower_MWh"] = 0
 
         for hydropower_technology in config["technologies"]["hydropower"]:
@@ -220,6 +221,10 @@ def optimize(config, *, status, output_directory):
             temporal_results[bidding_zone][f"generation_{hydropower_technology}_hydropower_MW"] = net_flow
             temporal_results[bidding_zone]["generation_total_hydropower_MW"] += net_flow
 
+            # Create the the hydropower spillage variables and add them to the temporal_results DataFrame (probably only required for Portugal)
+            spillage_MW = pd.Series(model.addVars(temporal_hydropower_data.index))
+            temporal_results[bidding_zone]["spillage_total_hydropower_MW"] += spillage_MW
+
             # Loop over all hours
             reservoir_previous = None
             temporal_reservoir_dict = {}
@@ -237,7 +242,7 @@ def optimize(config, *, status, output_directory):
 
                 # Add the reservoir level constraint with regard to the previous timestamp
                 if reservoir_previous:
-                    model.addConstr(reservoir_current == reservoir_previous + (inflow_MW[timestamp] - turbine_flow[timestamp] / efficiency + pump_flow[timestamp] * efficiency) * interval_length)
+                    model.addConstr(reservoir_current == reservoir_previous + (inflow_MW[timestamp] - spillage_MW[timestamp] - turbine_flow[timestamp] / efficiency + pump_flow[timestamp] * efficiency) * interval_length)
 
                 # Add the current reservoir level to temporal_reservoir_dict
                 temporal_reservoir_dict[timestamp] = reservoir_current
@@ -470,6 +475,11 @@ def optimize(config, *, status, output_directory):
     # Calculate the annual electricity costs
     annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, None, config=config, annual_costs=True)
 
+    # Calculate the total spillage and give it an artificial cost (this is required because otherwise some of the curtailment might be accounted as spillage)
+    total_spillage_hydropower_MWh = utils.merge_dataframes_on_column(temporal_results, "spillage_total_hydropower_MW").sum().sum() * interval_length
+    artificial_spillage_cost_factor = 100
+    total_spillage_costs = total_spillage_hydropower_MWh * artificial_spillage_cost_factor
+
     # Calculate the annual electrolyzer costs (don't include electricity costs as this is already included in the electricity costs calculation above)
     if include_hydrogen_production:
         annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=1, annual_costs=True).electrolyzer
@@ -477,7 +487,7 @@ def optimize(config, *, status, output_directory):
         annual_electrolyzer_costs = 0
 
     # Set the objective to the annual system costs
-    annualized_system_costs = annual_electricity_costs + annual_electrolyzer_costs
+    annualized_system_costs = annual_electricity_costs + annual_electrolyzer_costs + total_spillage_costs
     model.setObjective(annualized_system_costs, gp.GRB.MINIMIZE)
 
     # Add the initializing duration to the dictionary
