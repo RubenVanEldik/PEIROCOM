@@ -5,42 +5,43 @@ import utils
 import validate
 
 
-def _calculate_scenario_costs(assumptions, variable, scenario_level):
+def _calculate_scenario_costs(assumptions, variable, technology_scenario):
     """
-    Calculate the costs for a given scenario level
+    Calculate the costs for a given technology scenario
     """
     assert validate.is_dict(assumptions)
     assert validate.is_string(variable)
-    assert validate.is_number(scenario_level, min_value=-1, max_value=1)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
-    if scenario_level == -1:
+    if technology_scenario == -1:
         return assumptions["conservative"][variable]
-    elif scenario_level == 0:
+    elif technology_scenario == 0:
         return assumptions["moderate"][variable]
-    elif scenario_level == 1:
+    elif technology_scenario == 1:
         return assumptions["advanced"][variable]
-    elif scenario_level > 0:
-        return (1 - scenario_level) * assumptions["moderate"][variable] + scenario_level * assumptions["advanced"][variable]
-    elif scenario_level < 0:
-        return (1 + scenario_level) * assumptions["moderate"][variable] - scenario_level * assumptions["conservative"][variable]
+    elif technology_scenario > 0:
+        return (1 - technology_scenario) * assumptions["moderate"][variable] + technology_scenario * assumptions["advanced"][variable]
+    elif technology_scenario < 0:
+        return (1 + technology_scenario) * assumptions["moderate"][variable] - technology_scenario * assumptions["conservative"][variable]
 
 
-def _calculate_annualized_electrolyzer_costs(electrolysis_technologies, electrolyzer_capacity_MW):
+def _calculate_annualized_electrolyzer_costs(electrolysis_technologies, electrolyzer_capacity_MW, *, technology_scenario):
     """
     Calculate the annualized electrolyzer costs
     """
-    assert validate.is_dict(electrolysis_technologies)
+    assert validate.is_list_like(electrolysis_technologies)
     assert validate.is_series(electrolyzer_capacity_MW)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
     # Read the electrolysis assumptions
     electrolysis_assumptions = utils.get_technologies(technology_type="electrolysis")
 
     # Calculate the total annual costs
     annualized_costs_electrolyzer = pd.Series([], dtype="float64")
-    for technology, scenario_level in electrolysis_technologies.items():
+    for technology in electrolysis_technologies:
         capacity_kW = electrolyzer_capacity_MW[technology] * 1000
-        capex = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "capex", scenario_level)
-        fixed_om = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "fixed_om", scenario_level)
+        capex = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "capex", technology_scenario)
+        fixed_om = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "fixed_om", technology_scenario)
         crf = utils.calculate_crf(electrolysis_assumptions[technology]["wacc"], electrolysis_assumptions[technology]["economic_lifetime"])
         annualized_costs_electrolyzer[technology] = crf * capex + fixed_om
 
@@ -73,6 +74,9 @@ def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs,
     assert validate.is_breakdown_level(breakdown_level)
     assert validate.is_bool(annual_costs)
 
+    # Get the technology scenario
+    technology_scenario = config["technologies"]["scenario"]
+
     # Get the electrolysis assumptions
     electrolysis_assumptions = utils.get_technologies(technology_type="electrolysis")
 
@@ -81,7 +85,7 @@ def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs,
     annual_hydrogen_production = 0
     for market_node in electrolysis_capacity.index:
         # Calculate the annualized electrolyzer costs
-        annualized_electrolyzer_costs += _calculate_annualized_electrolyzer_costs(config["technologies"]["electrolysis"], electrolysis_capacity.loc[market_node])
+        annualized_electrolyzer_costs += _calculate_annualized_electrolyzer_costs(config["technologies"]["electrolysis"], electrolysis_capacity.loc[market_node], technology_scenario=technology_scenario)
 
         # Calculate the annual electricity demand and electricity costs for electrolysis
         if electricity_demand is not None:

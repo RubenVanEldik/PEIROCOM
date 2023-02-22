@@ -65,11 +65,8 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
     # Add the output for the sensitivity steps to the sensitivity plot
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"]:
         # Ask for the breakdown level
-        if sensitivity_config["analysis_type"] == "technology_scenario":
-            breakdown_level = 0
-        else:
-            breakdown_level_options = {0: "Off", 1: "Technology types", 2: "Technologies"}
-            breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
+        breakdown_level_options = {0: "Off", 1: "Technology types", 2: "Technologies"}
+        breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
 
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
@@ -83,7 +80,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             data = _retrieve_statistics(steps, "premium", output_directory, breakdown_level=breakdown_level)
 
         # Plot the data depending on the breakdown level
-        if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
+        if breakdown_level == 0:
             if st.sidebar.checkbox("Fit a curve on the data"):
                 sensitivity_plot.ax.scatter(data.index, data, label=label, color=colors.primary(alpha=0.5), linewidths=0)
                 try:
@@ -167,21 +164,12 @@ def sensitivity(output_directory):
     sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")
 
     # Select an output variable to run the sensitivity analysis on
-    statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment"]
-    if sensitivity_config["analysis_type"] != "technology_scenario":
-        statistic_options += ["ires_capacity", "storage_capacity", "optimization_duration"]
+    statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment", "ires_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
     # Plot the data
     sensitivity_plot = chart.Chart(xlabel=None, ylabel=None)
-    if sensitivity_config["analysis_type"] == "technology_scenario":
-        sensitivity_data = pd.DataFrame()
-        for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
-            label = utils.format_technology(technology_name)
-            line_color = colors.technology(technology_name)
-            sensitivity_data[technology_name] = _plot(output_directory / technology_name, sensitivity_config, sensitivity_plot, statistic_name, label=label, line_color=line_color)
-    else:
-        sensitivity_data = _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name)
+    sensitivity_data = _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)

@@ -63,14 +63,14 @@ with st.sidebar.expander("Technologies"):
 
     # Select the scenario
     scenario_levels = {-1: "Conservative", 0: "Moderate", 1: "Advanced"}
-    scenario_level = st.select_slider("Scenario", options=scenario_levels.keys(), value=0, format_func=lambda key: scenario_levels[key])
+    config["technologies"]["scenario"] = st.select_slider("Scenario", options=scenario_levels.keys(), value=0, format_func=lambda key: scenario_levels[key])
 
     # Select the technologies
     technology_types = ["ires", "hydropower", "storage", "electrolysis"]
     technology_type_tabs = st.tabs([utils.format_str(technology_type) for technology_type in technology_types])
     for technology_type, technology_type_tab in zip(technology_types, technology_type_tabs):
         # Initialize the dictionary for the technology
-        config["technologies"][technology_type] = {}
+        config["technologies"][technology_type] = []
 
         # Get all technology options for this technology
         technology_options = utils.get_technologies(technology_type=technology_type).keys()
@@ -83,7 +83,7 @@ with st.sidebar.expander("Technologies"):
         # Create a checkbox for each technology option
         for technology in technology_options:
             if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
-                config["technologies"][technology_type][technology] = scenario_level
+                config["technologies"][technology_type].append(technology)
 
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):
@@ -128,10 +128,6 @@ with st.sidebar.expander("Sensitivity analysis"):
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitity_steps = np.linspace(start=-1, stop=1, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
-        # Select the technologies
-        technology_names = {technology_name: technology_type for technology_type in ["ires", "storage"] for technology_name in config["technologies"][technology_type]}
-        selected_technologies = st.multiselect("Technologies", technology_names, format_func=utils.format_technology)
-        sensitivity_config["technologies"] = {technology_name: technology_names[technology_name] for technology_name in selected_technologies}
     elif sensitivity_analysis_type == "hydrogen_demand":
         sensitivity_start, sensitivity_stop = st.slider("Relative hydrogen demand range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
