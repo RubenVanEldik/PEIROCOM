@@ -2,7 +2,7 @@
   nuts2: LB
   alpha3: LBK
   flag: 🏳️‍🌈
-  bidding_zones: [LB00, LB01, LB02, LB03, LB04, LB05, LB06, LB07, LB08, LB09]
+  market_nodes: [LB00, LB01, LB02, LB03, LB04, LB05, LB06, LB07, LB08, LB09]
   included_geographic_units: []
   population: 6985 # 2022
   annual_hydrogen_demand: 0
@@ -18,7 +18,7 @@
   nuts2: NL
   alpha3: NLD
   flag: 🇳🇱
-  bidding_zones: [NL00]
+  market_nodes: [NL00]
   included_geographic_units: [NLX]
   population: 17533405
   land_area: 33670

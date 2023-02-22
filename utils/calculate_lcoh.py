@@ -64,10 +64,10 @@ def _calculate_annual_electricity_demand(demand_MW, electricity_costs):
 
 def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs, *, config, breakdown_level=0, annual_costs=False):
     """
-    Calculate the average Levelized Costs of Hydrogen for all bidding zones
+    Calculate the average Levelized Costs of Hydrogen for all market nodes
     """
     assert validate.is_dataframe(electrolysis_capacity)
-    assert validate.is_bidding_zone_dict(electricity_demand, required=not annual_costs)
+    assert validate.is_market_node_dict(electricity_demand, required=not annual_costs)
     assert validate.is_number(electricity_costs, required=electricity_demand is not None)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
@@ -79,20 +79,20 @@ def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs,
     annualized_electrolyzer_costs = 0
     annualized_electricity_costs = 0
     annual_hydrogen_production = 0
-    for bidding_zone in electrolysis_capacity.index:
+    for market_node in electrolysis_capacity.index:
         # Calculate the annualized electrolyzer costs
-        annualized_electrolyzer_costs += _calculate_annualized_electrolyzer_costs(config["technologies"]["electrolysis"], electrolysis_capacity.loc[bidding_zone])
+        annualized_electrolyzer_costs += _calculate_annualized_electrolyzer_costs(config["technologies"]["electrolysis"], electrolysis_capacity.loc[market_node])
 
         # Calculate the annual electricity demand and electricity costs for electrolysis
         if electricity_demand is not None:
-            annual_electricity_demand_bidding_zone = _calculate_annual_electricity_demand(electricity_demand[bidding_zone], electricity_costs)
+            annual_electricity_demand_market_node = _calculate_annual_electricity_demand(electricity_demand[market_node], electricity_costs)
 
             # Calculate the annual hydrogen production
             for electrolysis_technology in electrolysis_assumptions:
-                annual_hydrogen_production += annual_electricity_demand_bidding_zone[electrolysis_technology] * electrolysis_assumptions[electrolysis_technology]["efficiency"]
+                annual_hydrogen_production += annual_electricity_demand_market_node[electrolysis_technology] * electrolysis_assumptions[electrolysis_technology]["efficiency"]
 
             # Add the annualized electrolyzer and electricity costs
-            annualized_electricity_costs += annual_electricity_demand_bidding_zone * electricity_costs
+            annualized_electricity_costs += annual_electricity_demand_market_node * electricity_costs
         else:
             annualized_electricity_costs = pd.Series(0, index=electrolysis_assumptions.keys())
 

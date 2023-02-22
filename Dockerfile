@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 # Copy the application code
 COPY . /app
 
-# Download and unzip the bidding zone and interconnection data
+# Download and unzip the market node and interconnection data
 RUN bash scripts/download_input.sh
 
 # Generate the Gurobi license file

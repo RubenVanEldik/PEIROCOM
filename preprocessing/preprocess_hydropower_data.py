@@ -49,10 +49,10 @@ def preprocess_hydropower_data(scenarios):
     assert validate.is_list_like(scenarios)
 
     for scenario in scenarios:
-        # Get a list of all bidding zones with hydropower data
+        # Get a list of all market nodes with hydropower data
         filepath_hydropower = utils.path("input", "eraa", "Climate Data", f"PEMMDB_XX00_Hydro Inflow_{scenario['year']}")
         filename_regex = "^PEMMDB_([A-Z]{2}[0-9A-Z]{2})_Hydro Inflow_\d{4}.xlsx$"
-        bidding_zones = sorted([re.search(filename_regex, filename.name).group(1) for filename in filepath_hydropower.iterdir() if re.search(filename_regex, filename.name)])
+        market_nodes = sorted([re.search(filename_regex, filename.name).group(1) for filename in filepath_hydropower.iterdir() if re.search(filename_regex, filename.name)])
 
         # Loop over each hydropower type
         for hydropower_technology in [{"name": "run_of_river", "sheet_name": "Run-of-River and pondage", "interval": "d"}, {"name": "reservoir", "sheet_name": "Reservoir", "interval": "w"}, {"name": "pumped_storage_open", "sheet_name": "Pump storage - Open Loop", "interval": "w"}, {"name": "pumped_storage_closed", "sheet_name": "Pump Storage - Closed Loop", "interval": "w"}]:
@@ -64,16 +64,16 @@ def preprocess_hydropower_data(scenarios):
             utils.path("input", "scenarios", scenario["name"], "hydropower", hydropower_technology["name"]).mkdir(parents=True, exist_ok=True)
 
             #
-            for bidding_zone in bidding_zones:
-                with st.spinner(f"Importing {bidding_zone} ({utils.format_str(hydropower_technology['name'])})"):
+            for market_node in market_nodes:
+                with st.spinner(f"Importing {market_node} ({utils.format_str(hydropower_technology['name'])})"):
                     # Load the Excel file and get the sheet for the current hydropower technology
-                    wb = openpyxl.load_workbook(filepath_hydropower / f"PEMMDB_{bidding_zone}_Hydro Inflow_{scenario['year']}.xlsx", data_only=True)
+                    wb = openpyxl.load_workbook(filepath_hydropower / f"PEMMDB_{market_node}_Hydro Inflow_{scenario['year']}.xlsx", data_only=True)
                     sheet = wb[hydropower_technology["sheet_name"]]
 
                     # Retrieve the capacities
-                    capacity.loc[bidding_zone, "turbine"] = sheet["C6"].value if sheet["C6"].value is not None else 0
-                    capacity.loc[bidding_zone, "pump"] = abs(sheet["C5"].value) if sheet["C5"].value is not None else 0  # Use absolute values as some pump capacities are specified as negative and others as positive values
-                    capacity.loc[bidding_zone, "reservoir"] = sheet["C7"].value * 1000 if sheet["C7"].value is not None else 0
+                    capacity.loc[market_node, "turbine"] = sheet["C6"].value if sheet["C6"].value is not None else 0
+                    capacity.loc[market_node, "pump"] = abs(sheet["C5"].value) if sheet["C5"].value is not None else 0  # Use absolute values as some pump capacities are specified as negative and others as positive values
+                    capacity.loc[market_node, "reservoir"] = sheet["C7"].value * 1000 if sheet["C7"].value is not None else 0
 
                     # Create a DataFrame for the temporal data
                     temporal_data = pd.DataFrame()
@@ -97,8 +97,8 @@ def preprocess_hydropower_data(scenarios):
                     temporal_data["max_reservoir_soc"] = _get_hydropower_series(sheet, min_row=min_row, max_row=max_row, min_col=412, max_col=447, interval=hydropower_technology["interval"])
 
                     # Store the temporal data
-                    temporal_data.to_csv(directory / f"{bidding_zone}.csv")
+                    temporal_data.to_csv(directory / f"{market_node}.csv")
 
             # Store the capacities
             capacity.to_csv(directory / "capacity.csv")
-    st.success("The hydropower data for all bidding zones is succesfully preprocessed")
+    st.success("The hydropower data for all market nodes is succesfully preprocessed")

@@ -4,7 +4,7 @@
 
 The Pan-European Intermittent Renewable Overbuilding and Curtailment Optimization Model (PEIROCOM) is an optimization model for a fully intermittent renewable Pan-European electricity grid. The model aims to find the least-cost solution for the deployment of solar PV, wind energy and storage. By overbuilding generation capacity to some degree, significant less storage capacity is required, resulting in lower system costs.
 
-The demand, climate, and interconnection capacity data are from ENTSO-E's [2021 European Resource Adequacy Assessment (ERAA)](https://www.entsoe.eu/outlooks/eraa/2021/eraa-downloads/). The techno-economic data is from NREL's [Annual Technology Baseline](https://atb.nrel.gov/).
+The demand, IRES, hydropower, and interconnection capacity data are from ENTSO-E's [2021 European Resource Adequacy Assessment (ERAA)](https://www.entsoe.eu/outlooks/eraa/2021/eraa-downloads/). The techno-economic data is from NREL's [Annual Technology Baseline](https://atb.nrel.gov/).
 
 The source code of the model is hosted on [Github](https://github.com/RubenVanEldik/PEIROCOM).
 
@@ -36,7 +36,7 @@ PEIROCOM consists out of three sections, preprocessing, optimization, and analys
 
 ### Preprocessing
 
-The preprocessor only needs to be run once. It removes some irragularities and converts the hourly ERAA data in Excel to a single CSV file per bidding zone.
+The preprocessor only needs to be run once. It removes some irragularities and converts the hourly ERAA data in Excel to a single CSV file per market node.
 
 ### Optimization
 

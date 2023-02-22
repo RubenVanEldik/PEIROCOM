@@ -45,7 +45,8 @@ def run():
         st.dataframe(countries_df, height=600)
 
     if data_type == "technologies":
-        for technology_type in ["ires", "hydropower", "storage"]:
+        technology_types = utils.read_yaml(utils.path("input", "technologies.yaml")).keys()
+        for technology_type in technology_types:
             st.header(utils.format_str(f"{technology_type}_technologies"))
 
             # Read the technology data and convert it to a DataFrame
@@ -86,15 +87,15 @@ def run():
         # Select the model year
         scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
 
-        # Select the bidding zone
+        # Select the market node
         input_path = utils.path("input", "scenarios", scenario, "ires")
-        bidding_zones = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
-        bidding_zone = st.sidebar.selectbox("Bidding zone", bidding_zones)
+        market_nodes = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
+        market_node = st.sidebar.selectbox("market node", market_nodes)
 
-        st.header(f"IRES capacity factors {bidding_zone}")
+        st.header(f"IRES capacity factors {market_node}")
 
         # Read the temporal data
-        ires_df = utils.read_temporal_data(input_path / f"{bidding_zone}.csv")
+        ires_df = utils.read_temporal_data(input_path / f"{market_node}.csv")
 
         # Format the index and column names and show the DataFrame
         ires_df.index = ires_df.index.strftime("%Y-%m-%d %H:%M UTC")
@@ -108,33 +109,33 @@ def run():
         hydropower_technologies = pd.DataFrame(utils.get_technologies(technology_type="hydropower")).columns
         hydropower_technology = st.sidebar.selectbox("Technology", hydropower_technologies, format_func=utils.format_str)
 
-        # Select the bidding zone
+        # Select the market node
         input_path = utils.path("input", "scenarios", scenario, "hydropower", hydropower_technology)
-        bidding_zones = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
-        bidding_zone = st.sidebar.selectbox("Bidding zone", bidding_zones)
+        market_nodes = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
+        market_node = st.sidebar.selectbox("market node", market_nodes)
 
-        st.header(f"Bidding zone {bidding_zone}")
+        st.header(f"market node {market_node}")
 
         # Read and show the capacity data
-        capacity = utils.read_csv(input_path / "capacity.csv", index_col=0).loc[bidding_zone]
+        capacity = utils.read_csv(input_path / "capacity.csv", index_col=0).loc[market_node]
         col1, col2, col3 = st.columns(3)
         col1.metric("Turbine capacity", f"{capacity['turbine']:,.0f}MW")
         col2.metric("Pump capacity", f"{capacity['pump']:,.0f}MW")
         col3.metric("Reservoir capacity", f"{capacity['reservoir'] / 1000:,.0f}GWh")
 
         # Read the temporal data
-        bidding_zone_df = utils.read_temporal_data(input_path / f"{bidding_zone}.csv")
+        market_node_df = utils.read_temporal_data(input_path / f"{market_node}.csv")
 
         # Format the index and column names and show the DataFrame
-        bidding_zone_df.index = bidding_zone_df.index.strftime("%Y-%m-%d %H:%M UTC")
-        bidding_zone_df.columns = [utils.format_column_name(column_name) for column_name in bidding_zone_df.columns]
-        st.dataframe(bidding_zone_df, height=600)
+        market_node_df.index = market_node_df.index.strftime("%Y-%m-%d %H:%M UTC")
+        market_node_df.columns = [utils.format_column_name(column_name) for column_name in market_node_df.columns]
+        st.dataframe(market_node_df, height=600)
 
     if data_type == "interconnections":
         # Select the model year
         scenario = st.sidebar.selectbox("Scenario", utils.get_scenarios())
 
-        # Select the bidding zone
+        # Select the market node
         interconnection_type = st.sidebar.selectbox("Interconnection type", ["hvac", "hvdc"], format_func=utils.format_str)
 
         st.header(utils.format_str(f"{interconnection_type}_interconnection_capacities"))
@@ -144,7 +145,7 @@ def run():
 
         # Format the index and column names and show the DataFrame
         interconnection_typedf.index = interconnection_typedf.index.strftime("%Y-%m-%d %H:%M UTC")
-        interconnection_typedf.columns = [f"{from_bidding_zone} > {to_bidding_zone}" for from_bidding_zone, to_bidding_zone in interconnection_typedf.columns]
+        interconnection_typedf.columns = [f"{from_market_node} > {to_market_node}" for from_market_node, to_market_node in interconnection_typedf.columns]
         st.dataframe(interconnection_typedf, height=600)
 
 

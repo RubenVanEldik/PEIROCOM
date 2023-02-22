@@ -27,11 +27,11 @@ def _read_and_map_export_limits(*, scenario, connection_type, timestamps):
     return timestamps.apply(lambda timestamp: export_limits.loc[timestamp.replace(year=year)])
 
 
-def get_export_limits(bidding_zone, *, config, connection_type, index, direction="export"):
+def get_export_limits(market_node, *, config, connection_type, index, direction="export"):
     """
-    Find the relevant export limits for a bidding zone
+    Find the relevant export limits for a market node
     """
-    assert validate.is_bidding_zone(bidding_zone)
+    assert validate.is_market_node(market_node)
     assert validate.is_config(config)
     assert validate.is_interconnection_type(connection_type)
     assert validate.is_datetime_index(index)
@@ -41,8 +41,8 @@ def get_export_limits(bidding_zone, *, config, connection_type, index, direction
     export_limits = _read_and_map_export_limits(scenario=config["scenario"], connection_type=connection_type, timestamps=index.to_series())
 
     relevant_interconnections = []
-    for zone in utils.get_bidding_zones_for_countries(config["country_codes"]):
-        interconnection = (bidding_zone, zone) if direction == "export" else (zone, bidding_zone)
+    for node in utils.get_market_nodes_for_countries(config["country_codes"]):
+        interconnection = (market_node, node) if direction == "export" else (node, market_node)
         if interconnection in export_limits.columns:
             relevant_interconnections.append(interconnection)
     return export_limits[relevant_interconnections]

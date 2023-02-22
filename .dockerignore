@@ -8,6 +8,6 @@ __pycache__
 *.pyd
 
 input/eraa
-input/bidding_zones/
+input/market_nodes/
 input/interconnections/
 output

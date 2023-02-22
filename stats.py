@@ -41,8 +41,8 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Set the storage capacity to zero
-    for bidding_zone in storage_capacity:
-        storage_capacity[bidding_zone] = 0 * storage_capacity[bidding_zone]
+    for market_node in storage_capacity:
+        storage_capacity[market_node] = 0 * storage_capacity[market_node]
 
     # Return the LCOE
     return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
@@ -88,7 +88,7 @@ def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysi
     config = utils.read_yaml(output_directory / "config.yaml")
     electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)[[electrolysis_technology]]
     temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    electrolysis_demand = {bidding_zone: temporal_results[bidding_zone][[f"demand_{electrolysis_technology}_MW"]] for bidding_zone in temporal_results}
+    electrolysis_demand = {market_node: temporal_results[market_node][[f"demand_{electrolysis_technology}_MW"]] for market_node in temporal_results}
     electricity_costs = firm_lcoe(output_directory, country_codes=country_codes, breakdown_level=breakdown_level)
 
     # Return the LCOE
