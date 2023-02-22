@@ -40,9 +40,15 @@ def interconnection_capacity(output_directory):
     # Get and sort all interconnections that got extra capacity
     interconnections_with_extra_capacity = data.sort_values("extra").tail(number_of_shown_interconnections)
 
+    # Set the interconnection capacity to GW if the maximum extra capacity exceeds 1 GW
+    unit = "MW"
+    if interconnections_with_extra_capacity.extra.max() > 1000:
+        interconnections_with_extra_capacity /= 1000
+        unit = "GW"
+
     # Create the bar chart
-    bar_chart = chart.Chart(xlabel="Extra capacity (GW)", ylabel="")
-    bar_chart.ax.barh(interconnections_with_extra_capacity.index, interconnections_with_extra_capacity.extra / 1000, color=colors.primary())
+    bar_chart = chart.Chart(xlabel=f"Extra capacity ({unit})", ylabel="")
+    bar_chart.ax.barh(interconnections_with_extra_capacity.index, interconnections_with_extra_capacity.extra, color=colors.primary())
 
     # Show the bar chart
     bar_chart.display()
