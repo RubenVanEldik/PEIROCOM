@@ -32,7 +32,7 @@ def interconnection_capacity(output_directory):
 
     # Group the data per connection
     data["new_index"] = data["from"] + " to " + data["to"]
-    data = data.groupby(["new_index"]).sum()
+    data = data.groupby(["new_index"]).sum(numeric_only=True)
 
     # Get and sort all interconnections that got extra capacity
     min_extra_capacity = 10
