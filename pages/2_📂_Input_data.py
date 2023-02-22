@@ -45,7 +45,8 @@ def run():
         st.dataframe(countries_df, height=600)
 
     if data_type == "technologies":
-        for technology_type in ["ires", "hydropower", "storage"]:
+        technology_types = utils.read_yaml(utils.path("input", "technologies.yaml")).keys()
+        for technology_type in technology_types:
             st.header(utils.format_str(f"{technology_type}_technologies"))
 
             # Read the technology data and convert it to a DataFrame
