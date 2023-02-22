@@ -130,18 +130,18 @@ def optimize(config, *, status, output_directory):
         for ires_technology in config["technologies"]["ires"]:
             status.update(f"{country_flag} Adding {utils.format_technology(ires_technology, capitalize=False)} generation")
 
-            # Create a capacity variable for each climate zone
-            climate_zones = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in temporal_ires[market_node].columns if column.startswith(f"{ires_technology}_")]
-            ires_potential = utils.get_ires_potential_in_climate_zone(market_node, ires_technology, config=config)
-            current_capacity = utils.get_current_ires_capacity_in_climate_zone(market_node, ires_technology, config=config)
-            capacities = model.addVars(climate_zones, lb=current_capacity, ub=ires_potential)
+            # Create a capacity variable for each IRES node
+            ires_nodes = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in temporal_ires[market_node].columns if column.startswith(f"{ires_technology}_")]
+            ires_potential = utils.get_potential_per_ires_node(market_node, ires_technology, config=config)
+            current_capacity = utils.get_current_capacity_per_ires_node(market_node, ires_technology, config=config)
+            capacities = model.addVars(ires_nodes, lb=current_capacity, ub=ires_potential)
 
             # Add the capacities to the ires_capacity DataFrame and calculate the temporal generation for a specific technology
             temporal_ires_generation = 0
-            for climate_zone, capacity in capacities.items():
-                ires_capacity[market_node].loc[climate_zone, ires_technology] = capacity
+            for ires_node, capacity in capacities.items():
+                ires_capacity[market_node].loc[ires_node, ires_technology] = capacity
                 # Apply is required, otherwise it will throw a ValueError if there are more than a few thousand rows (see https://stackoverflow.com/questions/64801287)
-                temporal_ires_generation += temporal_ires[market_node][f"{ires_technology}_{climate_zone}_cf"].apply(lambda cf: cf * capacity)
+                temporal_ires_generation += temporal_ires[market_node][f"{ires_technology}_{ires_node}_cf"].apply(lambda cf: cf * capacity)
             temporal_results[market_node][f"generation_{ires_technology}_MW"] = temporal_ires_generation
             temporal_results[market_node]["generation_ires_MW"] += temporal_ires_generation
 

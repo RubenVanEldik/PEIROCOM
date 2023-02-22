@@ -16,14 +16,14 @@ from .format_technology import format_technology
 from .get_market_nodes_for_countries import get_market_nodes_for_countries
 from .get_country_of_market_node import get_country_of_market_node
 from .get_country_property import get_country_property
-from .get_current_ires_capacity_in_climate_zone import get_current_ires_capacity_in_climate_zone
+from .get_current_capacity_per_ires_node import get_current_capacity_per_ires_node
 from .get_electrolysis_capacity import get_electrolysis_capacity
 from .get_env import get_env
 from .get_export_limits import get_export_limits
 from .get_geometries_of_countries import get_geometries_of_countries
 from .get_hydropower_capacity import get_hydropower_capacity
 from .get_ires_capacity import get_ires_capacity
-from .get_ires_potential_in_climate_zone import get_ires_potential_in_climate_zone
+from .get_potential_per_ires_node import get_potential_per_ires_node
 from .get_nested_key import get_nested_key
 from .get_next_run_name import get_next_run_name
 from .get_previous_runs import get_previous_runs

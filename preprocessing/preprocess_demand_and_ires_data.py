@@ -13,7 +13,7 @@ def _get_relevant_sheet_names(filepath, market_node):
     assert validate.is_filepath(filepath)
     assert validate.is_market_node(market_node)
 
-    def sheet_belongs_to_zone(sheet, market_node):
+    def sheet_belongs_to_node(sheet, market_node):
         """
         Check if a specific sheet belongs to a market node
         """
@@ -64,7 +64,7 @@ def _get_relevant_sheet_names(filepath, market_node):
         return False
 
     # Return a sorted list of all relevant sheet names
-    relevant_sheet_names = [sheet_name for sheet_name in pd.ExcelFile(filepath).sheet_names if sheet_belongs_to_zone(sheet_name, market_node)]
+    relevant_sheet_names = [sheet_name for sheet_name in pd.ExcelFile(filepath).sheet_names if sheet_belongs_to_node(sheet_name, market_node)]
     relevant_sheet_names.sort()
     return relevant_sheet_names
 
@@ -78,12 +78,12 @@ def _import_data(data, filepath, *, market_node, column_name=None):
     assert validate.is_market_node(market_node)
     assert validate.is_string(column_name)
 
-    climate_zones = _get_relevant_sheet_names(filepath, market_node)
-    for climate_zone in climate_zones:
-        # Import the Excel sheet for a climate zone
+    ires_nodes = _get_relevant_sheet_names(filepath, market_node)
+    for ires_node in ires_nodes:
+        # Import the Excel sheet for a IRES node
         usecols_func = lambda col: col in ["Date", "Hour"] or isinstance(col, int)
-        sheet = pd.read_excel(filepath, sheet_name=climate_zone, index_col=[0, 1], skiprows=10, usecols=usecols_func)
-        formatted_column_name = column_name.replace("{climate_zone}", climate_zone)
+        sheet = pd.read_excel(filepath, sheet_name=ires_node, index_col=[0, 1], skiprows=10, usecols=usecols_func)
+        formatted_column_name = column_name.replace("{ires_node}", ires_node)
 
         # Transform the sheet DataFrame to a Series with appropriate index
         new_column = pd.Series([], dtype="float64")
@@ -156,15 +156,15 @@ def preprocess_demand_and_ires_data(scenarios):
             with st.spinner(f"Preprocessing IRES data for {market_node} ({scenario['name']})"):
                 # Import PV data
                 filepath_pv = climate_directory / f"PECD_LFSolarPV_{scenario['year']}_edition 2021.3.xlsx"
-                ires_data = _import_data(None, filepath_pv, market_node=market_node, column_name="pv_{climate_zone}_cf")
+                ires_data = _import_data(None, filepath_pv, market_node=market_node, column_name="pv_{ires_node}_cf")
 
                 # Import onshore wind data
                 filepath_onshore = climate_directory / f"PECD_Onshore_{scenario['year']}_edition 2021.3.xlsx"
-                ires_data = _import_data(ires_data, filepath_onshore, market_node=market_node, column_name="onshore_{climate_zone}_cf")
+                ires_data = _import_data(ires_data, filepath_onshore, market_node=market_node, column_name="onshore_{ires_node}_cf")
 
                 # Import offshore wind data
                 filepath_offshore = climate_directory / f"PECD_Offshore_{scenario['year']}_edition 2021.3.xlsx"
-                ires_data = _import_data(ires_data, filepath_offshore, market_node=market_node, column_name="offshore_{climate_zone}_cf")
+                ires_data = _import_data(ires_data, filepath_offshore, market_node=market_node, column_name="offshore_{ires_node}_cf")
 
                 # Store the data in a CSV file
                 ires_data.to_csv(ires_directory / f"{market_node}.csv")

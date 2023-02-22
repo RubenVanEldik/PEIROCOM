@@ -2,9 +2,9 @@ import utils
 import validate
 
 
-def get_current_ires_capacity_in_climate_zone(market_node, ires_technology, *, config):
+def get_current_capacity_per_ires_node(market_node, ires_technology, *, config):
     """
-    Calculate the current ires capacity per climate zone for a specific market node and ires technology
+    Calculate the current ires capacity per IRES node for a specific market node and ires technology
     """
     assert validate.is_market_node(market_node)
     assert validate.is_technology(ires_technology)
@@ -18,15 +18,15 @@ def get_current_ires_capacity_in_climate_zone(market_node, ires_technology, *, c
     if current_capacity is None:
         return 0
 
-    # Calculate the number of climate zones in the country
-    climate_zone_count = 0
+    # Calculate the number of IRES nodes in the country
+    ires_node_count = 0
     for market_node_in_country in utils.get_country_property(country_code, "market_nodes"):
         ires_data = utils.read_temporal_data(utils.path("input", "scenarios", config["scenario"], "ires", f"{market_node_in_country}.csv"))
-        climate_zone_count += len([column for column in ires_data.columns if column.startswith(f"{ires_technology}_")])
+        ires_node_count += len([column for column in ires_data.columns if column.startswith(f"{ires_technology}_")])
 
-    # Return zero if there are no climate zones in the country for this technology (otherwise there will be a division by zero error in the final return statement)
-    if climate_zone_count == 0:
+    # Return zero if there are no IRES nodes in the country for this technology (otherwise there will be a division by zero error in the final return statement)
+    if ires_node_count == 0:
         return 0
 
-    # Return the current capacity in the country divided by the number of climate zones in the country
-    return current_capacity / climate_zone_count
+    # Return the current capacity in the country divided by the number of IRES nodes in the country
+    return current_capacity / ires_node_count
