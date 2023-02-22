@@ -26,21 +26,29 @@ def interconnection_capacity(output_directory):
     # Read the interconnection capacity
     data = utils.read_csv(output_directory / "capacity" / "interconnections" / f"{interconnection_type}.csv")
 
-    # Change the market nodes to countries
-    data["from"] = data["from"].apply(lambda market_node: utils.get_country_property(market_node[:2], "name"))
-    data["to"] = data["to"].apply(lambda market_node: utils.get_country_property(market_node[:2], "name"))
+    number_of_shown_interconnections = st.sidebar.slider("Number of interconnections shown", value=10, min_value=3, max_value=len(data.index))
+
+    if st.sidebar.checkbox("Aggregate per country"):
+        # Change the market nodes to countries
+        data["from"] = data["from"].apply(lambda market_node: utils.get_country_property(market_node[:2], "name"))
+        data["to"] = data["to"].apply(lambda market_node: utils.get_country_property(market_node[:2], "name"))
 
     # Group the data per connection
     data["new_index"] = data["from"] + " to " + data["to"]
-    data = data.groupby(["new_index"]).sum()
+    data = data.groupby(["new_index"]).sum(numeric_only=True)
 
     # Get and sort all interconnections that got extra capacity
-    min_extra_capacity = 10
-    interconnections_with_extra_capacity = data[data.extra > min_extra_capacity].sort_values("extra")
+    interconnections_with_extra_capacity = data.sort_values("extra").tail(number_of_shown_interconnections)
+
+    # Set the interconnection capacity to GW if the maximum extra capacity exceeds 1 GW
+    unit = "MW"
+    if interconnections_with_extra_capacity.extra.max() > 1000:
+        interconnections_with_extra_capacity /= 1000
+        unit = "GW"
 
     # Create the bar chart
-    bar_chart = chart.Chart(xlabel="Extra capacity (GW)", ylabel="")
-    bar_chart.ax.barh(interconnections_with_extra_capacity.index, interconnections_with_extra_capacity.extra / 1000, color=colors.primary())
+    bar_chart = chart.Chart(xlabel=f"Extra capacity ({unit})", ylabel="")
+    bar_chart.ax.barh(interconnections_with_extra_capacity.index, interconnections_with_extra_capacity.extra, color=colors.primary())
 
     # Show the bar chart
     bar_chart.display()
