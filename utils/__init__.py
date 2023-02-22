@@ -13,8 +13,8 @@ from .format_column_name import format_column_name
 from .format_resolution import format_resolution
 from .format_str import format_str
 from .format_technology import format_technology
-from .get_bidding_zones_for_countries import get_bidding_zones_for_countries
-from .get_country_of_bidding_zone import get_country_of_bidding_zone
+from .get_market_nodes_for_countries import get_market_nodes_for_countries
+from .get_country_of_market_node import get_country_of_market_node
 from .get_country_property import get_country_property
 from .get_current_ires_capacity_in_climate_zone import get_current_ires_capacity_in_climate_zone
 from .get_electrolysis_capacity import get_electrolysis_capacity

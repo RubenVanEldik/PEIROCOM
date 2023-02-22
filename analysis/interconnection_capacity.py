@@ -26,9 +26,9 @@ def interconnection_capacity(output_directory):
     # Read the interconnection capacity
     data = utils.read_csv(output_directory / "capacity" / "interconnections" / f"{interconnection_type}.csv")
 
-    # Change the bidding zones to countries
-    data["from"] = data["from"].apply(lambda bidding_zone: utils.get_country_property(bidding_zone[:2], "name"))
-    data["to"] = data["to"].apply(lambda bidding_zone: utils.get_country_property(bidding_zone[:2], "name"))
+    # Change the market nodes to countries
+    data["from"] = data["from"].apply(lambda market_node: utils.get_country_property(market_node[:2], "name"))
+    data["to"] = data["to"].apply(lambda market_node: utils.get_country_property(market_node[:2], "name"))
 
     # Group the data per connection
     data["new_index"] = data["from"] + " to " + data["to"]

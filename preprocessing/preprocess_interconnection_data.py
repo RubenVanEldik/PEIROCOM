@@ -57,7 +57,7 @@ def preprocess_interconnection_data(scenarios):
                     limits = pd.read_excel(filepath, sheet_name="Max limit", index_col=[0, 1], skiprows=9)
                     limits = limits.loc[:, ~limits.columns.str.contains("^Unnamed")]
                     limits = limits.drop(index=("Country Level Maximum NTC ", "UTC"))
-                    limits.columns = pd.MultiIndex.from_tuples([(bidding_zone, _format_export_limit_type(limit_type)) for bidding_zone, limit_type in limits.columns.str.split(" - ")])
+                    limits.columns = pd.MultiIndex.from_tuples([(market_node, _format_export_limit_type(limit_type)) for market_node, limit_type in limits.columns.str.split(" - ")])
                     limits = limits[sorted(limits.columns)]
                     limits.index = utils.create_datetime_index(limits.index, scenario["year"])
                     limits.to_csv(output_directory / "limits.csv")

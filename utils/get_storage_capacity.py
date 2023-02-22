@@ -16,21 +16,21 @@ def get_storage_capacity(output_directory, *, group=None, country_codes=None):
         config = utils.read_yaml(output_directory / "config.yaml")
         country_codes = config["country_codes"]
 
-    # Get the storage capacity for each bidding zone
+    # Get the storage capacity for each market node
     storage_capacity = {}
-    for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / "capacity" / "storage" / f"{bidding_zone}.csv"
-        storage_capacity[bidding_zone] = utils.read_csv(filepath, index_col=0)
+    for market_node in utils.get_market_nodes_for_countries(country_codes):
+        filepath = output_directory / "capacity" / "storage" / f"{market_node}.csv"
+        storage_capacity[market_node] = utils.read_csv(filepath, index_col=0)
 
-    # Return a dictionary with the storage capacity per bidding zone DataFrame if not grouped
+    # Return a dictionary with the storage capacity per market node DataFrame if not grouped
     if group is None:
         return storage_capacity
 
     # Return a dictionary with the storage capacity per country DataFrame
     if group == "country":
         storage_capacity_per_country = {}
-        for bidding_zone, storage_capacity_local in storage_capacity.items():
-            country_code = utils.get_country_of_bidding_zone(bidding_zone)
+        for market_node, storage_capacity_local in storage_capacity.items():
+            country_code = utils.get_country_of_market_node(market_node)
             if country_code not in storage_capacity_per_country:
                 storage_capacity_per_country[country_code] = storage_capacity_local.copy(deep=True)
             else:
@@ -40,7 +40,7 @@ def get_storage_capacity(output_directory, *, group=None, country_codes=None):
     # Return a DataFrame with the total storage capacity per technology
     if group == "all":
         total_storage_capacity = None
-        for bidding_zone, storage_capacity_local in storage_capacity.items():
+        for storage_capacity_local in storage_capacity.values():
             if total_storage_capacity is None:
                 total_storage_capacity = storage_capacity_local.copy(deep=True)
             else:

@@ -9,21 +9,21 @@ import shapely
 import chart
 
 
-def is_bidding_zone(value, *, required=True):
+def is_market_node(value, *, required=True):
     if value is None:
         return not required
 
     return bool(re.search("^[A-Z]{2}[0-9a-zA-Z]{2}$", value))
 
 
-def is_bidding_zone_list(value, *, required=True):
+def is_market_node_list(value, *, required=True):
     if value is None:
         return not required
 
     if type(value) is not list:
         return False
 
-    return all(is_bidding_zone(x) for x in value)
+    return all(is_market_node(x) for x in value)
 
 
 def is_bool(value, *, required=True):
@@ -33,14 +33,14 @@ def is_bool(value, *, required=True):
     return type(value) is bool
 
 
-def is_bidding_zone_dict(value, *, required=True):
+def is_market_node_dict(value, *, required=True):
     if value is None:
         return not required
 
     if not type(value) is dict and not isinstance(value, gp.tupledict):
         return False
 
-    return all(is_bidding_zone(x) for x in value.keys())
+    return all(is_market_node(x) for x in value.keys())
 
 
 def is_breakdown_level(value, *, required=True):
@@ -160,7 +160,7 @@ def is_country_obj(value, *, required=True):
     if not type(value) is dict:
         return False
 
-    return bool(value["name"] and value["bidding_zones"])
+    return bool(value["name"] and value["market_nodes"])
 
 
 def is_country_obj_list(value, *, required=True):
@@ -327,7 +327,7 @@ def is_interconnection_tuple(value, *, required=True):
     if type(value) is not tuple or len(value) != 2:
         return False
 
-    return is_bidding_zone(value[0]) and (is_bidding_zone(value[1]) or bool(re.search("^(gross|net)_(ex|im)port_limit$", value[1])))
+    return is_market_node(value[0]) and (is_market_node(value[1]) or bool(re.search("^(gross|net)_(ex|im)port_limit$", value[1])))
 
 
 def is_interconnection_type(value, *, required=True):

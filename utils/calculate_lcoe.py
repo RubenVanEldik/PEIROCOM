@@ -117,14 +117,14 @@ def _calculate_annual_demand(demand_MW):
     return demand_MW.sum() * timestep_hours / share_of_year_modelled
 
 
-def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_per_bidding_zone, *, config, breakdown_level=0, annual_costs=False):
+def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_per_market_node, *, config, breakdown_level=0, annual_costs=False):
     """
-    Calculate the average Levelized Costs of Electricity for all bidding zones
+    Calculate the average Levelized Costs of Electricity for all market nodes
     """
-    assert validate.is_bidding_zone_dict(ires_capacity)
-    assert validate.is_bidding_zone_dict(storage_capacity)
-    assert validate.is_bidding_zone_dict(hydropower_capacity)
-    assert validate.is_dataframe(demand_per_bidding_zone, column_validator=validate.is_bidding_zone, required=not annual_costs)
+    assert validate.is_market_node_dict(ires_capacity)
+    assert validate.is_market_node_dict(storage_capacity)
+    assert validate.is_market_node_dict(hydropower_capacity)
+    assert validate.is_dataframe(demand_per_market_node, column_validator=validate.is_market_node, required=not annual_costs)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
     assert validate.is_bool(annual_costs)
@@ -134,15 +134,15 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
     annualized_hydropower_costs = 0
     annual_electricity_demand = 0
 
-    for bidding_zone in ires_capacity.keys():
+    for market_node in ires_capacity.keys():
         # Add the annualized costs
-        annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[bidding_zone])
-        annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[bidding_zone])
-        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[bidding_zone])
+        annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node])
+        annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node])
+        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node])
 
         # Add the annual electricity demand
         if not annual_costs:
-            annual_electricity_demand += _calculate_annual_demand(demand_per_bidding_zone[bidding_zone])
+            annual_electricity_demand += _calculate_annual_demand(demand_per_market_node[market_node])
 
     # Calculate and return the LCOE
     if breakdown_level == 0:

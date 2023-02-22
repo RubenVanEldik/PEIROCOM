@@ -18,26 +18,26 @@ def get_temporal_results(output_directory, *, group=None, country_codes=None):
         config = utils.read_yaml(output_directory / "config.yaml")
         country_codes = config["country_codes"]
 
-    # Get the temporal data for each bidding zone
+    # Get the temporal data for each market node
     temporal_results = {}
-    for bidding_zone in utils.get_bidding_zones_for_countries(country_codes):
-        filepath = output_directory / "temporal" / "bidding_zones" / f"{bidding_zone}.csv"
-        temporal_results[bidding_zone] = utils.read_temporal_data(filepath)
+    for market_node in utils.get_market_nodes_for_countries(country_codes):
+        filepath = output_directory / "temporal" / "market_nodes" / f"{market_node}.csv"
+        temporal_results[market_node] = utils.read_temporal_data(filepath)
 
-        if temporal_results[bidding_zone].isnull().values.any():
-            st.warning(f"Bidding zone {bidding_zone} contains NaN values")
+        if temporal_results[market_node].isnull().values.any():
+            st.warning(f"market node {market_node} contains NaN values")
 
-    # Return all bidding zones individually if not grouped
+    # Return all market nodes individually if not grouped
     if group is None:
         return temporal_results
 
-    # Return the sum of all bidding zones per country
+    # Return the sum of all market nodes per country
     if group == "country":
         temporal_results_per_country = {}
-        for bidding_zone, temporal_results_local in temporal_results.items():
-            country_code = utils.get_country_of_bidding_zone(bidding_zone)
+        for market_node, temporal_results_local in temporal_results.items():
+            country_code = utils.get_country_of_market_node(market_node)
             if country_code not in temporal_results_per_country:
-                # Create a new DataFrame for the country with the data from this bidding zone
+                # Create a new DataFrame for the country with the data from this market node
                 temporal_results_per_country[country_code] = temporal_results_local
             else:
                 # Add the missing columns to the country's DataFrame
@@ -46,11 +46,11 @@ def get_temporal_results(output_directory, *, group=None, country_codes=None):
                 # Add the missing columns to the local DataFrame
                 missing_columns_local = [column_name for column_name in temporal_results_per_country[country_code].columns if column_name not in temporal_results_local.columns]
                 temporal_results_local[missing_columns_local] = 0
-                # Add the data from the bidding zone to the existing country's DataFrame
+                # Add the data from the market node to the existing country's DataFrame
                 temporal_results_per_country[country_code] += temporal_results_local
         return temporal_results_per_country
 
-    # Return the sum of all bidding zones
+    # Return the sum of all market nodes
     if group == "all":
         total_temporal_results = None
         for temporal_results_local in temporal_results.values():

@@ -36,7 +36,7 @@ PEIROCOM consists out of three sections, preprocessing, optimization, and analys
 
 ### Preprocessing
 
-The preprocessor only needs to be run once. It removes some irragularities and converts the hourly ERAA data in Excel to a single CSV file per bidding zone.
+The preprocessor only needs to be run once. It removes some irragularities and converts the hourly ERAA data in Excel to a single CSV file per market node.
 
 ### Optimization
 
