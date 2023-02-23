@@ -41,5 +41,5 @@ class Chart:
 
     def download_button(self, file_name):
         buf = io.BytesIO()
-        plt.savefig(buf, dpi=400, bbox_inches="tight", transparent=True)
+        plt.savefig(buf, dpi=800, bbox_inches="tight", transparent=True)
         st.sidebar.download_button("💾 Download figure", buf, file_name=file_name, mime="image/png")
