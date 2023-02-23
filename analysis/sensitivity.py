@@ -104,10 +104,25 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             else:
                 sensitivity_plot.ax.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
-            sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
-            sensitivity_plot.ax.plot(data["ires"], color=colors.technology_type("ires"), label="IRES")
-            sensitivity_plot.ax.plot(data["storage"], color=colors.technology_type("storage"), label="Storage")
-            sensitivity_plot.ax.legend()
+            cumulative_data = 0
+            for technology_type in sorted(data.columns, key=lambda technology_type: {"hydropower": 0, "ires": 1, "storage": 2}.get(technology_type, 3)):
+                # Don't add the technology if it only has 0 values
+                if data[technology_type].abs().max() == 0:
+                    continue
+
+                # Add the data to the cumulative data
+                cumulative_data += data[technology_type]
+
+                # Add the area to the chart
+                sensitivity_plot.ax.fill_between(data[technology_type].index, cumulative_data - data[technology_type], cumulative_data, label=utils.format_str(technology_type), facecolor=colors.technology_type(technology_type))
+
+            # Add the legend
+            handles, labels = sensitivity_plot.ax.get_legend_handles_labels()
+            sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
+
+            # Set the x and y limits to the limits of the data so there is no padding in the area chart
+            sensitivity_plot.ax.set_xlim([round(data.index.min(), 2), round(data.index.max(), 2)])
+            sensitivity_plot.ax.set_ylim([0, sensitivity_plot.ax.set_ylim()[1]])
         else:
             cumulative_data = 0
             for technology in data:
