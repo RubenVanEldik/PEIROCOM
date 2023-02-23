@@ -113,7 +113,10 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             for technology in data:
                 cumulative_data += data[technology]
                 sensitivity_plot.ax.fill_between(data[technology].index, cumulative_data - data[technology], cumulative_data, label=utils.format_technology(technology), facecolor=colors.technology(technology))
-            sensitivity_plot.ax.legend()
+
+            # Add the legend
+            handles, labels = sensitivity_plot.ax.get_legend_handles_labels()
+            sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
     if statistic_name == "relative_curtailment":
         data = _retrieve_statistics(steps, "relative_curtailment", output_directory)
         sensitivity_plot.ax.set_ylabel("Relative curtailment (%)")
