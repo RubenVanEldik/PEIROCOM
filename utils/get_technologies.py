@@ -10,17 +10,20 @@ def get_technologies(*, technology_type=None):
     assert validate.is_technology_type(technology_type, required=False)
 
     # Read the technologies YAML file
-    technologies = utils.read_yaml(utils.path("input", "technologies.yaml"))
+    technology_types = utils.read_yaml(utils.path("input", "technologies.yaml"))
 
-    # Return the requested technologies if a technology type was specfied
+    # Return the requested technologies if a technology type was specfied or all if none was specified
     if technology_type == "ires":
-        return technologies.get("ires", {})
-    if technology_type == "hydropower":
-        return technologies.get("hydropower", {})
-    if technology_type == "storage":
-        return technologies.get("storage", {})
-    if technology_type == "electrolysis":
-        return technologies.get("electrolysis", {})
+        technologies = technology_types.get("ires", {})
+    elif technology_type == "hydropower":
+        technologies = technology_types.get("hydropower", {})
+    elif technology_type == "storage":
+        technologies = technology_types.get("storage", {})
+    elif technology_type == "electrolysis":
+        technologies = technology_types.get("electrolysis", {})
+    else:
+        technologies = {**technology_types.get("ires", {}), **technology_types.get("hydropower", {}), **technology_types.get("storage", {}), **technology_types.get("electrolysis", {})}
 
-    # Return all technologies when no technology type was specified
-    return {**technologies.get("ires", {}), **technologies.get("hydropower", {}), **technologies.get("storage", {}), **technologies.get("electrolysis", {})}
+    del technologies["color"]
+
+    return technologies
