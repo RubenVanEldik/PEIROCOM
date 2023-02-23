@@ -48,6 +48,24 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
 
 
+def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
+    """
+    Calculate the annual costs for a specific run
+    """
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
+    assert validate.is_breakdown_level(breakdown_level)
+
+    # Get the capacities and demand
+    ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
+    storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
+    hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
+    config = utils.read_yaml(output_directory / "config.yaml")
+
+    # Return the LCOE
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, None, config=config, breakdown_level=breakdown_level, annual_costs=True)
+
+
 def premium(output_directory, *, country_codes=None, breakdown_level=0):
     """
     Calculate the firm kWh premium

@@ -66,7 +66,7 @@ def run_sensitivity(config, sensitivity_config):
         # Calculate the optimal storage costs
         st.subheader(f"Sensitivity run 1.000")
         run(config, status=status, output_directory=output_directory / "1.000")
-        optimal_storage_costs = stats.firm_lcoe(output_directory / "1.000", breakdown_level=1)["storage"]
+        annual_storage_costs_optimal = stats.annual_costs(output_directory / "1.000", breakdown_level=1)["storage"]
 
         # Send the notification
         if config["send_notification"]:
@@ -86,8 +86,8 @@ def run_sensitivity(config, sensitivity_config):
 
                 # Set the total storage costs for this step
                 step_config = deepcopy(config)
-                storage_costs_step = float(relative_storage_costs * optimal_storage_costs)
-                utils.set_nested_key(step_config, "fixed_storage.costs", storage_costs_step)
+                annual_storage_costs_step = float(relative_storage_costs * annual_storage_costs_optimal)
+                utils.set_nested_key(step_config, "fixed_storage.annual_costs", annual_storage_costs_step)
                 fixed_storage_costs_direction = "gte" if step_factor > 1 else "lte" if step_factor < 1 else None
                 utils.set_nested_key(step_config, "fixed_storage.direction", fixed_storage_costs_direction)
 
@@ -113,6 +113,10 @@ def run_sensitivity(config, sensitivity_config):
                 # Break the while loop if the premium exceeds the maximum premium
                 firm_lcoe = stats.firm_lcoe(output_directory_step)
                 if firm_lcoe >= sensitivity_config["max_lcoe"]:
+                    break
+
+                # Add a break to the lowest relative storage costs (due to hydropower sometimes almost no storage costs are required)
+                if relative_storage_costs < 0.01:
                     break
 
                 # Update the relative storage capacity for the next pass

@@ -458,14 +458,14 @@ def optimize(config, *, status, output_directory):
 
         # Calculate the storage costs
         temporal_total_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW")
-        storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_total_demand, config=config, breakdown_level=1)["storage"]
+        annual_storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, None, config=config, breakdown_level=1, annual_costs=True)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
-        fixed_storage_costs = config["fixed_storage"]["costs"]
+        fixed_annual_storage_costs = config["fixed_storage"]["annual_costs"]
         if config["fixed_storage"]["direction"] == "gte":
-            model.addConstr(storage_costs >= fixed_storage_costs)
+            model.addConstr(annual_storage_costs >= fixed_annual_storage_costs)
         elif config["fixed_storage"]["direction"] == "lte":
-            model.addConstr(storage_costs <= fixed_storage_costs)
+            model.addConstr(annual_storage_costs <= fixed_annual_storage_costs)
 
     """
     Step 8: Set objective function
