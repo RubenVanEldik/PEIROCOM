@@ -213,14 +213,23 @@ def sensitivity(output_directory):
         sensitivity_plot.ax.legend()
         sensitivity_plot.ax.set_xlabel("Technology scenario")
         sensitivity_plot.ax.set_xticks([-1, 0, 1], ["Conservative", "Moderate", "Advanced"])
+    elif sensitivity_config["analysis_type"] == "hydrogen_demand":
+        sensitivity_plot.ax.set_xlabel("Hydrogen demand (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "hydropower_capacity":
+        sensitivity_plot.ax.set_xlabel("Hydropower capacity ($\%_{current}$)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "interconnection_capacity":
         sensitivity_plot.ax.set_xlabel("Relative interconnection capacity (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "interconnection_efficiency":
         sensitivity_plot.ax.set_xlabel("Interconnection efficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
-    elif sensitivity_config["analysis_type"] == "self_sufficiency":
+    elif sensitivity_config["analysis_type"] == "min_self_sufficiency":
         sensitivity_plot.ax.set_xlabel("Minimum self-sufficiency (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "max_self_sufficiency":
+        sensitivity_plot.ax.set_xlabel("Maximum self-sufficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot
