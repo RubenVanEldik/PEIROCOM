@@ -167,6 +167,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         handles, labels = sensitivity_plot.ax.get_legend_handles_labels()
         sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
         sensitivity_plot.ax.set_xlim([data.index.min(), data.index.max()])
+        sensitivity_plot.ax.set_ylim([0, sensitivity_plot.ax.set_ylim()[1]])
 
     # Return the data so it can be shown in a table
     return data
