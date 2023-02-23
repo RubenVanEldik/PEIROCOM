@@ -132,6 +132,10 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             # Add the legend
             handles, labels = sensitivity_plot.ax.get_legend_handles_labels()
             sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
+
+            # Set the x and y limits to the limits of the data so there is no padding in the area chart
+            sensitivity_plot.ax.set_xlim([round(data.index.min(), 2), round(data.index.max(), 2)])
+            sensitivity_plot.ax.set_ylim([0, sensitivity_plot.ax.set_ylim()[1]])
     if statistic_name == "relative_curtailment":
         data = _retrieve_statistics(steps, "relative_curtailment", output_directory)
         sensitivity_plot.ax.set_ylabel("Relative curtailment (%)")
