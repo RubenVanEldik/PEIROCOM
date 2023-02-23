@@ -6,7 +6,7 @@ ires:
     name: "solar PV"
     color:
       name: 'amber'
-      value: 400
+      value: 200
     economic_lifetime: 30
     wacc: 0.044
     conservative:
@@ -21,8 +21,8 @@ ires:
   onshore:
     name: "onshore wind"
     color:
-      name: 'sky'
-      value: 400
+      name: 'amber'
+      value: 300
     economic_lifetime: 30
     wacc: 0.05
     conservative:
@@ -37,8 +37,8 @@ ires:
   offshore:
     name: "offshore wind"
     color:
-      name: 'teal'
-      value: 700
+      name: 'amber'
+      value: 400
     economic_lifetime: 30
     wacc: 0.052
     conservative:
@@ -57,7 +57,7 @@ hydropower:
   run_of_river:
     name: "run-of-river"
     color:
-      name: 'blue'
+      name: 'sky'
       value: 500
     roundtrip_efficiency: 0.85
     economic_lifetime: 60
@@ -74,8 +74,8 @@ hydropower:
   reservoir:
     name: "reservoir"
     color:
-      name: 'blue'
-      value: 500
+      name: 'sky'
+      value: 600
     roundtrip_efficiency: 0.85
     economic_lifetime: 60
     wacc: 0.05
@@ -91,8 +91,8 @@ hydropower:
   pumped_storage_open:
     name: "pumped storage (open)"
     color:
-      name: 'blue'
-      value: 500
+      name: 'sky'
+      value: 700
     roundtrip_efficiency: 0.85
     economic_lifetime: 60
     wacc: 0.05
@@ -108,8 +108,8 @@ hydropower:
   pumped_storage_closed:
     name: "pumped storage (closed)"
     color:
-      name: 'blue'
-      value: 500
+      name: 'sky'
+      value: 900
     roundtrip_efficiency: 0.85
     economic_lifetime: 60
     wacc: 0.05
@@ -129,8 +129,8 @@ storage:
   lion:
     name: "Li-ion"
     color:
-      name: 'rose'
-      value: 500
+      name: 'red'
+      value: 800
     soc_min: 0.2
     soc_max: 1
     roundtrip_efficiency: 0.85
@@ -158,8 +158,8 @@ electrolysis:
   pem:
     name: "PEM"
     color:
-      name: 'rose'
-      value: 500
+      name: 'neutral'
+      value: 900
     efficiency: 0.82
     economic_lifetime: 20
     wacc: 0.044
