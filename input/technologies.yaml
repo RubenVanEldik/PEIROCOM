@@ -1,4 +1,7 @@
 ires:
+  color:
+    name: 'amber'
+    value: 300
   pv:
     name: "solar PV"
     color:
@@ -48,6 +51,9 @@ ires:
       capex: 1583
       fixed_om: 61
 hydropower:
+  color:
+    name: 'sky'
+    value: 600
   run_of_river:
     name: "run-of-river"
     color:
@@ -117,6 +123,9 @@ hydropower:
       capex_power: 2471.098
       fixed_om_power: 61.83
 storage:
+  color:
+    name: 'red'
+    value: 800
   lion:
     name: "Li-ion"
     color:
@@ -143,6 +152,9 @@ storage:
       fixed_om_energy: 1.425
       fixed_om_power: 2.6
 electrolysis:
+  color:
+    name: 'neutral'
+    value: 900
   pem:
     name: "PEM"
     color:
