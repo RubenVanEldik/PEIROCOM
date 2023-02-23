@@ -40,11 +40,7 @@ def run():
         # Get the config for the first step
         sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")
         first_step = next(iter(sensitivity_config["steps"]))
-        if sensitivity_config["analysis_type"] == "technology_scenario":
-            first_technology_type = next(iter(sensitivity_config["technologies"]))
-            config = utils.read_yaml(output_directory / first_technology_type / first_step / "config.yaml")
-        else:
-            config = utils.read_yaml(output_directory / first_step / "config.yaml")
+        config = utils.read_yaml(output_directory / first_step / "config.yaml")
     else:
         config = utils.read_yaml(output_directory / "config.yaml")
 
@@ -60,12 +56,7 @@ def run():
 
         # If its not a sensitivity analysis, ask for which sensitivity step the data should be shown
         if analysis_type != "sensitivity":
-            if sensitivity_config["analysis_type"] == "technology_scenario":
-                col1, col2 = sensitivity_step_placeholder.columns(2)
-                output_directory /= col1.selectbox("Technology", sensitivity_config["technologies"], format_func=utils.format_technology)
-                output_directory /= col2.selectbox("Step", sensitivity_config["steps"])
-            else:
-                output_directory /= sensitivity_step_placeholder.selectbox("Step", sensitivity_config["steps"])
+            output_directory /= sensitivity_step_placeholder.selectbox("Step", sensitivity_config["steps"])
 
         # Run the analysis
         getattr(analysis, analysis_type)(output_directory)

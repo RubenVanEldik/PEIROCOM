@@ -11,7 +11,7 @@ class Chart:
 
     def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear", wide=False):
         # Create the figure
-        figure_width = 12 if wide else 6
+        figure_width = 9 if wide else 7
         figure_height = 4
         self.fig, self.ax = plt.subplots(figsize=(figure_width, figure_height))
         self.fig.tight_layout()
@@ -31,6 +31,9 @@ class Chart:
     def format_yticklabels(self, label):
         self.ax.yaxis.set_major_locator(mticker.FixedLocator(self.ax.get_yticks().tolist()))
         self.ax.set_yticklabels([label.format(tick) for tick in self.ax.get_yticks()])
+
+    def add_legend(self, *, ncol=3):
+        self.ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=ncol, frameon=False, framealpha=0)
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white

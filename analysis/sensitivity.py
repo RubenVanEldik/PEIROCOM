@@ -65,11 +65,8 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
     # Add the output for the sensitivity steps to the sensitivity plot
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"]:
         # Ask for the breakdown level
-        if sensitivity_config["analysis_type"] == "technology_scenario":
-            breakdown_level = 0
-        else:
-            breakdown_level_options = {0: "Off", 1: "Technology types", 2: "Technologies"}
-            breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
+        breakdown_level_options = {0: "Off", 1: "Technology types", 2: "Technologies"}
+        breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
 
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
@@ -83,7 +80,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             data = _retrieve_statistics(steps, "premium", output_directory, breakdown_level=breakdown_level)
 
         # Plot the data depending on the breakdown level
-        if breakdown_level == 0 or sensitivity_config["analysis_type"] == "technology_scenario":
+        if breakdown_level == 0:
             if st.sidebar.checkbox("Fit a curve on the data"):
                 sensitivity_plot.ax.scatter(data.index, data, label=label, color=colors.primary(alpha=0.5), linewidths=0)
                 try:
@@ -101,22 +98,42 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
 
                     # Plot the regression line
                     sensitivity_plot.ax.plot(regression_line, color=colors.get("red", 600), label=regression_function_string_formatted)
-                    sensitivity_plot.ax.legend()
+                    sensitivity_plot.add_legend()
                 except:
                     st.sidebar.error("The function is not valid")
             else:
                 sensitivity_plot.ax.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
-            sensitivity_plot.ax.plot(data.sum(axis=1), color=colors.tertiary(), label="Total")
-            sensitivity_plot.ax.plot(data["ires"], color=colors.technology_type("ires"), label="IRES")
-            sensitivity_plot.ax.plot(data["storage"], color=colors.technology_type("storage"), label="Storage")
-            sensitivity_plot.ax.legend()
+            cumulative_data = 0
+            for technology_type in sorted(data.columns, key=lambda technology_type: {"hydropower": 0, "ires": 1, "storage": 2}.get(technology_type, 3)):
+                # Don't add the technology if it only has 0 values
+                if data[technology_type].abs().max() == 0:
+                    continue
+
+                # Add the data to the cumulative data
+                cumulative_data += data[technology_type]
+
+                # Add the area to the chart
+                sensitivity_plot.ax.fill_between(data[technology_type].index, cumulative_data - data[technology_type], cumulative_data, label=utils.format_str(technology_type), facecolor=colors.technology_type(technology_type))
+
+            # Add the legend
+            sensitivity_plot.add_legend()
+
+            # Set the x and y limits to the limits of the data so there is no padding in the area chart
+            sensitivity_plot.ax.set_xlim([round(data.index.min(), 2), round(data.index.max(), 2)])
+            sensitivity_plot.ax.set_ylim([0, sensitivity_plot.ax.set_ylim()[1]])
         else:
             cumulative_data = 0
             for technology in data:
                 cumulative_data += data[technology]
                 sensitivity_plot.ax.fill_between(data[technology].index, cumulative_data - data[technology], cumulative_data, label=utils.format_technology(technology), facecolor=colors.technology(technology))
-            sensitivity_plot.ax.legend()
+
+            # Add the legend
+            sensitivity_plot.add_legend()
+
+            # Set the x and y limits to the limits of the data so there is no padding in the area chart
+            sensitivity_plot.ax.set_xlim([round(data.index.min(), 2), round(data.index.max(), 2)])
+            sensitivity_plot.ax.set_ylim([0, sensitivity_plot.ax.set_ylim()[1]])
     if statistic_name == "relative_curtailment":
         data = _retrieve_statistics(steps, "relative_curtailment", output_directory)
         sensitivity_plot.ax.set_ylabel("Relative curtailment (%)")
@@ -127,16 +144,16 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         for ires_technology in data:
             sensitivity_plot.ax.plot(data[ires_technology], color=colors.technology(ires_technology), label=utils.format_technology(ires_technology))
         sensitivity_plot.ax.set_ylabel("IRES capacity (GW)")
-        sensitivity_plot.ax.legend()
+        sensitivity_plot.add_legend()
     if statistic_name == "storage_capacity":
         storage_capacity_attribute = st.sidebar.selectbox("Storage capacity attribute", ["energy", "power"], format_func=utils.format_str)
         data = steps.apply(lambda step: stats.storage_capacity(output_directory / step)[storage_capacity_attribute])
-        data = data / 10 ** 6 if storage_capacity_type == "energy" else data / 10 ** 3
+        data = data / 10 ** 6 if storage_capacity_attribute == "energy" else data / 10 ** 3
         for storage_technology in data:
             sensitivity_plot.ax.plot(data[storage_technology], color=colors.technology(storage_technology), label=utils.format_technology(storage_technology))
-        unit = "TWh" if storage_capacity_type == "energy" else "GW"
+        unit = "TWh" if storage_capacity_attribute == "energy" else "GW"
         sensitivity_plot.ax.set_ylabel(f"Storage capacity ({unit})")
-        sensitivity_plot.ax.legend()
+        sensitivity_plot.add_legend()
     if statistic_name == "optimization_duration":
         data = steps.apply(lambda step: utils.read_csv(output_directory / step / "model" / "duration.csv", index_col=0).sum(axis=1)) / 3600
         cumulative_data = 0
@@ -146,8 +163,9 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             sensitivity_plot.ax.fill_between(data[column_name].index, cumulative_data - data[column_name], cumulative_data, label=utils.format_str(column_name), color=line_color)
         sensitivity_plot.ax.set_ylabel("Duration (H)")
         handles, labels = sensitivity_plot.ax.get_legend_handles_labels()
-        sensitivity_plot.ax.legend(reversed(handles), reversed(labels))
         sensitivity_plot.ax.set_xlim([data.index.min(), data.index.max()])
+        sensitivity_plot.ax.set_ylim([0, sensitivity_plot.ax.set_ylim()[1]])
+        sensitivity_plot.add_legend()
 
     # Return the data so it can be shown in a table
     return data
@@ -167,21 +185,12 @@ def sensitivity(output_directory):
     sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")
 
     # Select an output variable to run the sensitivity analysis on
-    statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment"]
-    if sensitivity_config["analysis_type"] != "technology_scenario":
-        statistic_options += ["ires_capacity", "storage_capacity", "optimization_duration"]
+    statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment", "ires_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
     # Plot the data
     sensitivity_plot = chart.Chart(xlabel=None, ylabel=None)
-    if sensitivity_config["analysis_type"] == "technology_scenario":
-        sensitivity_data = pd.DataFrame()
-        for technology_name in utils.sort_technology_names(sensitivity_config["technologies"].keys()):
-            label = utils.format_technology(technology_name)
-            line_color = colors.technology(technology_name)
-            sensitivity_data[technology_name] = _plot(output_directory / technology_name, sensitivity_config, sensitivity_plot, statistic_name, label=label, line_color=line_color)
-    else:
-        sensitivity_data = _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name)
+    sensitivity_data = _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name)
 
     # Set the range of the y-axis
     col1, col2 = st.sidebar.columns(2)
@@ -199,17 +208,25 @@ def sensitivity(output_directory):
     elif sensitivity_config["analysis_type"] == "climate_years":
         sensitivity_plot.ax.set_xlabel("Number of climate years")
     elif sensitivity_config["analysis_type"] == "technology_scenario":
-        sensitivity_plot.ax.legend()
         sensitivity_plot.ax.set_xlabel("Technology scenario")
         sensitivity_plot.ax.set_xticks([-1, 0, 1], ["Conservative", "Moderate", "Advanced"])
+    elif sensitivity_config["analysis_type"] == "hydrogen_demand":
+        sensitivity_plot.ax.set_xlabel("Hydrogen demand (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "hydropower_capacity":
+        sensitivity_plot.ax.set_xlabel("Hydropower capacity ($\%_{current}$)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "interconnection_capacity":
         sensitivity_plot.ax.set_xlabel("Relative interconnection capacity (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "interconnection_efficiency":
         sensitivity_plot.ax.set_xlabel("Interconnection efficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
-    elif sensitivity_config["analysis_type"] == "self_sufficiency":
+    elif sensitivity_config["analysis_type"] == "min_self_sufficiency":
         sensitivity_plot.ax.set_xlabel("Minimum self-sufficiency (%)")
+        sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "max_self_sufficiency":
+        sensitivity_plot.ax.set_xlabel("Maximum self-sufficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
 
     # Plot the sensitivity plot

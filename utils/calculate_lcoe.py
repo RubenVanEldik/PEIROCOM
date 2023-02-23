@@ -4,65 +4,67 @@ import utils
 import validate
 
 
-def _calculate_scenario_costs(assumptions, variable, scenario_level):
+def _calculate_scenario_costs(assumptions, variable, technology_scenario):
     """
-    Calculate the costs for a given scenario level
+    Calculate the costs for a given technology scenario
     """
     assert validate.is_dict(assumptions)
     assert validate.is_string(variable)
-    assert validate.is_number(scenario_level, min_value=-1, max_value=1)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
-    if scenario_level == -1:
+    if technology_scenario == -1:
         return assumptions["conservative"][variable]
-    elif scenario_level == 0:
+    elif technology_scenario == 0:
         return assumptions["moderate"][variable]
-    elif scenario_level == 1:
+    elif technology_scenario == 1:
         return assumptions["advanced"][variable]
-    elif scenario_level > 0:
-        return (1 - scenario_level) * assumptions["moderate"][variable] + scenario_level * assumptions["advanced"][variable]
-    elif scenario_level < 0:
-        return (1 + scenario_level) * assumptions["moderate"][variable] - scenario_level * assumptions["conservative"][variable]
+    elif technology_scenario > 0:
+        return (1 - technology_scenario) * assumptions["moderate"][variable] + technology_scenario * assumptions["advanced"][variable]
+    elif technology_scenario < 0:
+        return (1 + technology_scenario) * assumptions["moderate"][variable] - technology_scenario * assumptions["conservative"][variable]
 
 
-def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW):
+def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW, *, technology_scenario):
     """
     Calculate the annualized IRES costs
     """
-    assert validate.is_dict(ires_technologies)
+    assert validate.is_list_like(ires_technologies)
     assert validate.is_dataframe(ires_capacity_MW, column_validator=validate.is_technology)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
     # Read the IRES assumptions
     ires_assumptions = utils.get_technologies(technology_type="ires")
 
     # Calculate the total annual costs
     annualized_costs_ires = pd.Series([], dtype="float64")
-    for technology, scenario_level in ires_technologies.items():
+    for technology in ires_technologies:
         capacity_kW = ires_capacity_MW[technology].sum() * 1000
-        capex = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "capex", scenario_level)
-        fixed_om = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "fixed_om", scenario_level)
+        capex = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "capex", technology_scenario)
+        fixed_om = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "fixed_om", technology_scenario)
         crf = utils.calculate_crf(ires_assumptions[technology]["wacc"], ires_assumptions[technology]["economic_lifetime"])
         annualized_costs_ires[technology] = crf * capex + fixed_om
 
     return annualized_costs_ires
 
 
-def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_capacity):
+def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_capacity, *, technology_scenario):
     """
     Calculate the annualized hydropower costs
     """
-    assert validate.is_dict(hydropower_technologies)
+    assert validate.is_list_like(hydropower_technologies)
     assert validate.is_dataframe(hydropower_capacity)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
     # Read the hydropower assumptions
     hydropower_assumptions = utils.get_technologies(technology_type="hydropower")
 
     # Calculate the total annual hydropower costs
     annualized_costs_hydropower = pd.Series([], dtype="float64")
-    for technology, scenario_level in hydropower_technologies.items():
+    for technology in hydropower_technologies:
         # Calculate costs for the turbine capacity
         turbine_capacity_kW = hydropower_capacity.loc[technology, "turbine"] * 1000
-        capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex_power", scenario_level)
-        fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om_power", scenario_level)
+        capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex_power", technology_scenario)
+        fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om_power", technology_scenario)
 
         # Calculate the total annualized costs
         crf = utils.calculate_crf(hydropower_assumptions[technology]["wacc"], hydropower_assumptions[technology]["economic_lifetime"])
@@ -71,30 +73,31 @@ def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_c
     return annualized_costs_hydropower
 
 
-def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_MWh):
+def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_MWh, *, technology_scenario):
     """
     Calculate the annualized storage costs
     """
-    assert validate.is_dict(storage_technologies)
+    assert validate.is_list_like(storage_technologies)
     assert validate.is_dataframe(storage_capacity_MWh)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
     # Read the storage assumptions
     storage_assumptions = utils.get_technologies(technology_type="storage")
 
     # Calculate the total annual storage costs
     annualized_costs_storage = pd.Series([], dtype="float64")
-    for technology, scenario_level in storage_technologies.items():
+    for technology in storage_technologies:
         capacity_energy_kWh = storage_capacity_MWh.loc[technology, "energy"] * 1000
         capacity_power_kW = storage_capacity_MWh.loc[technology, "power"] * 1000
 
         # Calculate CAPEX
-        capex_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "capex_energy", scenario_level)
-        capex_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "capex_power", scenario_level)
+        capex_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "capex_energy", technology_scenario)
+        capex_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "capex_power", technology_scenario)
         capex = capex_energy + capex_power
 
         # Calcalate fixed O&M
-        fixed_om_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_energy", scenario_level)
-        fixed_om_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_power", scenario_level)
+        fixed_om_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_energy", technology_scenario)
+        fixed_om_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_power", technology_scenario)
         fixed_om = fixed_om_energy + fixed_om_power
 
         # Calculate the total annualized costs
@@ -129,6 +132,9 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
     assert validate.is_breakdown_level(breakdown_level)
     assert validate.is_bool(annual_costs)
 
+    # Get the technology scenario
+    technology_scenario = config["technologies"]["scenario"]
+
     annualized_ires_costs = 0
     annualized_storage_costs = 0
     annualized_hydropower_costs = 0
@@ -136,9 +142,9 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
 
     for market_node in ires_capacity.keys():
         # Add the annualized costs
-        annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node])
-        annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node])
-        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node])
+        annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node], technology_scenario=technology_scenario)
+        annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], technology_scenario=technology_scenario)
+        annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node], technology_scenario=technology_scenario)
 
         # Add the annual electricity demand
         if not annual_costs:

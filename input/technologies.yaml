@@ -1,9 +1,12 @@
 ires:
+  color:
+    name: 'amber'
+    value: 300
   pv:
     name: "solar PV"
     color:
       name: 'amber'
-      value: 400
+      value: 200
     economic_lifetime: 30
     wacc: 0.044
     conservative:
@@ -18,8 +21,8 @@ ires:
   onshore:
     name: "onshore wind"
     color:
-      name: 'sky'
-      value: 400
+      name: 'amber'
+      value: 300
     economic_lifetime: 30
     wacc: 0.05
     conservative:
@@ -34,8 +37,8 @@ ires:
   offshore:
     name: "offshore wind"
     color:
-      name: 'teal'
-      value: 700
+      name: 'amber'
+      value: 400
     economic_lifetime: 30
     wacc: 0.052
     conservative:
@@ -47,13 +50,19 @@ ires:
     advanced:
       capex: 1583
       fixed_om: 61
-hydropower: {}
+hydropower:
+  color:
+    name: 'sky'
+    value: 600
 storage:
+  color:
+    name: 'red'
+    value: 800
   lion:
     name: "Li-ion"
     color:
-      name: 'rose'
-      value: 500
+      name: 'red'
+      value: 800
     soc_min: 0.2
     soc_max: 1
     roundtrip_efficiency: 0.85
@@ -75,11 +84,14 @@ storage:
       fixed_om_energy: 1.425
       fixed_om_power: 2.6
 electrolysis:
+  color:
+    name: 'neutral'
+    value: 900
   pem:
     name: "PEM"
     color:
-      name: 'rose'
-      value: 500
+      name: 'neutral'
+      value: 900
     efficiency: 0.82
     economic_lifetime: 20
     wacc: 0.044

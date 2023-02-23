@@ -66,7 +66,7 @@ def run_sensitivity(config, sensitivity_config):
         # Calculate the optimal storage costs
         st.subheader(f"Sensitivity run 1.000")
         run(config, status=status, output_directory=output_directory / "1.000")
-        optimal_storage_costs = stats.firm_lcoe(output_directory / "1.000", breakdown_level=1)["storage"]
+        annual_storage_costs_optimal = stats.annual_costs(output_directory / "1.000", breakdown_level=1)["storage"]
 
         # Send the notification
         if config["send_notification"]:
@@ -86,8 +86,8 @@ def run_sensitivity(config, sensitivity_config):
 
                 # Set the total storage costs for this step
                 step_config = deepcopy(config)
-                storage_costs_step = float(relative_storage_costs * optimal_storage_costs)
-                utils.set_nested_key(step_config, "fixed_storage.costs", storage_costs_step)
+                annual_storage_costs_step = float(relative_storage_costs * annual_storage_costs_optimal)
+                utils.set_nested_key(step_config, "fixed_storage.annual_costs", annual_storage_costs_step)
                 fixed_storage_costs_direction = "gte" if step_factor > 1 else "lte" if step_factor < 1 else None
                 utils.set_nested_key(step_config, "fixed_storage.direction", fixed_storage_costs_direction)
 
@@ -115,29 +115,12 @@ def run_sensitivity(config, sensitivity_config):
                 if firm_lcoe >= sensitivity_config["max_lcoe"]:
                     break
 
+                # Add a break to the lowest relative storage costs (due to hydropower sometimes almost no storage costs are required)
+                if relative_storage_costs < 0.01:
+                    break
+
                 # Update the relative storage capacity for the next pass
                 relative_storage_costs *= step_factor
-
-    # Run a specific sensitivity analysis for the technology scenarios
-    elif sensitivity_config["analysis_type"] == "technology_scenario":
-        # Loop over all technologies
-        for technology_name, technology_type in sensitivity_config["technologies"].items():
-            st.subheader(utils.format_technology(technology_name))
-
-            # Loop over each sensitivity analysis step
-            for step_key, step_value in sensitivity_config["steps"].items():
-                step_number = list(sensitivity_config["steps"].keys()).index(step_key) + 1
-                number_of_steps = len(sensitivity_config["steps"])
-                st.markdown(f"#### Sensitivity run {step_number}/{number_of_steps}")
-
-                # Make a copy of the config, change the config parameters for the specific technology and run the optimization
-                step_config = deepcopy(config)
-                utils.set_nested_key(step_config, f"technologies.{technology_type}.{technology_name}", step_value)
-                run(step_config, status=status, output_directory=output_directory / technology_name / step_key)
-
-                # If enabled, send a notification
-                if config["send_notification"]:
-                    utils.send_notification(f"Optimization {step_number}/{number_of_steps} ({technology_name}) of '{config['name']}' has finished")
 
     # Otherwise run the general sensitivity analysis
     else:
@@ -152,6 +135,8 @@ def run_sensitivity(config, sensitivity_config):
             if sensitivity_config["analysis_type"] == "climate_years":
                 last_climate_year = utils.get_nested_key(step_config, "climate_years.end")
                 utils.set_nested_key(step_config, "climate_years.start", last_climate_year - (step_value - 1))
+            if sensitivity_config["analysis_type"] == "technology_scenario":
+                utils.set_nested_key(step_config, "technologies.scenario", step_value)
             elif sensitivity_config["analysis_type"] == "hydrogen_demand":
                 utils.set_nested_key(step_config, "relative_hydrogen_demand", step_value)
             elif sensitivity_config["analysis_type"] == "hydropower_capacity":
