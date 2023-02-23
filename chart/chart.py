@@ -11,7 +11,7 @@ class Chart:
 
     def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear", wide=False):
         # Create the figure
-        figure_width = 12 if wide else 6
+        figure_width = 9 if wide else 7
         figure_height = 4
         self.fig, self.ax = plt.subplots(figsize=(figure_width, figure_height))
         self.fig.tight_layout()
