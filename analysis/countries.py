@@ -180,7 +180,7 @@ def countries(output_directory):
                     bar_chart.ax.bar(data.index, data[column_name], bar_width, bottom=bottom, label=utils.format_str(column_name), color=color)
                     bottom += data[column_name]
                 handles, labels = bar_chart.ax.get_legend_handles_labels()
-                bar_chart.ax.legend(reversed(handles), reversed(labels))
+                bar_chart.add_legend()
             else:
                 bar_chart.ax.bar(data.index, data, bar_width, color=colors.primary())
 

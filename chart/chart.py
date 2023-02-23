@@ -32,6 +32,9 @@ class Chart:
         self.ax.yaxis.set_major_locator(mticker.FixedLocator(self.ax.get_yticks().tolist()))
         self.ax.set_yticklabels([label.format(tick) for tick in self.ax.get_yticks()])
 
+    def add_legend(self, *, ncol=3):
+        self.ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=ncol, frameon=False, framealpha=0)
+
     def display(self):
         # Transparent is required for Streamlit because the background is not white
         st.pyplot(self.fig, dpi=400, bbox_inches="tight", transparent=True)
