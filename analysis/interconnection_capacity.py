@@ -48,7 +48,7 @@ def interconnection_capacity(output_directory):
 
     # Create the bar chart
     bar_chart = chart.Chart(xlabel=f"Extra capacity ({unit})", ylabel="")
-    bar_chart.ax.barh(interconnections_with_extra_capacity.index, interconnections_with_extra_capacity.extra, color=colors.primary())
+    bar_chart.axs.barh(interconnections_with_extra_capacity.index, interconnections_with_extra_capacity.extra, color=colors.primary())
 
     # Show the bar chart
     bar_chart.display()

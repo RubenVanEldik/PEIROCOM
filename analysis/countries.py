@@ -168,7 +168,7 @@ def countries(output_directory):
                 data = data.dropna()
 
             # Initialize bar chart
-            bar_chart = chart.Chart(xlabel="", ylabel=label, wide=True)
+            bar_chart = chart.Chart(ylabel=label, wide=True)
             bar_width = 0.8
 
             data = data.sort_index(key=lambda x: [utils.get_country_property(xx, "name") for xx in x])
@@ -177,21 +177,21 @@ def countries(output_directory):
                 bottom = 0
                 for column_name in data:
                     color = colors.technology(column_name) if validate.is_technology(column_name) else colors.random()
-                    bar_chart.ax.bar(data.index, data[column_name], bar_width, bottom=bottom, label=utils.format_str(column_name), color=color)
+                    bar_chart.axs.bar(data.index, data[column_name], bar_width, bottom=bottom, label=utils.format_str(column_name), color=color)
                     bottom += data[column_name]
-                handles, labels = bar_chart.ax.get_legend_handles_labels()
+                handles, labels = bar_chart.axs.get_legend_handles_labels()
                 bar_chart.add_legend()
             else:
-                bar_chart.ax.bar(data.index, data, bar_width, color=colors.primary())
+                bar_chart.axs.bar(data.index, data, bar_width, color=colors.primary())
 
             if format_percentage:
                 bar_chart.format_yticklabels("{:,.0%}")
 
             country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
-            bar_chart.ax.set_xticks(bar_chart.ax.get_xticks())  # Required to not get a warning message when using set_xticklabels
-            bar_chart.ax.set_xticklabels(country_names, rotation=90)
+            bar_chart.axs.set_xticks(bar_chart.axs.get_xticks())  # Required to not get a warning message when using set_xticklabels
+            bar_chart.axs.set_xticklabels(country_names, rotation=90)
             padding = bar_width - (1 - bar_width) / 2
-            bar_chart.ax.set_xlim(-padding, len(data.index) - (1 - padding))
+            bar_chart.axs.set_xlim(-padding, len(data.index) - (1 - padding))
             bar_chart.display()
             bar_chart.download_button("countries.png")
 

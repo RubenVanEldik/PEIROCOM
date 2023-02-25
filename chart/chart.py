@@ -9,31 +9,78 @@ class Chart:
     Create a matplotlib figure
     """
 
-    def __init__(self, *, xlabel, ylabel, xscale="linear", yscale="linear", wide=False):
+    def __init__(self, nrows=1, ncols=1, *, xlabel=None, ylabel=None, xscale="linear", yscale="linear", sharex=True, sharey=True, wide=False):
+        # Store the number of rows and columns of the figure
+        self.nrows = nrows
+        self.ncols = ncols
+
         # Create the figure
-        figure_width = 9 if wide else 7
-        figure_height = 4
-        self.fig, self.ax = plt.subplots(figsize=(figure_width, figure_height))
+        width = (9 if wide else 7) * ncols ** (1 / 2)
+        height = 4 * nrows ** (1 / 2)
+        self.fig, self.axs = plt.subplots(nrows, ncols, figsize=(width, height), sharex=sharex, sharey=sharey)
+
+        # Enable tight_layout
         self.fig.tight_layout()
 
-        # Set the axes' labels and scale and remove the top and right spine
-        self.ax.set(xlabel=xlabel)
-        self.ax.set(ylabel=ylabel)
-        self.ax.set_xscale(xscale)
-        self.ax.set_yscale(yscale)
-        self.ax.spines.right.set_visible(False)
-        self.ax.spines.top.set_visible(False)
+        # Make a list with all axis independent of layout
+        self.all_axs = []
+        if nrows > 1 and ncols > 1:
+            for axs in self.axs:
+                self.all_axs.extend(axs)
+        if nrows > 1 or ncols > 1:
+            self.all_axs.extend(self.axs)
+        else:
+            self.all_axs.append(self.axs)
+
+        # Set Set the labels on the outer x and y axis and remove the top and right spine
+        for ax in self.all_axs:
+            ax.set_xscale(xscale)
+            ax.set_yscale(yscale)
+            ax.spines.right.set_visible(False)
+            ax.spines.top.set_visible(False)
+
+        if nrows > 1 and ncols > 1:
+            for axs in self.axs:
+                axs[0].set(ylabel=ylabel)
+            for axs in self.axs[-1]:
+                axs.set(xlabel=xlabel)
+                axs.spines.bottom.set_visible(True)
+        elif nrows > 1:
+            for index, axs in enumerate(self.axs):
+                axs.set(ylabel=ylabel)
+            self.axs[-1].set(xlabel=xlabel)
+            self.axs[-1].spines.bottom.set_visible(True)
+        elif ncols > 1:
+            for axs in self.axs:
+                axs.set(xlabel=xlabel)
+                axs.spines.bottom.set_visible(True)
+            self.axs[0].set(ylabel=ylabel)
+        else:
+            self.axs.spines.bottom.set_visible(True)
+            self.axs.set(xlabel=xlabel)
+            self.axs.set(ylabel=xlabel)
 
     def format_xticklabels(self, label):
-        self.ax.xaxis.set_major_locator(mticker.FixedLocator(self.ax.get_xticks().tolist()))
-        self.ax.set_xticklabels([label.format(tick) for tick in self.ax.get_xticks()])
+        for ax in self.all_axs:
+            ax.xaxis.set_major_locator(mticker.FixedLocator(ax.get_xticks().tolist()))
+            ax.set_xticklabels([label.format(tick) for tick in ax.get_xticks()])
 
     def format_yticklabels(self, label):
-        self.ax.yaxis.set_major_locator(mticker.FixedLocator(self.ax.get_yticks().tolist()))
-        self.ax.set_yticklabels([label.format(tick) for tick in self.ax.get_yticks()])
+        for ax in self.all_axs:
+            ax.yaxis.set_major_locator(mticker.FixedLocator(ax.get_yticks().tolist()))
+            ax.set_yticklabels([label.format(tick) for tick in ax.get_yticks()])
 
-    def add_legend(self, *, ncol=3):
-        self.ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=ncol, frameon=False, framealpha=0)
+    def add_legend(self):
+        if self.nrows > 1 and self.ncols > 1:
+            legend_ax = self.axs[round(self.ncols / 2), 0]
+        elif self.nrows > 1:
+            legend_ax = self.axs[0]
+        elif self.ncols > 1:
+            legend_ax = self.axs[round(self.ncols / 2)]
+        else:
+            legend_ax = self.axs
+
+        legend_ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=3, frameon=False, framealpha=0)
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white
@@ -41,5 +88,5 @@ class Chart:
 
     def download_button(self, file_name):
         buf = io.BytesIO()
-        plt.savefig(buf, dpi=400, bbox_inches="tight", transparent=True)
+        plt.savefig(buf, dpi=800, bbox_inches="tight", transparent=True)
         st.sidebar.download_button("💾 Download figure", buf, file_name=file_name, mime="image/png")

@@ -45,9 +45,9 @@ def correlation(output_directory):
 
     # Create a scatter plot
     correlation_plot = chart.Chart(xlabel="Distance (km)", ylabel="Coefficient of determination")
-    correlation_plot.ax.set_ylim([0, 1])
+    correlation_plot.axs.set_ylim([0, 1])
     correlation_plot.format_yticklabels("{:,.0%}")
-    correlation_plot.ax.scatter(correlations_df.distance, correlations_df.r_squared, color=colors.primary(alpha=0.5), linewidths=0)
+    correlation_plot.axs.scatter(correlations_df.distance, correlations_df.r_squared, color=colors.primary(alpha=0.5), linewidths=0)
 
     # Add a regression line if the checkbox is checked
     if st.sidebar.checkbox("Show regression line"):
@@ -55,7 +55,7 @@ def correlation(output_directory):
         regression_function = eval(f"lambda x, a, b, c: {regression_function_string}")
         try:
             regression_line = utils.fit_curve(correlations_df.distance, correlations_df.r_squared, function=regression_function)
-            correlation_plot.ax.plot(regression_line, color=colors.get("red", 600))
+            correlation_plot.axs.plot(regression_line, color=colors.get("red", 600))
         except:
             st.sidebar.error("The function is not valid")
 

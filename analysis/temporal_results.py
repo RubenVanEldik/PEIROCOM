@@ -45,7 +45,7 @@ def temporal_results(output_directory):
 
         # Add each of the selected columns to the plot
         for column_name in temporal_results:
-            plot.ax.plot(temporal_results[column_name], label=column_name, color=colors.random(value=600))
+            plot.axs.plot(temporal_results[column_name], label=column_name, color=colors.random(value=600))
 
         # Show the plot
         plot.add_legend()

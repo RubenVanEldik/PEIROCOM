@@ -95,21 +95,21 @@ def duration_curve(output_directory):
 
     # Plot the range fill
     if range_area:
-        waterfall_plot.ax.fill_between(waterfall_df.index, waterfall_df.min(axis=1), waterfall_df.max(axis=1), color=colors.get("blue", 100))
+        waterfall_plot.axs.fill_between(waterfall_df.index, waterfall_df.min(axis=1), waterfall_df.max(axis=1), color=colors.get("blue", 100))
 
     # Plot a line for each column (country)
     if individual_lines:
-        waterfall_plot.ax.plot(waterfall_df, color=colors.primary(alpha=0.1), linewidth=1)
+        waterfall_plot.axs.plot(waterfall_df, color=colors.primary(alpha=0.1), linewidth=1)
 
     # Plot the mean values
-    waterfall_plot.ax.plot(waterfall_df_mean, color=colors.primary())
+    waterfall_plot.axs.plot(waterfall_df_mean, color=colors.primary())
 
     # Plot the unity line
     if unity_line:
-        waterfall_plot.ax.axhline(y=1, color=colors.get("red", 600), linewidth=1)
+        waterfall_plot.axs.axhline(y=1, color=colors.get("red", 600), linewidth=1)
 
     # Set the x-axis limits. Use round() to ensure that the labels on either end are included
-    waterfall_plot.ax.set_xlim([round(waterfall_df.index.min(), 2), round(waterfall_df.index.max(), 2)])
+    waterfall_plot.axs.set_xlim([round(waterfall_df.index.min(), 2), round(waterfall_df.index.max(), 2)])
 
     # Format the axes to be percentages
     waterfall_plot.format_xticklabels("{:,.0%}")
