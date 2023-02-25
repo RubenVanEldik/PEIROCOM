@@ -45,7 +45,7 @@ def run():
         config = utils.read_yaml(output_directory / "config.yaml")
 
     # Set the analysis type options
-    analysis_type_options = ["statistics", "temporal_results", "countries", "correlation", "duration_curve", "interconnection_capacity"]
+    analysis_type_options = ["statistics", "temporal_results", "countries", "average_week", "correlation", "duration_curve", "interconnection_capacity"]
     if is_sensitivity_analysis:
         # Add a Streamlit placeholder for if the sensitivity step should be specified
         sensitivity_step_placeholder = st.sidebar.empty()
