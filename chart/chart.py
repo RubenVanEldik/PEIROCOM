@@ -9,7 +9,7 @@ class Chart:
     Create a matplotlib figure
     """
 
-    def __init__(self, nrows=1, ncols=1, *, xlabel, ylabel, xscale="linear", yscale="linear", sharex=True, sharey=True, wide=False):
+    def __init__(self, nrows=1, ncols=1, *, xlabel=None, ylabel=None, xscale="linear", yscale="linear", sharex=True, sharey=True, wide=False):
         # Store the number of rows and columns of the figure
         self.nrows = nrows
         self.ncols = ncols
