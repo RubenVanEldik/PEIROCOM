@@ -25,6 +25,7 @@ def average_week(output_directory):
 
     # Ask if the import and export should be shown in the chart
     show_import_export = st.sidebar.checkbox("Show import and export")
+    show_hydropower = temporal_results.generation_total_hydropower_MW.abs().max() != 0
 
     # Set the unit to TW or GW when applicable
     unit = "MW"
@@ -75,9 +76,10 @@ def average_week(output_directory):
         cumulative_demand += electrolysis_demand
 
         # Add the pumped hydropower
-        hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + hydropower_pump_flow, label="Hydropower", facecolor=colors.get("sky", 600))
-        cumulative_demand += hydropower_pump_flow
+        if show_hydropower:
+            hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
+            subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + hydropower_pump_flow, label="Hydropower", facecolor=colors.get("sky", 600))
+            cumulative_demand += hydropower_pump_flow
 
         # Add the storage charging
         storage_charging_flow = temporal_results_season.net_storage_flow_total_MW.clip(lower=0)
@@ -103,9 +105,10 @@ def average_week(output_directory):
         cumulative_generation += temporal_results_season.generation_ires_MW
 
         # Add the hydropower turbine power
-        hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
-        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + hydropower_turbine_flow), facecolor=colors.get("sky", 600))
-        cumulative_generation += hydropower_turbine_flow
+        if show_hydropower:
+            hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
+            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + hydropower_turbine_flow), facecolor=colors.get("sky", 600))
+            cumulative_generation += hydropower_turbine_flow
 
         # Add the storage discharging
         storage_discharging_flow = -temporal_results_season.net_storage_flow_total_MW.clip(upper=0)
