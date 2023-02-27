@@ -71,7 +71,7 @@ def average_week(output_directory):
 
         # Add the electrolysis demand
         electrolysis_demand = temporal_results_season.demand_total_MW - temporal_results_season.demand_fixed_MW
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + electrolysis_demand, label="Electrolysis", facecolor=colors.get("amber", 700))
+        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + electrolysis_demand, label="Electrolysis", facecolor=colors.get("amber", 600))
         cumulative_demand += electrolysis_demand
 
         # Add the pumped hydropower
