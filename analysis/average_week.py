@@ -47,8 +47,8 @@ def average_week(output_directory):
 
         # Get the results of an average week
         temporal_results_season = temporal_results_season.groupby([temporal_results_season.index.weekday, temporal_results_season.index.hour]).mean()
-        temporal_results_season["new_index"] = temporal_results_season.index.to_series().apply(lambda x: 24 * x[0] + x[1])
-        temporal_results_season = temporal_results_season.set_index("new_index")
+        temporal_results_season["hour_of_week"] = temporal_results_season.index.to_series().apply(lambda x: 24 * x[0] + x[1])
+        temporal_results_season = temporal_results_season.set_index("hour_of_week")
         season_data[season] = temporal_results_season
 
         # Set the title and format the ticks and labels of the subplot
