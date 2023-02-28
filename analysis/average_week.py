@@ -118,8 +118,8 @@ def average_week(output_directory):
         # Add the import
         if show_import_export:
             net_import = -temporal_results_season.net_export_MW.clip(upper=0)
-            subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + net_import, facecolor=colors.get("gray", 400))
-            cumulative_demand += net_import
+            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + net_import), facecolor=colors.get("gray", 400))
+            cumulative_generation += net_import
 
     # Show the plot
     week_plot.add_legend()
