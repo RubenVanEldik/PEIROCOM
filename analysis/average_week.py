@@ -40,7 +40,7 @@ def average_week(output_directory):
     week_plot = chart.Chart(4, 1)
 
     # Loop over each of the four seasons
-    season_dates = {"winter": list(range(1, 79)) + list(range(355, 366)), "spring": list(range(79, 172)), "summer": list(range(172, 266)), "autumn": list(range(266, 356))}
+    season_dates = {"winter": list(range(1, 79)) + list(range(355, 366)), "spring": list(range(79, 172)), "summer": list(range(172, 266)), "autumn": list(range(266, 355))}
     season_data = {}
     for index, season in enumerate(season_dates.keys()):
         # Get a subset of the temporal results
