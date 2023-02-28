@@ -55,8 +55,15 @@ def average_week(output_directory):
         # Set the title and format the ticks and labels of the subplot
         subplot = week_plot.axs[index]
         subplot.set_title(utils.format_str(season), rotation=90, x=1.025, y=0.3)
-        subplot.set_xticks(range(0, 24 * 7, 24), ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ha="left")
+        # Set the limit of the x-axis
         subplot.set_xlim([0, 7 * 24])
+        # Show the daily ticks, but don't show the labels
+        subplot.set_xticks(range(0, 24 * 7, 24))
+        subplot.tick_params(axis="x", which="major", labelbottom=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
+        # Show the weekday labels as minor ticks so they are between the day ticks
+        subplot.set_xticks(range(12, 24 * 7, 24), ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], minor=True)
+        subplot.tick_params(axis="x", which="minor", bottom=False, top=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
+        # Show the tick labels on the y-axis as absolute
         subplot.set_yticklabels([round(abs(x)) for x in subplot.get_yticks()])
         subplot.text(-0.055, 0.46, "Generation", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="top", rotation=90)
         subplot.text(-0.055, 0.59, "Demand", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="bottom", rotation=90)
