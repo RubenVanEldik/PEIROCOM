@@ -25,6 +25,7 @@ def average_week(output_directory):
 
     # Ask if the import and export should be shown in the chart
     show_import_export = st.sidebar.checkbox("Show import and export")
+    show_hydropower = temporal_results.generation_total_hydropower_MW.abs().max() != 0
 
     # Set the unit to TW or GW when applicable
     unit = "MW"
@@ -39,7 +40,7 @@ def average_week(output_directory):
     week_plot = chart.Chart(4, 1)
 
     # Loop over each of the four seasons
-    season_dates = {"winter": list(range(1, 79)) + list(range(355, 366)), "spring": list(range(79, 172)), "summer": list(range(172, 266)), "autumn": list(range(266, 356))}
+    season_dates = {"winter": list(range(1, 79)) + list(range(355, 366)), "spring": list(range(79, 172)), "summer": list(range(172, 266)), "autumn": list(range(266, 355))}
     season_data = {}
     for index, season in enumerate(season_dates.keys()):
         # Get a subset of the temporal results
@@ -47,19 +48,26 @@ def average_week(output_directory):
 
         # Get the results of an average week
         temporal_results_season = temporal_results_season.groupby([temporal_results_season.index.weekday, temporal_results_season.index.hour]).mean()
-        temporal_results_season["new_index"] = temporal_results_season.index.to_series().apply(lambda x: 24 * x[0] + x[1])
-        temporal_results_season = temporal_results_season.set_index("new_index")
+        temporal_results_season["hour_of_week"] = temporal_results_season.index.to_series().apply(lambda x: 24 * x[0] + x[1])
+        temporal_results_season = temporal_results_season.set_index("hour_of_week")
         season_data[season] = temporal_results_season
 
         # Set the title and format the ticks and labels of the subplot
         subplot = week_plot.axs[index]
         subplot.set_title(utils.format_str(season), rotation=90, x=1.025, y=0.3)
-        subplot.set_xticks(range(0, 24 * 7, 24), ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ha="left")
+        # Set the limit of the x-axis
         subplot.set_xlim([0, 7 * 24])
+        # Show the daily ticks, but don't show the labels
+        subplot.set_xticks(range(0, 24 * 7, 24))
+        subplot.tick_params(axis="x", which="major", labelbottom=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
+        # Show the weekday labels as minor ticks so they are between the day ticks
+        subplot.set_xticks(range(12, 24 * 7, 24), ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], minor=True)
+        subplot.tick_params(axis="x", which="minor", bottom=False, top=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
+        # Show the tick labels on the y-axis as absolute
         subplot.set_yticklabels([round(abs(x)) for x in subplot.get_yticks()])
-        subplot.text(-0.055, 0.46, "Generation", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="top", rotation=90)
-        subplot.text(-0.055, 0.59, "Demand", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="bottom", rotation=90)
-        subplot.text(-0.1, 0.5, f"({unit})", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="center", rotation=90)
+        subplot.text(-0.06, 0.25, "From", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.06, 0.75, "To", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.1, 0.5, f"({unit})", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
 
         # Demand
         # Create a series with the cumulative demand
@@ -71,13 +79,14 @@ def average_week(output_directory):
 
         # Add the electrolysis demand
         electrolysis_demand = temporal_results_season.demand_total_MW - temporal_results_season.demand_fixed_MW
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + electrolysis_demand, label="Electrolysis", facecolor=colors.get("amber", 700))
+        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + electrolysis_demand, label="Electrolysis", facecolor=colors.get("amber", 600))
         cumulative_demand += electrolysis_demand
 
         # Add the pumped hydropower
-        hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + hydropower_pump_flow, label="Hydropower", facecolor=colors.get("sky", 600))
-        cumulative_demand += hydropower_pump_flow
+        if show_hydropower:
+            hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
+            subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + hydropower_pump_flow, label="Hydropower", facecolor=colors.get("sky", 600))
+            cumulative_demand += hydropower_pump_flow
 
         # Add the storage charging
         storage_charging_flow = temporal_results_season.net_storage_flow_total_MW.clip(lower=0)
@@ -103,9 +112,10 @@ def average_week(output_directory):
         cumulative_generation += temporal_results_season.generation_ires_MW
 
         # Add the hydropower turbine power
-        hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
-        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + hydropower_turbine_flow), facecolor=colors.get("sky", 600))
-        cumulative_generation += hydropower_turbine_flow
+        if show_hydropower:
+            hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
+            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + hydropower_turbine_flow), facecolor=colors.get("sky", 600))
+            cumulative_generation += hydropower_turbine_flow
 
         # Add the storage discharging
         storage_discharging_flow = -temporal_results_season.net_storage_flow_total_MW.clip(upper=0)
@@ -115,8 +125,8 @@ def average_week(output_directory):
         # Add the import
         if show_import_export:
             net_import = -temporal_results_season.net_export_MW.clip(upper=0)
-            subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + net_import, facecolor=colors.get("gray", 400))
-            cumulative_demand += net_import
+            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + net_import), facecolor=colors.get("gray", 400))
+            cumulative_generation += net_import
 
     # Show the plot
     week_plot.add_legend()
