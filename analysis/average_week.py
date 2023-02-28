@@ -65,9 +65,9 @@ def average_week(output_directory):
         subplot.tick_params(axis="x", which="minor", bottom=False, top=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
         # Show the tick labels on the y-axis as absolute
         subplot.set_yticklabels([round(abs(x)) for x in subplot.get_yticks()])
-        subplot.text(-0.055, 0.46, "Generation", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="top", rotation=90)
-        subplot.text(-0.055, 0.59, "Demand", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="bottom", rotation=90)
-        subplot.text(-0.1, 0.5, f"({unit})", transform=subplot.transAxes, horizontalalignment="right", verticalalignment="center", rotation=90)
+        subplot.text(-0.06, 0.25, "From", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.06, 0.75, "To", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.1, 0.5, f"({unit})", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
 
         # Demand
         # Create a series with the cumulative demand
