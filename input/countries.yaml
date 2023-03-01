@@ -22,7 +22,7 @@
   included_geographic_units: [NLX]
   population: 17533405
   land_area: 33670
-  annual_hydrogen_demand: 10000
+  annual_hydrogen_demand: 12283
   capacity:
     current:
       pv: 0
