@@ -1,6 +1,7 @@
 # Miscellaneous
 .DS_Store
 __pycache__/
+.idea/
 todo.txt
 
 # ENV variables
