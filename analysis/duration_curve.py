@@ -42,7 +42,7 @@ def duration_curve(output_directory):
     st.sidebar.header("Options")
 
     # Get the storage capacity and temporal results
-    all_temporal_results = utils.get_temporal_results(output_directory, group="country")
+    all_temporal_results = utils.get_temporal_results(output_directory)
 
     # Select a column as numerator and denominator
     st.sidebar.subheader("Columns")
