@@ -1,7 +1,6 @@
 # Remove any existing containers or images
 docker container stop peirocom-container
 docker rm peirocom-container
-docker image rm peirocom
 
 # Build and run the container
 docker build . -t peirocom $(for i in `cat .env`; do out+="--build-arg $i " ; done; echo $out;out="")
