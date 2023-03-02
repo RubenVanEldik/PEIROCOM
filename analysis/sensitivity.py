@@ -99,7 +99,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
                     # Plot the regression line
                     sensitivity_plot.axs.plot(regression_line, color=colors.get("red", 600), label=regression_function_string_formatted)
                     sensitivity_plot.add_legend()
-                except:
+                except (NameError, TypeError, SyntaxError):
                     st.sidebar.error("The function is not valid")
             else:
                 sensitivity_plot.axs.plot(data, label=label, color=line_color)
