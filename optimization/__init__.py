@@ -116,7 +116,7 @@ def run_sensitivity(config, sensitivity_config):
                     break
 
                 # Add a break to the lowest relative storage costs (due to hydropower sometimes almost no storage costs are required)
-                if relative_storage_costs < 0.01:
+                if relative_storage_costs < 0.05:
                     break
 
                 # Update the relative storage capacity for the next pass
