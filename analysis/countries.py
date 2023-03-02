@@ -1,5 +1,6 @@
-import pandas as pd
 import re
+
+import pandas as pd
 import streamlit as st
 
 import chart
@@ -76,7 +77,7 @@ def _select_data(output_directory, *, name):
         if selected_ires_types:
             return ires_capacity[selected_ires_types]
 
-    storage_capacity_match = re.search("Storage capacity \((.+)\)$", data_source)
+    storage_capacity_match = re.search(r"Storage capacity \((.+)\)$", data_source)
     if storage_capacity_match:
         energy_or_power = storage_capacity_match.group(1)
 
@@ -119,7 +120,7 @@ def countries(output_directory):
         denominator = _select_data(output_directory, name="denominator")
 
         if numerator is not None and denominator is not None:
-            # Sum the denominator if its a DataFrame
+            # Sum the denominator if it's a DataFrame
             if validate.is_dataframe(denominator):
                 denominator = denominator.sum(axis=1)
 
@@ -159,11 +160,11 @@ def countries(output_directory):
             if validate.is_dataframe(data):
                 data = data.sum(axis=1)
 
-            map = chart.Map(data, label=label, format_percentage=format_percentage)
-            map.display()
-            map.download_button("countries.png")
+            countries_map = chart.Map(data, label=label, format_percentage=format_percentage)
+            countries_map.display()
+            countries_map.download_button("countries.png")
         else:
-            # Drop the non-exising values when zero values are excluded
+            # Drop the non-existing values when zero values are excluded
             if exclude_zero_values:
                 data = data.dropna()
 
@@ -179,7 +180,6 @@ def countries(output_directory):
                     color = colors.technology(column_name) if validate.is_technology(column_name) else colors.random()
                     bar_chart.axs.bar(data.index, data[column_name], bar_width, bottom=bottom, label=utils.format_str(column_name), color=color)
                     bottom += data[column_name]
-                handles, labels = bar_chart.axs.get_legend_handles_labels()
                 bar_chart.add_legend()
             else:
                 bar_chart.axs.bar(data.index, data, bar_width, color=colors.primary())
@@ -188,7 +188,7 @@ def countries(output_directory):
                 bar_chart.format_yticklabels("{:,.0%}")
 
             country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
-            bar_chart.axs.set_xticks(bar_chart.axs.get_xticks())  # Required to not get a warning message when using set_xticklabels
+            bar_chart.axs.set_xticks(bar_chart.axs.get_xticks())  # Required to not get a warning message when using 'set_xticklabels'
             bar_chart.axs.set_xticklabels(country_names, rotation=90)
             padding = bar_width - (1 - bar_width) / 2
             bar_chart.axs.set_xlim(-padding, len(data.index) - (1 - padding))

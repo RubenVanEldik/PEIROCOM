@@ -5,13 +5,13 @@ import validate
 
 
 @utils.cache
-def format_column_name(str):
+def format_column_name(column_name):
     """
     Properly format any column name
     """
-    assert validate.is_string(str)
+    assert validate.is_string(column_name)
 
-    match = re.search("(.+)_(\w+)$", str)
+    match = re.search(r"(.+)_(\w+)$", column_name)
     label = match.group(1)
     unit = match.group(2)
 

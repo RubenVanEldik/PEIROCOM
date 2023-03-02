@@ -1,4 +1,3 @@
-from datetime import datetime
 import pandas as pd
 import streamlit as st
 
@@ -37,7 +36,7 @@ def preprocess_interconnection_data(scenarios):
                 output_directory = utils.path("input", "scenarios", scenario["name"], "interconnections")
                 filepath = utils.path(input_directory, f"Transfer Capacities_ERAA2021_TY{scenario['year']}.xlsx")
 
-                # Create the output directory if does not exist yet
+                # Create the output directory if it does not exist yet
                 if not output_directory.is_dir():
                     output_directory.mkdir(parents=True)
 
@@ -62,4 +61,4 @@ def preprocess_interconnection_data(scenarios):
                     limits.index = utils.create_datetime_index(limits.index, scenario["year"])
                     limits.to_csv(output_directory / "limits.csv")
 
-    st.success("The data for all interconnections is succesfully preprocessed")
+    st.success("The data for all interconnections is successfully preprocessed")

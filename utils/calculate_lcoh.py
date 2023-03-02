@@ -1,5 +1,6 @@
-import pandas as pd
 import re
+
+import pandas as pd
 
 import utils
 import validate
@@ -103,10 +104,12 @@ def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs,
     # Calculate and return the LCOH
     if breakdown_level == 0:
         total_costs = annualized_electrolyzer_costs.sum() + annualized_electricity_costs.sum()
-    if breakdown_level == 1:
+    elif breakdown_level == 1:
         total_costs = pd.Series({"electrolyzer": annualized_electrolyzer_costs.sum(), "electricity": annualized_electricity_costs.sum()})
-    if breakdown_level == 2:
+    elif breakdown_level == 2:
         total_costs = pd.concat([annualized_electrolyzer_costs.rename("electrolyzer"), annualized_electricity_costs.rename("electricity")], axis=1)
+    else:
+        raise ValueError("breakdown_level should be between 0, 1, or 2")
 
     # Convert the costs from Dollar to Euro
     eur_usd = 1.1290  # Source: https://www.federalreserve.gov/releases/h10/20220110/

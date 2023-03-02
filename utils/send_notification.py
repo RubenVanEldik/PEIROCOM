@@ -3,7 +3,6 @@ import pushover
 import utils
 import validate
 
-
 # Initialize the Pushover client if the keys are available
 user_key = utils.get_env("PUSHOVER_USER_KEY")
 api_token = utils.get_env("PUSHOVER_API_TOKEN")
@@ -17,7 +16,7 @@ def send_notification(message):
     """
     assert validate.is_string(message)
 
-    # Send the message if the client has been intialized
+    # Send the message if the client has been initialized
     if "client" in globals():
         try:
             client.send_message(message, title="Thesis model")

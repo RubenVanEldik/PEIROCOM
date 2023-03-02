@@ -1,9 +1,9 @@
-import math
+import re
 from datetime import datetime, timedelta
+
 import gurobipy as gp
 import numpy as np
 import pandas as pd
-import re
 import streamlit as st
 
 import utils
@@ -23,7 +23,7 @@ def optimize(config, *, status, output_directory):
 
     # Check if the interconnections should be optimized individually
     include_hydrogen_production = len(config["technologies"]["electrolysis"]) > 0
-    optimize_individual_interconnections = config["interconnections"]["optimize_individual_interconnections"] == True and config["interconnections"]["relative_capacity"] != 1
+    optimize_individual_interconnections = config["interconnections"]["optimize_individual_interconnections"] is True and config["interconnections"]["relative_capacity"] != 1
 
     # Calculate the interval length in hours
     interval_length = pd.Timedelta(config["resolution"]).total_seconds() / 3600
@@ -96,7 +96,7 @@ def optimize(config, *, status, output_directory):
         """
         if include_hydrogen_production:
             # Calculate the mean hourly electricity demand for hydrogen production
-            # (This is both the hourly mean and the non-weighted mean of the efficiency; the mean of efficiency is used as its mathemetically impossible in this LP to use the variables)
+            # (This is both the hourly mean and the non-weighted mean of the efficiency; the mean of efficiency is used as its mathematically impossible in this LP to use the variables)
             country_code = utils.get_country_of_market_node(market_node)
             annual_hydrogen_demand_country = config.get("relative_hydrogen_demand", 1) * utils.get_country_property(country_code, "annual_hydrogen_demand")
             number_of_market_nodes_in_country = len(utils.get_market_nodes_for_countries([country_code]))
@@ -224,7 +224,7 @@ def optimize(config, *, status, output_directory):
             temporal_results[market_node][f"generation_{hydropower_technology}_hydropower_MW"] = net_flow
             temporal_results[market_node]["generation_total_hydropower_MW"] += net_flow
 
-            # Create the the hydropower spillage variables and add them to the temporal_results DataFrame (probably only required for Portugal)
+            # Create the hydropower spillage variables and add them to the temporal_results DataFrame (probably only required for Portugal)
             spillage_MW = pd.Series(model.addVars(temporal_hydropower_data.index))
             temporal_results[market_node]["spillage_total_hydropower_MW"] += spillage_MW
 
@@ -478,7 +478,7 @@ def optimize(config, *, status, output_directory):
     # Calculate the annual electricity costs
     annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, None, config=config, annual_costs=True)
 
-    # Calculate the total spillage and give it an artificial cost (this is required because otherwise some of the curtailment might be accounted as spillage)
+    # Calculate the total spillage and give it an artificial cost (this is required because otherwise some curtailment might be accounted as spillage)
     total_spillage_hydropower_MWh = utils.merge_dataframes_on_column(temporal_results, "spillage_total_hydropower_MW").sum().sum() * interval_length
     artificial_spillage_cost_factor = 100
     total_spillage_costs = total_spillage_hydropower_MWh * artificial_spillage_cost_factor

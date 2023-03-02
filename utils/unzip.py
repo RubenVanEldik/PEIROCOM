@@ -14,5 +14,5 @@ def unzip(filepath, *, remove_zip_file=False):
     shutil.unpack_archive(str(filepath), filepath.parent / filepath.stem)
 
     # Remove the ZIP file if specified
-    if remove_zip_file == True:
+    if remove_zip_file:
         filepath.unlink()

@@ -1,7 +1,8 @@
 import io
-from matplotlib import pyplot as plt
+
 import numpy as np
 import streamlit as st
+from matplotlib import pyplot as plt
 
 import colors
 import utils
@@ -20,11 +21,10 @@ class Map:
 
         # Create the color bar
         colormap = colors.colormap("blue")
-        vmin = data.min()
-        vmax = data[data < np.Inf].max()
-        scalar_mappable = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
-        format = lambda x, pos: f"{x:.0%}" if format_percentage else f"{x:.3g}"
-        self.fig.colorbar(scalar_mappable, shrink=0.7, aspect=20, label=label, format=format)
+        v_min = data.min()
+        v_max = data[data < np.Inf].max()
+        scalar_mappable = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=v_min, vmax=v_max))
+        self.fig.colorbar(scalar_mappable, shrink=0.7, aspect=20, label=label, format=lambda x, pos: f"{x:.0%}" if format_percentage else f"{x:.3g}")
 
         # Get the geopandas DataFrame and map the data to it
         map_df = utils.get_geometries_of_countries(data.index)

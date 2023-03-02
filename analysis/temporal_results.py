@@ -19,7 +19,7 @@ def temporal_results(output_directory):
     # Get temporal results for a country
     all_temporal_results = utils.get_temporal_results(output_directory, group="country")
     config = utils.read_yaml(output_directory / "config.yaml")
-    country_code = st.sidebar.selectbox("Country", config["country_codes"], format_func=lambda country_code: utils.get_country_property(country_code, "name"))
+    country_code = st.sidebar.selectbox("Country", config["country_codes"], format_func=lambda value: utils.get_country_property(value, "name"))
     temporal_results = all_temporal_results[country_code]
 
     # Filter the data columns
@@ -38,7 +38,7 @@ def temporal_results(output_directory):
         start_data = temporal_results.index.min().to_pydatetime()
         end_data = temporal_results.index.max().to_pydatetime()
         data_range = st.sidebar.slider("Date range", value=(start_data, end_data), min_value=start_data, max_value=end_data)
-        temporal_results = temporal_results.loc[data_range[0] : data_range[1]]
+        temporal_results = temporal_results.loc[data_range[0]: data_range[1]]
 
         # Initialize the plot
         plot = chart.Chart(xlabel="Time", ylabel="", wide=True)

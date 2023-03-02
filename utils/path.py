@@ -25,16 +25,16 @@ def path(*args):
     assert _validate_path_arguments(args)
 
     # Create the path object
-    path = pathlib.Path(".")
+    new_path = pathlib.Path(".")
 
     # Loop over all arguments, adding them to the path object
     for arg in args:
-        # If its a number, convert the argument to a string
+        # If it's a number, convert the argument to a string
         if validate.is_number(arg):
             arg = str(arg)
 
         # Add the argument to teh path
-        path /= arg
+        new_path /= arg
 
     # Return the path object
-    return path
+    return new_path

@@ -1,6 +1,6 @@
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
 import pandas as pd
+from matplotlib.colors import LinearSegmentedColormap
 
 import utils
 import validate
@@ -116,5 +116,4 @@ def colormap(color1, color2=None, *, alpha=1):
         color_list = color_list1 + color_list2
 
     # Return the colormap
-    colormap = LinearSegmentedColormap.from_list(name, color_list)
-    return colormap
+    return LinearSegmentedColormap.from_list(name, color_list)

@@ -12,7 +12,7 @@ def get_technologies(*, technology_type=None):
     # Read the technologies YAML file
     technology_types = utils.read_yaml(utils.path("input", "technologies.yaml"))
 
-    # Return the requested technologies if a technology type was specfied or all if none was specified
+    # Return the requested technologies if a technology type was specified or all if none was specified
     if technology_type == "ires":
         technologies = technology_types.get("ires", {})
     elif technology_type == "hydropower":

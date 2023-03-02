@@ -16,7 +16,7 @@ def _validate_run(run_name):
     if utils.path("output", run_name, "sensitivity.yaml").is_file():
         return True
 
-    # Return False if has neither a config.yaml or sensitivity.yaml file
+    # Return False if it has neither a config.yaml nor sensitivity.yaml file
     return False
 
 

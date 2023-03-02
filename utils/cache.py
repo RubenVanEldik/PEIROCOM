@@ -2,7 +2,6 @@ import streamlit as st
 
 from .is_demo import is_demo
 
-
 # Set a maximum cache time of 1 minute for the demo
 ttl = 60 if is_demo else None
 

@@ -72,12 +72,14 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         if statistic_name == "firm_lcoe":
             sensitivity_plot.axs.set_ylabel("Firm LCOE (€/MWh)")
             data = _retrieve_statistics(steps, "firm_lcoe", output_directory, breakdown_level=breakdown_level)
-        if statistic_name == "unconstrained_lcoe":
+        elif statistic_name == "unconstrained_lcoe":
             sensitivity_plot.axs.set_ylabel("Unconstrained LCOE (€/MWh)")
             data = _retrieve_statistics(steps, "unconstrained_lcoe", output_directory, breakdown_level=breakdown_level)
-        if statistic_name == "premium":
+        elif statistic_name == "premium":
             sensitivity_plot.axs.set_ylabel("Firm kWh premium")
             data = _retrieve_statistics(steps, "premium", output_directory, breakdown_level=breakdown_level)
+        else:
+            raise ValueError("'statistic_name has to be 'firm_lcoe', 'unconstrained_lcoe', or 'premium'")
 
         # Plot the data depending on the breakdown level
         if breakdown_level == 0:
@@ -93,19 +95,19 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
 
                     # Format the regression string
                     regression_function_string_formatted = f"${regression_function_string}$"
-                    for old_substring, new_substring in [("a ", f"{parameters[0]:.2f} "), (" b ", f" {parameters[1]:.2f} "), (" c ", f" {parameters[2]:.2f} "), (" * ", " \cdot ")]:
+                    for old_substring, new_substring in [("a ", f"{parameters[0]:.2f} "), (" b ", f" {parameters[1]:.2f} "), (" c ", f" {parameters[2]:.2f} "), (" * ", r" \cdot ")]:
                         regression_function_string_formatted = regression_function_string_formatted.replace(old_substring, new_substring)
 
                     # Plot the regression line
                     sensitivity_plot.axs.plot(regression_line, color=colors.get("red", 600), label=regression_function_string_formatted)
                     sensitivity_plot.add_legend()
-                except:
+                except (NameError, TypeError, SyntaxError):
                     st.sidebar.error("The function is not valid")
             else:
                 sensitivity_plot.axs.plot(data, label=label, color=line_color)
         elif breakdown_level == 1:
             cumulative_data = 0
-            for technology_type in sorted(data.columns, key=lambda technology_type: {"hydropower": 0, "ires": 1, "storage": 2}.get(technology_type, 3)):
+            for technology_type in sorted(data.columns, key=lambda value: {"hydropower": 0, "ires": 1, "storage": 2}.get(value, 3)):
                 # Don't add the technology if it only has 0 values
                 if data[technology_type].abs().max() == 0:
                     continue
@@ -162,12 +164,11 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             line_color = colors.get("blue", (index + 1) * 300)
             sensitivity_plot.axs.fill_between(data[column_name].index, cumulative_data - data[column_name], cumulative_data, label=utils.format_str(column_name), color=line_color)
         sensitivity_plot.axs.set_ylabel("Duration (H)")
-        handles, labels = sensitivity_plot.axs.get_legend_handles_labels()
         sensitivity_plot.axs.set_xlim([data.index.min(), data.index.max()])
         sensitivity_plot.axs.set_ylim([0, sensitivity_plot.axs.set_ylim()[1]])
         sensitivity_plot.add_legend()
 
-    # Return the data so it can be shown in a table
+    # Return the data, so it can be shown in a table
     return data
 
 
@@ -202,8 +203,8 @@ def sensitivity(output_directory):
     # Format the axes
     if sensitivity_config["analysis_type"] == "curtailment":
         sensitivity_plot.axs.set_xlabel("Curtailment (%)")
-        xticks = np.arange(0, 1.2, 0.2)
-        sensitivity_plot.axs.set_xticks(xticks, xticks)
+        x_ticks = np.arange(0, 1.2, 0.2)
+        sensitivity_plot.axs.set_xticks(x_ticks, x_ticks)
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "climate_years":
         sensitivity_plot.axs.set_xlabel("Number of climate years")
@@ -214,7 +215,7 @@ def sensitivity(output_directory):
         sensitivity_plot.axs.set_xlabel("Hydrogen demand ($\%_{electricity\ demand}$)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "hydropower_capacity":
-        sensitivity_plot.axs.set_xlabel("Hydropower capacity ($\%_{current}$)")
+        sensitivity_plot.axs.set_xlabel(r"Hydropower capacity ($\%_{current}$)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "interconnection_capacity":
         sensitivity_plot.axs.set_xlabel("Individual interconnection capacity (MW)")

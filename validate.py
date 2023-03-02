@@ -1,9 +1,10 @@
 import datetime
+import pathlib
+import re
+
 import gurobipy as gp
 import numpy as np
 import pandas as pd
-import pathlib
-import re
 import shapely
 
 import chart
@@ -228,9 +229,7 @@ def is_dict_or_list(value, *, required=True):
     if value is None:
         return not required
 
-    is_list = type(value) is list
-    is_dict = type(value) is dict
-    return is_list or is_dict
+    return isinstance(value, (list, dict))
 
 
 def is_directory_path(value, *, required=True, existing=None):
@@ -239,9 +238,9 @@ def is_directory_path(value, *, required=True, existing=None):
 
     if not isinstance(value, pathlib.Path):
         return False
-    if existing == False:
+    if existing is False:
         return not value.exists()
-    if existing == True:
+    if existing is True:
         return value.is_dir()
 
     return True
@@ -262,9 +261,9 @@ def is_filepath(value, *, required=True, suffix=None, existing=None):
         return False
     if suffix and value.suffix != suffix:
         return False
-    if existing == False:
+    if existing is False:
         return not value.exists()
-    if existing == True:
+    if existing is True:
         return value.is_file()
 
     return True
@@ -314,7 +313,7 @@ def is_gurobi_variable_tupledict(value, *, required=True):
     if value is None:
         return not required
 
-    if not isinstance(value, gurobipy.tupledict):
+    if not isinstance(value, gp.tupledict):
         return False
 
     return all(is_gurobi_variable(x) for x in value.values())
@@ -480,5 +479,5 @@ def is_url(value, *, required=True):
     if value is None:
         return not required
 
-    url_regex = '^(ftp|https?):\/\/[^ "]+\.\w{2,}'
+    url_regex = r'^(ftp|https?):\/\/[^ "]+\.\w{2,}'
     return bool(re.search(url_regex, value))

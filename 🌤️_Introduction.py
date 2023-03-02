@@ -11,7 +11,6 @@ st.image("./images/logo.png")
 # Show the README introduction
 st.markdown(utils.read_text(utils.path("README.md")))
 
-
 st.markdown(
     """
 <style>
@@ -24,9 +23,9 @@ st.markdown(
         width: 22rem;
 
     }
-	.stMarkdown{
-		text-align: center;
-	}
+    .stMarkdown{
+        text-align: center;
+    }
 
     .stMarkdown h3 {
         font-size: 1.5rem;

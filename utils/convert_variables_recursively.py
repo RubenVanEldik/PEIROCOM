@@ -1,8 +1,6 @@
 import gurobipy as gp
 import pandas as pd
 
-import validate
-
 
 def convert_variables_recursively(data):
     """

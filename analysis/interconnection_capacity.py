@@ -8,7 +8,7 @@ import validate
 
 def interconnection_capacity(output_directory):
     """
-    Show a horizontal bar chart with the largest expansions in interonnection capacity
+    Show a horizontal bar chart with the largest expansions in interconnection capacity
     """
     assert validate.is_directory_path(output_directory)
 

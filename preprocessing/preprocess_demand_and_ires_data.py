@@ -1,4 +1,3 @@
-from datetime import datetime
 import pandas as pd
 import streamlit as st
 
@@ -17,7 +16,7 @@ def _get_relevant_sheet_names(filepath, market_node):
         """
         Check if a specific sheet belongs to a market node
         """
-        # Return True if its an exact match
+        # Return True if it's an exact match
         if sheet == market_node:
             return True
 
@@ -60,7 +59,7 @@ def _get_relevant_sheet_names(filepath, market_node):
         if exceptions.get(sheet) is not None:
             return exceptions.get(sheet) == market_node
 
-        # Return false if its not an exact match, the country has multiple market nodes and its not an exception
+        # Return false if it's not an exact match, the country has multiple market nodes, and it's not an exception
         return False
 
     # Return a sorted list of all relevant sheet names
@@ -81,8 +80,7 @@ def _import_data(data, filepath, *, market_node, column_name=None):
     ires_nodes = _get_relevant_sheet_names(filepath, market_node)
     for ires_node in ires_nodes:
         # Import the Excel sheet for a IRES node
-        usecols_func = lambda col: col in ["Date", "Hour"] or isinstance(col, int)
-        sheet = pd.read_excel(filepath, sheet_name=ires_node, index_col=[0, 1], skiprows=10, usecols=usecols_func)
+        sheet = pd.read_excel(filepath, sheet_name=ires_node, index_col=[0, 1], skiprows=10, usecols=lambda col: col in ["Date", "Hour"] or isinstance(col, int))
         formatted_column_name = column_name.replace("{ires_node}", ires_node)
 
         # Transform the sheet DataFrame to a Series with appropriate index
@@ -133,12 +131,11 @@ def preprocess_demand_and_ires_data(scenarios):
 
     for scenario_index, scenario in enumerate(scenarios):
         # Define the directory variables
-        demand_directory = utils.path("input", "eraa", "Demand Data")
         climate_directory = utils.path("input", "eraa", "Climate Data")
         output_directory = utils.path("input", "scenarios", scenario["name"])
         ires_directory = output_directory / "ires"
 
-        # Create the IRES directory if does not exist yet
+        # Create the IRES directory if it does not exist yet
         if not ires_directory.is_dir():
             ires_directory.mkdir(parents=True)
 
@@ -169,4 +166,4 @@ def preprocess_demand_and_ires_data(scenarios):
                 # Store the data in a CSV file
                 ires_data.to_csv(ires_directory / f"{market_node}.csv")
 
-    st.success("The demand and IRES data for all market nodes is succesfully preprocessed")
+    st.success("The demand and IRES data for all market nodes is successfully preprocessed")

@@ -95,7 +95,7 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
         capex_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "capex_power", technology_scenario)
         capex = capex_energy + capex_power
 
-        # Calcalate fixed O&M
+        # Calculate fixed O&M
         fixed_om_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_energy", technology_scenario)
         fixed_om_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_power", technology_scenario)
         fixed_om = fixed_om_energy + fixed_om_power
@@ -122,7 +122,7 @@ def _calculate_annual_demand(demand_MW):
 
 def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_per_market_node, *, config, breakdown_level=0, annual_costs=False):
     """
-    Calculate the average Levelized Costs of Electricity for all market nodes
+    Calculate the average levelized costs of electricity for all market nodes
     """
     assert validate.is_market_node_dict(ires_capacity)
     assert validate.is_market_node_dict(storage_capacity)
@@ -153,10 +153,12 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
     # Calculate and return the LCOE
     if breakdown_level == 0:
         total_costs = annualized_ires_costs.sum() + annualized_storage_costs.sum() + annualized_hydropower_costs.sum()
-    if breakdown_level == 1:
+    elif breakdown_level == 1:
         total_costs = pd.Series({"ires": annualized_ires_costs.sum(), "hydropower": annualized_hydropower_costs.sum(), "storage": annualized_storage_costs.sum()})
-    if breakdown_level == 2:
+    elif breakdown_level == 2:
         total_costs = pd.concat([annualized_ires_costs, annualized_storage_costs, annualized_hydropower_costs])
+    else:
+        raise ValueError("breakdown_level should be between 0, 1, or 2")
 
     # Convert the costs from Dollar to Euro
     eur_usd = 1.1290  # Source: https://www.federalreserve.gov/releases/h10/20220110/

@@ -5,18 +5,18 @@ word_dict = {"ires": "IRES", "lcoe": "LCOE", "hvac": "HVAC", "hvdc": "HVDC", "so
 
 
 @utils.cache
-def format_str(str):
+def format_str(string):
     """
     Replace underscores with spaces, capitalize the string, and convert the abbreviations into uppercase
     """
-    assert validate.is_string(str)
+    assert validate.is_string(string)
 
     # Replace underscores with spaces
-    str = str.replace("_", " ")
+    string = string.replace("_", " ")
 
-    # Format technology names and bbreviations properly, and capitalize the first word of the string
+    # Format technology names and abbreviations properly, and capitalize the first word of the string
     word_list = []
-    for index, word in enumerate(str.split(" ")):
+    for index, word in enumerate(string.split(" ")):
         if validate.is_technology(word):
             word_list.append(utils.format_technology(word, capitalize=index == 0))
         elif word in word_dict:
