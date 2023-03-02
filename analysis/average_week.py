@@ -60,7 +60,7 @@ def average_week(output_directory):
         # Show the daily ticks, but don't show the labels
         subplot.set_xticks(range(0, 24 * 7, 24))
         subplot.tick_params(axis="x", which="major", labelbottom=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
-        # Show the weekday labels as minor ticks so they are between the day ticks
+        # Show the weekday labels as minor ticks, so they are between the day ticks
         subplot.set_xticks(range(12, 24 * 7, 24), ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], minor=True)
         subplot.tick_params(axis="x", which="minor", bottom=False, top=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
         # Show the tick labels on the y-axis as absolute

@@ -1,11 +1,10 @@
 from copy import deepcopy
-import pandas as pd
+
 import streamlit as st
 
 import stats
 import utils
 import validate
-
 from .optimize import optimize
 from .status import Status
 
@@ -29,7 +28,7 @@ def run(config, *, status=None, output_directory):
 
     error_message = optimize(config, status=status, output_directory=output_directory)
 
-    # Stop the run if an error occured during the optimization
+    # Stop the run if an error occurred during the optimization
     if error_message is not None:
         status.update(error_message, status_type="error")
         if config["send_notification"]:
@@ -105,10 +104,6 @@ def run_sensitivity(config, sensitivity_config):
 
                 # Add the step to the sensitivity config
                 sensitivity_config["steps"][step_key] = relative_storage_costs
-
-                # Calculate the curtailment
-                current_temporal_results = utils.get_temporal_results(output_directory_step, group="all")
-                current_curtailment = current_temporal_results.curtailed_MW.sum() / (current_temporal_results.generation_ires_MW.sum() + current_temporal_results.generation_total_hydropower_MW.sum())
 
                 # Break the while loop if the premium exceeds the maximum premium
                 firm_lcoe = stats.firm_lcoe(output_directory_step)

@@ -3,7 +3,7 @@ import validate
 
 def validate_files(filenames):
     """
-    Check if all all files in a list exist
+    Check if all files in a list exist
     """
     assert validate.is_filepath_list(filenames)
 

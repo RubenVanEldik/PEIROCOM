@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 
-import analysis
 import utils
 
 # Set the page config

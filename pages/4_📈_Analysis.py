@@ -35,18 +35,12 @@ def run():
         else:
             return
 
-    # Get the config
-    if is_sensitivity_analysis:
-        # Get the config for the first step
-        sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")
-        first_step = next(iter(sensitivity_config["steps"]))
-        config = utils.read_yaml(output_directory / first_step / "config.yaml")
-    else:
-        config = utils.read_yaml(output_directory / "config.yaml")
-
     # Set the analysis type options
     analysis_type_options = ["statistics", "temporal_results", "countries", "average_week", "correlation", "duration_curve", "interconnection_capacity"]
     if is_sensitivity_analysis:
+        # Get the config for the first step
+        sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")
+
         # Add a Streamlit placeholder for if the sensitivity step should be specified
         sensitivity_step_placeholder = st.sidebar.empty()
 
@@ -54,7 +48,7 @@ def run():
         analysis_type_options.extend(["sensitivity", "optimization_log"])
         analysis_type = st.sidebar.radio("Type of analysis", analysis_type_options, index=len(analysis_type_options) - 2, format_func=utils.format_str)
 
-        # If its not a sensitivity analysis, ask for which sensitivity step the data should be shown
+        # If it's not a sensitivity analysis, ask for which sensitivity step the data should be shown
         if analysis_type != "sensitivity":
             output_directory /= sensitivity_step_placeholder.selectbox("Step", sensitivity_config["steps"])
 

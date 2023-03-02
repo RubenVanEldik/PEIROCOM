@@ -1,6 +1,7 @@
+import re
+
 import numpy as np
 import pandas as pd
-import re
 import streamlit as st
 
 import chart
@@ -46,8 +47,6 @@ def duration_curve(output_directory):
 
     # Select a column as numerator and denominator
     st.sidebar.subheader("Columns")
-    first_country = next(iter(all_temporal_results))
-    columns = all_temporal_results[first_country].columns
     relevant_columns = utils.find_common_columns(all_temporal_results)
     relative = st.sidebar.checkbox("Relative")
     if relative:
@@ -58,18 +57,19 @@ def duration_curve(output_directory):
     else:
         numerator = st.sidebar.selectbox("Column", relevant_columns, format_func=utils.format_column_name)
         denominator = None
+        denominator_type = None
 
     # Set the label for the y-axis
     st.sidebar.subheader("Axes")
     col1, col2 = st.sidebar.columns(2)
-    ylabel_match = re.search("(.+)_(\w+)$", numerator)
-    ylabel_text = utils.format_str(ylabel_match.group(1))
-    ylabel_unit = ylabel_match.group(2) if denominator is None else "%" if denominator_type == "series" else f"$\%_{{{denominator_type}}}$"
-    xlabel = col1.text_input("Label x-axis", value="Time (%)")
-    ylabel = col2.text_input("Label y-axis", value=f"{ylabel_text} ({ylabel_unit})")
+    y_label_match = re.search(r"(.+)_(\w+)$", numerator)
+    y_label_text = utils.format_str(y_label_match.group(1))
+    y_label_unit = y_label_match.group(2) if denominator is None else "%" if denominator_type == "series" else fr"$\%_{{{denominator_type}}}$"
+    x_label = col1.text_input("Label x-axis", value="Time (%)")
+    y_label = col2.text_input("Label y-axis", value=f"{y_label_text} ({y_label_unit})")
     axis_scale_options = ["linear", "log", "symlog", "logit"]
     xscale = col1.selectbox("Scale x-axis", axis_scale_options, format_func=utils.format_str)
-    yscale = col2.selectbox("Scale y-axis", axis_scale_options, format_func=utils.format_str)
+    y_scale = col2.selectbox("Scale y-axis", axis_scale_options, format_func=utils.format_str)
 
     # Set the waterfall parameters
     st.sidebar.subheader("Options")
@@ -91,7 +91,7 @@ def duration_curve(output_directory):
         waterfall_df_mean = _sort(numerator_df.mean(axis=1))
 
     # Create the chart
-    waterfall_plot = chart.Chart(xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+    waterfall_plot = chart.Chart(xlabel=x_label, ylabel=y_label, xscale=xscale, yscale=y_scale)
 
     # Plot the range fill
     if range_area:

@@ -3,13 +3,11 @@ import streamlit as st
 import preprocessing
 import utils
 
-
 # Set the page config
 st.set_page_config(page_title="Preprocessing - PEIROCOM", page_icon="🔗")
 
 # Define the scenarios
 scenarios = [{"name": "ERAA 2025", "year": 2025}, {"name": "ERAA 2030", "year": 2030}]
-
 
 # Show the download section
 st.header("Download files")
@@ -34,7 +32,6 @@ interconnection_files_are_downloaded = utils.validate_files(interconnection_file
 if st.button("Download interconnection data", disabled=interconnection_files_are_downloaded):
     interconnection_data_url = "https://eepublicdownloads.azureedge.net/clean-documents/sdc-documents/ERAA/Net%20Transfer%20Capacities.7z"
     preprocessing.download_eraa_data(interconnection_data_url, interconnection_filenames)
-
 
 # Show the preprocessing section
 st.header("Preprocess files")

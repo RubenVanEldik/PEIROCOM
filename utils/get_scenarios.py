@@ -1,5 +1,4 @@
 import utils
-import validate
 
 
 def get_scenarios():

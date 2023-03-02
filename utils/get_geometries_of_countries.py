@@ -8,7 +8,7 @@ def get_geometries_of_countries(country_codes):
     """
     assert validate.is_country_code_list(country_codes, code_type="nuts2")
 
-    # Get a list of all included geographic units and all excluded geographic sub-units
+    # Get a list of all included geographic units and all excluded geographic subunits
     included_geographic_units = []
     excluded_geographic_subunits = []
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))

@@ -1,6 +1,6 @@
-from datetime import date, datetime, time, timedelta
-import numpy as np
 import os
+
+import numpy as np
 import streamlit as st
 
 import optimization
@@ -14,9 +14,9 @@ st.set_page_config(page_title="Optimization - PEIROCOM", page_icon="🔮")
 demo_disabled_message = "This feature is not available in the online demo" if utils.is_demo else None
 
 # Settings dictionary for the new run
-config = {}
+config = dict()
 
-# Ask for the name of the this run
+# Ask for the name of this run
 config["name"] = st.sidebar.text_input("Name", value=utils.get_next_run_name(), max_chars=50)
 
 # Set the scope options
@@ -121,43 +121,43 @@ with st.sidebar.expander("Sensitivity analysis"):
             # Get all possible step sizes that properly fit into the climate years range
             step_size_options = [step for step in range(1, number_of_climate_years) if ((number_of_climate_years - 1) / step) % 1 == 0]
             # Ask for the number of steps and return the preferred step size
-            step_size = st.select_slider("Number of steps", step_size_options[::-1], value=1, format_func=lambda step_size: int(((number_of_climate_years - 1) / step_size) + 1))
+            step_size = st.select_slider("Number of steps", step_size_options[::-1], value=1, format_func=lambda value: int(((number_of_climate_years - 1) / value) + 1))
             # Use the step size to calculate the sensitivity steps and add them to the config
             sensitivity_config["steps"] = {str(step): step for step in range(1, number_of_climate_years + 1, step_size)}
     elif sensitivity_analysis_type == "technology_scenario":
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=-1, stop=1, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=-1, stop=1, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "hydrogen_demand":
         sensitivity_start, sensitivity_stop = st.slider("Relative hydrogen demand range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "hydropower_capacity":
         sensitivity_start, sensitivity_stop = st.slider("Hydropower capacity range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "interconnection_capacity":
         sensitivity_start, sensitivity_stop = st.slider("Interconnection capacity range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "interconnection_efficiency":
         sensitivity_start, sensitivity_stop = st.slider("Interconnection efficiency range", value=(0.8, 1.0), min_value=0.05, max_value=1.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "min_self_sufficiency":
         sensitivity_start, sensitivity_stop = st.slider("Minimum self-sufficiency range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "max_self_sufficiency":
         sensitivity_start, sensitivity_stop = st.slider("Maximum self-sufficiency range", value=(1.0, 2.0), min_value=1.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
-        sensitity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
-        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitity_steps}
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
 
 # Set the optimization parameters
 with st.sidebar.expander("Optimization parameters"):
@@ -180,12 +180,10 @@ with st.sidebar.expander("Optimization parameters"):
     # Check if the optimization data should be stored
     config["optimization"]["store_model"] = st.checkbox("Store optimization data", disabled=utils.is_demo, help=demo_disabled_message)
 
-
 # Check if a notification should be send and results uploaded when the model finishes
 dropbox_keys_available = utils.get_env("DROPBOX_APP_KEY") and utils.get_env("DROPBOX_APP_SECRET") and utils.get_env("DROPBOX_REFRESH_TOKEN")
 config["upload_results"] = st.sidebar.checkbox("Upload results to Dropbox", disabled=not dropbox_keys_available or utils.is_demo, help=demo_disabled_message)
 config["send_notification"] = st.sidebar.checkbox("Send a notification when finished", disabled=not utils.get_env("PUSHOVER_USER_KEY") or not utils.get_env("PUSHOVER_API_TOKEN") or utils.is_demo, help=demo_disabled_message)
-
 
 # Run the model if the button has been pressed
 invalid_config = not validate.is_config(config)

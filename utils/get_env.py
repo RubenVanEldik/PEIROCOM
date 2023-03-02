@@ -1,8 +1,8 @@
-import dotenv
 import os
 
-import validate
+import dotenv
 
+import validate
 
 # Load the variables from the .env file
 dotenv.load_dotenv(".env")

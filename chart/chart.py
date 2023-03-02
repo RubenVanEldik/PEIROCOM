@@ -1,7 +1,8 @@
 import io
+
+import streamlit as st
 from matplotlib import pyplot as plt
 from matplotlib import ticker as mticker
-import streamlit as st
 
 
 class Chart:
@@ -32,7 +33,7 @@ class Chart:
         else:
             self.all_axs.append(self.axs)
 
-        # Set Set the labels on the outer x and y axis and remove the top and right spine
+        # Set the labels on the outer x- and y-axis and remove the top and right spine
         for ax in self.all_axs:
             ax.set_xscale(xscale)
             ax.set_yscale(yscale)

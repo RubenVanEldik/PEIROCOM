@@ -1,6 +1,7 @@
+import re
+
 import openpyxl
 import pandas as pd
-import re
 import streamlit as st
 
 import utils
@@ -28,13 +29,15 @@ def _get_hydropower_series(sheet, *, min_row, max_row, min_col, max_col, interva
     # Loop over all values and add them to the DataFrame
     for day_or_week_number, row in zip(range(1, len(values) + 1), values):
         for year, value in zip(years, row):
-            # Create a timestamp of the year and day if the day exists (non leapday years have one row too many)
+            # Create a timestamp of the year and day if the day exists (non leap day years have one row too many)
             if interval == "w":
                 timestamp = pd.to_datetime(f"{year}-{day_or_week_number - 1:02}-0", format="%Y-%W-%w", utc=True)
             elif interval == "d":
                 timestamp = pd.to_datetime(f"{year}-{day_or_week_number:03}", format="%Y-%j", utc=True)
+            else:
+                raise ValueError("Interval should be either 'w' or 'd'")
 
-            # Only add the value if the timestamp is in the same year (non leapday years have one row too many)
+            # Only add the value if the timestamp is in the same year (non leap day years have one row too many)
             if timestamp.year == year:
                 series[timestamp] = value
 
@@ -51,7 +54,7 @@ def preprocess_hydropower_data(scenarios):
     for scenario in scenarios:
         # Get a list of all market nodes with hydropower data
         filepath_hydropower = utils.path("input", "eraa", "Climate Data", f"PEMMDB_XX00_Hydro Inflow_{scenario['year']}")
-        filename_regex = "^PEMMDB_([A-Z]{2}[0-9A-Z]{2})_Hydro Inflow_\d{4}.xlsx$"
+        filename_regex = r"^PEMMDB_([A-Z]{2}[0-9A-Z]{2})_Hydro Inflow_\d{4}.xlsx$"
         market_nodes = sorted([re.search(filename_regex, filename.name).group(1) for filename in filepath_hydropower.iterdir() if re.search(filename_regex, filename.name)])
 
         # Loop over each hydropower type
@@ -101,4 +104,4 @@ def preprocess_hydropower_data(scenarios):
 
             # Store the capacities
             capacity.to_csv(directory / "capacity.csv")
-    st.success("The hydropower data for all market nodes is succesfully preprocessed")
+    st.success("The hydropower data for all market nodes is successfully preprocessed")
