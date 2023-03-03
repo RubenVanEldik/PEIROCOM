@@ -26,7 +26,8 @@ with st.sidebar.expander("Scope"):
         st.warning("**This is a demo**\n\nA maximum of 3 countries and 1 year can be modeled simultaneously. Download the model from Github to run larger simulations.")
 
     # Select the model year
-    config["scenario"] = st.selectbox("Scenario", utils.get_scenarios(), index=1)
+    default_value_scenario_index = scenarios.index("ERAA 2030") if "ERAA 2030" in scenarios else 0
+    config["scenario"] = st.selectbox("Scenario", scenarios, index=default_value_scenario_index)
 
     # Select the countries
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
