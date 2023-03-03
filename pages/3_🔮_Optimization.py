@@ -1,4 +1,5 @@
 import os
+import sys
 
 import numpy as np
 import streamlit as st
@@ -18,6 +19,12 @@ config = dict()
 
 # Ask for the name of this run
 config["name"] = st.sidebar.text_input("Name", value=utils.get_next_run_name(), max_chars=50)
+
+# Get the scenario and stop if there are no scenarios
+scenarios = utils.get_scenarios()
+if len(scenarios) == 0:
+    st.sidebar.warning("There are no scenarios available in /input/scenarios")
+    sys.exit(0)
 
 # Set the scope options
 with st.sidebar.expander("Scope"):
