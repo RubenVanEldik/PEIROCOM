@@ -17,14 +17,9 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 # Copy the application code
 COPY . /app
 
-# Download and unzip the market node and interconnection data
-RUN bash scripts/download_input.sh
-
 # Generate the Gurobi license file
 RUN mkdir /opt/gurobi -p
-RUN echo "WLSACCESSID=$GUROBI_WLSACCESSID" > /opt/gurobi/gurobi.lic
-RUN echo "WLSSECRET=$GUROBI_WLSSECRET" >> /opt/gurobi/gurobi.lic
-RUN echo "LICENSEID=$GUROBI_LICENSEID" >> /opt/gurobi/gurobi.lic
+COPY ./gurobi.lic /opt/gurobi/gurobi.lic
 
 # Command used to start the application
 ENTRYPOINT ["streamlit", "run", "🌤️_Introduction.py"]
