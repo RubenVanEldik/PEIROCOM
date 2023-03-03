@@ -1,4 +1,5 @@
 import os
+import sys
 
 import numpy as np
 import streamlit as st
@@ -19,6 +20,12 @@ config = dict()
 # Ask for the name of this run
 config["name"] = st.sidebar.text_input("Name", value=utils.get_next_run_name(), max_chars=50)
 
+# Get the scenario and stop if there are no scenarios
+scenarios = utils.get_scenarios()
+if len(scenarios) == 0:
+    st.sidebar.warning("There are no scenarios available in /input/scenarios")
+    sys.exit(0)
+
 # Set the scope options
 with st.sidebar.expander("Scope"):
     # Show a warning message if it's deployed as a demo
@@ -26,7 +33,8 @@ with st.sidebar.expander("Scope"):
         st.warning("**This is a demo**\n\nA maximum of 3 countries and 1 year can be modeled simultaneously. Download the model from Github to run larger simulations.")
 
     # Select the model year
-    config["scenario"] = st.selectbox("Scenario", utils.get_scenarios(), index=1)
+    default_value_scenario_index = scenarios.index("ERAA 2030") if "ERAA 2030" in scenarios else 0
+    config["scenario"] = st.selectbox("Scenario", scenarios, index=default_value_scenario_index)
 
     # Select the countries
     countries = utils.read_yaml(utils.path("input", "countries.yaml"))
