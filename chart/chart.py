@@ -59,7 +59,7 @@ class Chart:
         else:
             self.axs.spines.bottom.set_visible(True)
             self.axs.set(xlabel=xlabel)
-            self.axs.set(ylabel=xlabel)
+            self.axs.set(ylabel=ylabel)
 
     def format_xticklabels(self, label):
         for ax in self.all_axs:
