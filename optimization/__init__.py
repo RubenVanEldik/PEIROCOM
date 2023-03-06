@@ -149,7 +149,11 @@ def run_sensitivity(config, sensitivity_config):
                 utils.set_nested_key(step_config, "interconnections.max_self_sufficiency", step_value)
 
             # Run the optimization
-            run(step_config, status=status, output_directory=output_directory / step_key)
+            error_message = run(step_config, status=status, output_directory=output_directory / step_key)
+
+            # Remove the step from the sensitivity analysis if the run did not finish successfully
+            if error_message is not None:
+                del sensitivity_config["steps"][step_key]
 
             # If enabled, send a notification
             if config["send_notification"]:
