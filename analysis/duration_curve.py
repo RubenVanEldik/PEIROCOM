@@ -68,7 +68,7 @@ def duration_curve(output_directory):
     x_label = col1.text_input("Label x-axis", value="Time (%)")
     y_label = col2.text_input("Label y-axis", value=f"{y_label_text} ({y_label_unit})")
     axis_scale_options = ["linear", "log", "symlog", "logit"]
-    xscale = col1.selectbox("Scale x-axis", axis_scale_options, format_func=utils.format_str)
+    x_scale = col1.selectbox("Scale x-axis", axis_scale_options, format_func=utils.format_str)
     y_scale = col2.selectbox("Scale y-axis", axis_scale_options, format_func=utils.format_str)
 
     # Set the waterfall parameters
@@ -91,7 +91,7 @@ def duration_curve(output_directory):
         waterfall_df_mean = _sort(numerator_df.mean(axis=1))
 
     # Create the chart
-    waterfall_plot = chart.Chart(xlabel=x_label, ylabel=y_label, xscale=xscale, yscale=y_scale)
+    waterfall_plot = chart.Chart(xlabel=x_label, ylabel=y_label, xscale=x_scale, yscale=y_scale)
 
     # Plot the range fill
     if range_area:

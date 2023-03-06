@@ -98,9 +98,11 @@ def run_sensitivity(config, sensitivity_config):
                 if config["send_notification"]:
                     utils.send_notification(f"Optimization {step_key} of '{config['name']}' has finished")
 
-                # Break the while loop if the model was infeasible
+                # Break the while loop if the model was infeasible, continue to the next step if the model could not be solved for another reason
                 if error_message == "The model was infeasible":
                     break
+                elif error_message is not None:
+                    continue
 
                 # Add the step to the sensitivity config
                 sensitivity_config["steps"][step_key] = relative_storage_costs
@@ -147,7 +149,11 @@ def run_sensitivity(config, sensitivity_config):
                 utils.set_nested_key(step_config, "interconnections.max_self_sufficiency", step_value)
 
             # Run the optimization
-            run(step_config, status=status, output_directory=output_directory / step_key)
+            error_message = run(step_config, status=status, output_directory=output_directory / step_key)
+
+            # Remove the step from the sensitivity analysis if the run did not finish successfully
+            if error_message is not None:
+                del sensitivity_config["steps"][step_key]
 
             # If enabled, send a notification
             if config["send_notification"]:
