@@ -47,7 +47,7 @@ class Chart:
                 axs.set(xlabel=xlabel)
                 axs.spines.bottom.set_visible(True)
         elif nrows > 1:
-            for index, axs in enumerate(self.axs):
+            for axs in self.axs:
                 axs.set(ylabel=ylabel)
             self.axs[-1].set(xlabel=xlabel)
             self.axs[-1].spines.bottom.set_visible(True)

@@ -40,12 +40,12 @@ def run(config, *, status=None, output_directory):
 
     # Upload the output directory to Dropbox
     if config["upload_results"]:
-        status.update(f"Uploading the results to Dropbox")
+        status.update("Uploading the results to Dropbox")
         utils.upload_to_dropbox(output_directory, output_directory)
 
     # Set the final status and send a message
     if is_standalone_run:
-        status.update(f"Optimization has finished and results are stored", status_type="success")
+        status.update("Optimization has finished and results are stored", status_type="success")
         if config["send_notification"]:
             utils.send_notification(f"Optimization '{config['name']}' has finished")
 
@@ -167,6 +167,6 @@ def run_sensitivity(config, sensitivity_config):
         utils.upload_to_dropbox(output_directory / "sensitivity.yaml", output_directory)
 
     # Set the final status
-    status.update(f"Sensitivity analysis has finished and results are stored", status_type="success")
+    status.update("Sensitivity analysis has finished and results are stored", status_type="success")
     if config["send_notification"]:
         utils.send_notification(f"The '{config['name']}' sensitivity analysis has finished")

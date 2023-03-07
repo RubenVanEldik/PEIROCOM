@@ -19,8 +19,8 @@ def format_resolution(resolution):
         return resolution
 
     # Get the magnitude and type
-    magnitude = groups.group(1)
-    resolution_type = groups.group(2)
+    magnitude = groups[1]
+    resolution_type = groups[2]
 
     # Return the formatted resolution for hours, days, and weeks
     if resolution_type == "H":

@@ -48,8 +48,7 @@ def duration_curve(output_directory):
     # Select a column as numerator and denominator
     st.sidebar.subheader("Columns")
     relevant_columns = utils.find_common_columns(all_temporal_results)
-    relative = st.sidebar.checkbox("Relative")
-    if relative:
+    if st.sidebar.checkbox("Relative"):
         col1, col2 = st.sidebar.columns(2)
         numerator = col1.selectbox("Numerator", relevant_columns, format_func=utils.format_column_name)
         denominator = col2.selectbox("Denominator", relevant_columns, format_func=utils.format_column_name)
@@ -63,8 +62,8 @@ def duration_curve(output_directory):
     st.sidebar.subheader("Axes")
     col1, col2 = st.sidebar.columns(2)
     y_label_match = re.search(r"(.+)_(\w+)$", numerator)
-    y_label_text = utils.format_str(y_label_match.group(1))
-    y_label_unit = y_label_match.group(2) if denominator is None else "%" if denominator_type == "series" else fr"$\%_{{{denominator_type}}}$"
+    y_label_text = utils.format_str(y_label_match[1])
+    y_label_unit = y_label_match[2] if denominator is None else "%" if denominator_type == "series" else fr"$\%_{{{denominator_type}}}$"
     x_label = col1.text_input("Label x-axis", value="Time (%)")
     y_label = col2.text_input("Label y-axis", value=f"{y_label_text} ({y_label_unit})")
     axis_scale_options = ["linear", "log", "symlog", "logit"]
