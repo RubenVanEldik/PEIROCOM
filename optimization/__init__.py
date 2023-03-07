@@ -102,6 +102,7 @@ def run_sensitivity(config, sensitivity_config):
                 if error_message == "The model was infeasible":
                     break
                 elif error_message is not None:
+                    relative_storage_costs *= step_factor
                     continue
 
                 # Add the step to the sensitivity config
