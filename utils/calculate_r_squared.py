@@ -21,7 +21,4 @@ def calculate_r_squared(col1, col2):
 
     # Fit the regression model and calculate the R-squared value
     model.fit(X, y)
-    r_squared = model.score(X, y)
-
-    # Return the R-squared value
-    return r_squared
+    return model.score(X, y)

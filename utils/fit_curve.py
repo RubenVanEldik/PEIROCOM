@@ -23,7 +23,4 @@ def fit_curve(independent_variables, dependent_variables, *, function, return_pa
     curve = pd.Series(curve_index, index=curve_index).apply(function, args=list(parameters))
 
     # Return the parameters, if explicitly specified
-    if return_parameters:
-        return curve, parameters
-
-    return curve
+    return (curve, parameters) if return_parameters else curve

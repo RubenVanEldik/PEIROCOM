@@ -165,6 +165,4 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
     total_costs /= eur_usd
 
     # Return the relative or absolute costs
-    if annual_costs:
-        return total_costs
-    return total_costs / annual_electricity_demand
+    return total_costs if annual_costs else total_costs / annual_electricity_demand
