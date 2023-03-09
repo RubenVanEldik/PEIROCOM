@@ -1,4 +1,5 @@
 from .average_week import average_week
+from .average_year import average_year
 from .correlation import correlation
 from .countries import countries
 from .duration_curve import duration_curve
