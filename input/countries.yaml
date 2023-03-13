@@ -2,8 +2,8 @@
   nuts2: AL
   alpha3: ALB
   flag: 🇦🇱
-  market_nodes: [AL00]
-  included_geographic_units: [ALB]
+  market_nodes: [ AL00 ]
+  included_geographic_units: [ ALB ]
   population: 2811666
   land_area: 27400
   annual_hydrogen_demand: 10000
@@ -19,8 +19,8 @@
   nuts2: AT
   alpha3: AUT
   flag: 🇦🇹
-  market_nodes: [AT00]
-  included_geographic_units: [AUT]
+  market_nodes: [ AT00 ]
+  included_geographic_units: [ AUT ]
   population: 8956279
   land_area: 82520
   annual_hydrogen_demand: 10000
@@ -35,8 +35,8 @@
   nuts2: BA
   alpha3: BIH
   flag: 🇧🇦
-  market_nodes: [BA00]
-  included_geographic_units: [BHF, BIS, BHB]
+  market_nodes: [ BA00 ]
+  included_geographic_units: [ BHF, BIS, BHB ]
   population: 3263459
   land_area: 51200
   annual_hydrogen_demand: 10000
@@ -51,8 +51,8 @@
   nuts2: BE
   alpha3: BEL
   flag: 🇧🇪
-  market_nodes: [BE00]
-  included_geographic_units: [BFR, BWR, BCR]
+  market_nodes: [ BE00 ]
+  included_geographic_units: [ BFR, BWR, BCR ]
   population: 11587882
   land_area: 30280
   annual_hydrogen_demand: 10000
@@ -68,8 +68,8 @@
   nuts2: BG
   alpha3: BGR
   flag: 🇧🇬
-  market_nodes: [BG00]
-  included_geographic_units: [BGR]
+  market_nodes: [ BG00 ]
+  included_geographic_units: [ BGR ]
   population: 6899125
   land_area: 108560
   annual_hydrogen_demand: 10000
@@ -85,8 +85,8 @@
   nuts2: CH
   alpha3: CHE
   flag: 🇨🇭
-  market_nodes: [CH00]
-  included_geographic_units: [CHE]
+  market_nodes: [ CH00 ]
+  included_geographic_units: [ CHE ]
   population: 8697723
   land_area: 39516.03
   annual_hydrogen_demand: 10000
@@ -101,8 +101,8 @@
   nuts2: CY
   alpha3: CYP
   flag: 🇨🇾
-  market_nodes: [CY00]
-  included_geographic_units: [CYP]
+  market_nodes: [ CY00 ]
+  included_geographic_units: [ CYP ]
   population: 1215588
   land_area: 9240
   annual_hydrogen_demand: 10000
@@ -111,13 +111,13 @@
       pv: 0
       onshore: 0
       offshore: 0
-    potential: {}
+    potential: { }
 - name: Czechia
   nuts2: CZ
   alpha3: CZE
   flag: 🇨🇿
-  market_nodes: [CZ00]
-  included_geographic_units: [CZE]
+  market_nodes: [ CZ00 ]
+  included_geographic_units: [ CZE ]
   population: 10703446
   land_area: 77198.53
   annual_hydrogen_demand: 10000
@@ -132,8 +132,8 @@
   nuts2: DE
   alpha3: DEU
   flag: 🇩🇪
-  market_nodes: [DE00]
-  included_geographic_units: [DEU]
+  market_nodes: [ DE00 ]
+  included_geographic_units: [ DEU ]
   population: 83129285
   land_area: 349390
   annual_hydrogen_demand: 10000
@@ -149,8 +149,8 @@
   nuts2: DK
   alpha3: DNK
   flag: 🇩🇰
-  market_nodes: [DKE1, DKW1]
-  included_geographic_units: [DNK]
+  market_nodes: [ DKE1, DKW1 ]
+  included_geographic_units: [ DNK ]
   population: 5856733
   land_area: 40000
   annual_hydrogen_demand: 10000
@@ -166,8 +166,8 @@
   nuts2: EE
   alpha3: EST
   flag: 🇪🇪
-  market_nodes: [EE00]
-  included_geographic_units: [EST]
+  market_nodes: [ EE00 ]
+  included_geographic_units: [ EST ]
   population: 1329254
   land_area: 42750
   annual_hydrogen_demand: 10000
@@ -183,9 +183,9 @@
   nuts2: ES
   alpha3: ESP
   flag: 🇪🇸
-  market_nodes: [ES00]
-  included_geographic_units: [ESP]
-  excluded_geographic_subunits: [ESC]
+  market_nodes: [ ES00 ]
+  included_geographic_units: [ ESP ]
+  excluded_geographic_subunits: [ ESC ]
   population: 47326687
   land_area: 499556.645
   annual_hydrogen_demand: 10000
@@ -201,8 +201,8 @@
   nuts2: FI
   alpha3: FIN
   flag: 🇫🇮
-  market_nodes: [FI00]
-  included_geographic_units: [FIN, ALD]
+  market_nodes: [ FI00 ]
+  included_geographic_units: [ FIN, ALD ]
   population: 5541696
   land_area: 303940
   annual_hydrogen_demand: 10000
@@ -218,8 +218,8 @@
   nuts2: FR
   alpha3: FRA
   flag: 🇫🇷
-  market_nodes: [FR00, FR15]
-  included_geographic_units: [FXX]
+  market_nodes: [ FR00, FR15 ]
+  included_geographic_units: [ FXX ]
   population: 67499343
   land_area: 547557
   annual_hydrogen_demand: 10000
@@ -235,8 +235,8 @@
   nuts2: GR
   alpha3: GRC
   flag: 🇬🇷
-  market_nodes: [GR00, GR03]
-  included_geographic_units: [GRC]
+  market_nodes: [ GR00, GR03 ]
+  included_geographic_units: [ GRC ]
   population: 10664568
   land_area: 128900
   annual_hydrogen_demand: 10000
@@ -252,8 +252,8 @@
   nuts2: HR
   alpha3: HRV
   flag: 🇭🇷
-  market_nodes: [HR00]
-  included_geographic_units: [HRV]
+  market_nodes: [ HR00 ]
+  included_geographic_units: [ HRV ]
   population: 3899000
   land_area: 55960
   annual_hydrogen_demand: 10000
@@ -269,8 +269,8 @@
   nuts2: HU
   alpha3: HUN
   flag: 🇭🇺
-  market_nodes: [HU00]
-  included_geographic_units: [HUN]
+  market_nodes: [ HU00 ]
+  included_geographic_units: [ HUN ]
   population: 9709886
   land_area: 91260
   annual_hydrogen_demand: 10000
@@ -285,8 +285,8 @@
   nuts2: IE
   alpha3: IRL
   flag: 🇮🇪
-  market_nodes: [IE00]
-  included_geographic_units: [IRL]
+  market_nodes: [ IE00 ]
+  included_geographic_units: [ IRL ]
   population: 5028230
   land_area: 68890
   annual_hydrogen_demand: 10000
@@ -302,8 +302,8 @@
   nuts2: IT
   alpha3: ITA
   flag: 🇮🇹
-  market_nodes: [ITCA, ITCN, ITCS, ITN1, ITS1, ITSA, ITSI]
-  included_geographic_units: [ITA]
+  market_nodes: [ ITCA, ITCN, ITCS, ITN1, ITS1, ITSA, ITSI ]
+  included_geographic_units: [ ITA ]
   population: 59066225
   land_area: 295717
   annual_hydrogen_demand: 10000
@@ -319,8 +319,8 @@
   nuts2: LT
   alpha3: LTU
   flag: 🇱🇹
-  market_nodes: [LT00]
-  included_geographic_units: [LTU]
+  market_nodes: [ LT00 ]
+  included_geographic_units: [ LTU ]
   population: 2795321
   land_area: 62620
   annual_hydrogen_demand: 10000
@@ -336,8 +336,8 @@
   nuts2: LU
   alpha3: LUX
   flag: 🇱🇺
-  market_nodes: [LUB1, LUF1, LUG1]
-  included_geographic_units: [LUX]
+  market_nodes: [ LUB1, LUF1, LUG1 ]
+  included_geographic_units: [ LUX ]
   population: 639070
   land_area: 2574.46
   annual_hydrogen_demand: 10000
@@ -352,8 +352,8 @@
   nuts2: LV
   alpha3: LVA
   flag: 🇱🇻
-  market_nodes: [LV00]
-  included_geographic_units: [LVA]
+  market_nodes: [ LV00 ]
+  included_geographic_units: [ LVA ]
   population: 1883162
   land_area: 62230
   annual_hydrogen_demand: 10000
@@ -369,8 +369,8 @@
   nuts2: ME
   alpha3: MNE
   flag: 🇲🇪
-  market_nodes: [ME00]
-  included_geographic_units: [MNE]
+  market_nodes: [ ME00 ]
+  included_geographic_units: [ MNE ]
   population: 620173
   land_area: 13450
   annual_hydrogen_demand: 10000
@@ -386,8 +386,8 @@
   nuts2: MK
   alpha3: MKD
   flag: 🇲🇰
-  market_nodes: [MK00]
-  included_geographic_units: [MKD]
+  market_nodes: [ MK00 ]
+  included_geographic_units: [ MKD ]
   population: 2065092
   land_area: 25220
   annual_hydrogen_demand: 10000
@@ -402,8 +402,8 @@
   nuts2: MT
   alpha3: MLT
   flag: 🇲🇹
-  market_nodes: [MT00]
-  included_geographic_units: [MLT]
+  market_nodes: [ MT00 ]
+  included_geographic_units: [ MLT ]
   population: 516869
   land_area: 320
   annual_hydrogen_demand: 10000
@@ -412,13 +412,13 @@
       pv: 0
       onshore: 0
       offshore: 0
-    potential: {}
+    potential: { }
 - name: Netherlands
   nuts2: NL
   alpha3: NLD
   flag: 🇳🇱
-  market_nodes: [NL00]
-  included_geographic_units: [NLX]
+  market_nodes: [ NL00 ]
+  included_geographic_units: [ NLX ]
   population: 17533405
   land_area: 33670
   annual_hydrogen_demand: 10000
@@ -434,8 +434,8 @@
   nuts2: "NO" # Strings are required, otherwise the YAML parser will parse it as a boolean False value
   alpha3: NOR
   flag: 🇳🇴
-  market_nodes: [NOM1, NON1, NOS0]
-  included_geographic_units: [NOW]
+  market_nodes: [ NOM1, NON1, NOS0 ]
+  included_geographic_units: [ NOW ]
   population: 5408320
   land_area: 364285
   annual_hydrogen_demand: 10000
@@ -451,8 +451,8 @@
   nuts2: PL
   alpha3: POL
   flag: 🇵🇱
-  market_nodes: [PL00]
-  included_geographic_units: [POL]
+  market_nodes: [ PL00 ]
+  included_geographic_units: [ POL ]
   population: 37781024
   land_area: 306130
   annual_hydrogen_demand: 10000
@@ -468,8 +468,8 @@
   nuts2: PT
   alpha3: PRT
   flag: 🇵🇹
-  market_nodes: [PT00]
-  included_geographic_units: [PRX]
+  market_nodes: [ PT00 ]
+  included_geographic_units: [ PRX ]
   population: 10299423
   land_area: 91605.6
   annual_hydrogen_demand: 10000
@@ -485,8 +485,8 @@
   nuts2: RO
   alpha3: ROU
   flag: 🇷🇴
-  market_nodes: [RO00]
-  included_geographic_units: [ROU]
+  market_nodes: [ RO00 ]
+  included_geographic_units: [ ROU ]
   population: 19115146
   land_area: 230080
   annual_hydrogen_demand: 10000
@@ -502,8 +502,8 @@
   nuts2: RS
   alpha3: SRB
   flag: 🇷🇸
-  market_nodes: [RS00]
-  included_geographic_units: [SRV, SRS]
+  market_nodes: [ RS00 ]
+  included_geographic_units: [ SRV, SRS ]
   population: 6844078
   land_area: 87460
   annual_hydrogen_demand: 10000
@@ -518,8 +518,8 @@
   nuts2: SE
   alpha3: SWE
   flag: 🇸🇪
-  market_nodes: [SE01, SE02, SE03, SE04]
-  included_geographic_units: [SWE]
+  market_nodes: [ SE01, SE02, SE03, SE04 ]
+  included_geographic_units: [ SWE ]
   population: 10415811
   land_area: 407283.532
   annual_hydrogen_demand: 10000
@@ -535,8 +535,8 @@
   nuts2: SI
   alpha3: SVN
   flag: 🇸🇮
-  market_nodes: [SI00]
-  included_geographic_units: [SVN]
+  market_nodes: [ SI00 ]
+  included_geographic_units: [ SVN ]
   population: 2107007
   land_area: 20136.4
   annual_hydrogen_demand: 10000
@@ -552,8 +552,8 @@
   nuts2: SK
   alpha3: SVK
   flag: 🇸🇰
-  market_nodes: [SK00]
-  included_geographic_units: [SVK]
+  market_nodes: [ SK00 ]
+  included_geographic_units: [ SVK ]
   population: 5447247
   land_area: 48080
   annual_hydrogen_demand: 10000
@@ -568,8 +568,8 @@
   nuts2: TR
   alpha3: TUR
   flag: 🇹🇷
-  market_nodes: [TR00]
-  included_geographic_units: [TUR]
+  market_nodes: [ TR00 ]
+  included_geographic_units: [ TUR ]
   population: 85042736
   land_area: 769630
   annual_hydrogen_demand: 10000
@@ -585,8 +585,8 @@
   nuts2: UA
   alpha3: UKR
   flag: 🇺🇦
-  market_nodes: [UA01]
-  included_geographic_units: [UKR]
+  market_nodes: [ UA01 ]
+  included_geographic_units: [ UKR ]
   population: 43814581
   land_area: 579400
   annual_hydrogen_demand: 10000
@@ -595,13 +595,13 @@
       pv: 5363
       onshore: 1111
       offshore: 0
-    potential: {}
+    potential: { }
 - name: United Kingdom
   nuts2: UK
   alpha3: GBR
   flag: 🇬🇧
-  market_nodes: [UK00, UKNI]
-  included_geographic_units: [ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS]
+  market_nodes: [ UK00, UKNI ]
+  included_geographic_units: [ ENG, GGY, IMN, GGY, JEY, NIR, SCT, WLS ]
   population: 67326569
   land_area: 241930
   annual_hydrogen_demand: 10000
