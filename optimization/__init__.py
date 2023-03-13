@@ -122,8 +122,11 @@ def run_sensitivity(config, sensitivity_config):
 
     # Otherwise run the general sensitivity analysis
     else:
+        # Create a copy of the steps' dictionary (this is required because it might could get updated when a run is not completed)
+        all_steps = dict(sensitivity_config["steps"])
+
         # Loop over each sensitivity analysis step
-        for step_key, step_value in sensitivity_config["steps"].items():
+        for step_key, step_value in all_steps.items():
             step_number = list(sensitivity_config["steps"].keys()).index(step_key) + 1
             number_of_steps = len(sensitivity_config["steps"])
             st.subheader(f"Sensitivity run {step_number}/{number_of_steps}")
