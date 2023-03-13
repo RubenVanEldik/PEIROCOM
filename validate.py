@@ -21,7 +21,7 @@ def is_market_node_list(value, *, required=True):
     if value is None:
         return not required
 
-    if type(value) is not list:
+    if not isinstance(value, list):
         return False
 
     return all(is_market_node(x) for x in value)
@@ -31,14 +31,14 @@ def is_bool(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is bool
+    return isinstance(value, bool)
 
 
 def is_market_node_dict(value, *, required=True):
     if value is None:
         return not required
 
-    if not type(value) is dict and not isinstance(value, gp.tupledict):
+    if not isinstance(value, (dict, gp.tupledict)):
         return False
 
     return all(is_market_node(x) for x in value.keys())
@@ -92,7 +92,7 @@ def is_config(value, *, required=True):
     if value is None:
         return not required
 
-    if type(value) is not dict:
+    if not isinstance(value, dict):
         return False
 
     if not is_string(value.get("name")):
@@ -158,7 +158,7 @@ def is_country_obj(value, *, required=True):
     if value is None:
         return not required
 
-    if not type(value) is dict:
+    if not isinstance(value, dict):
         return False
 
     return bool(value["name"] and value["market_nodes"])
@@ -191,7 +191,7 @@ def is_dataframe_dict(value, *, required=True):
     if value is None:
         return not required
 
-    if not type(value) is dict:
+    if not isinstance(value, dict):
         return False
 
     return all(is_dataframe(value[x]) for x in value)
@@ -201,28 +201,28 @@ def is_date(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is datetime.date
+    return isinstance(value, datetime.date)
 
 
 def is_datetime(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is datetime.datetime
+    return isinstance(value, datetime.datetime)
 
 
 def is_datetime_index(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is pd.core.indexes.datetimes.DatetimeIndex
+    return isinstance(value, pd.core.indexes.datetimes.DatetimeIndex)
 
 
 def is_dict(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is dict
+    return isinstance(value, dict)
 
 
 def is_dict_or_list(value, *, required=True):
@@ -323,7 +323,7 @@ def is_interconnection_tuple(value, *, required=True):
     if value is None:
         return not required
 
-    if type(value) is not tuple or len(value) != 2:
+    if not isinstance(value, tuple) or len(value) != 2:
         return False
 
     return is_market_node(value[0]) and (is_market_node(value[1]) or bool(re.search("^(gross|net)_(ex|im)port_limit$", value[1])))
@@ -384,7 +384,7 @@ def is_point(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is shapely.geometry.point.Point
+    return isinstance(value, shapely.geometry.point.Point)
 
 
 def is_resolution(value, *, required=True):
@@ -412,7 +412,7 @@ def is_sensitivity_config(value, *, required=True):
     if value is None:
         return not required
 
-    if not type(value) is dict:
+    if not isinstance(value, dict):
         return False
 
     return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
@@ -422,14 +422,14 @@ def is_series(value, *, required=True):
     if value is None:
         return not required
 
-    return type(value) is pd.core.series.Series
+    return isinstance(value, pd.core.series.Series)
 
 
 def is_string(value, *, required=True, min_length=0):
     if value is None:
         return not required
 
-    if not type(value) is str:
+    if not isinstance(value, str):
         return False
 
     return len(value) >= min_length
