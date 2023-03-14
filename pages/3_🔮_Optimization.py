@@ -93,6 +93,9 @@ with st.sidebar.expander("Technologies"):
             if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
                 config["technologies"][technology_type].append(technology)
 
+        if technology_type == "electrolysis" and len(config["technologies"][technology_type]):
+            config["relative_hydrogen_demand"] = technology_type_tab.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")
+
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):
     config["interconnections"] = {"efficiency": {}}
