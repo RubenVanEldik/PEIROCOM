@@ -40,6 +40,8 @@ def average_year(output_directory):
 
     # Get temporal results for all countries
     temporal_results = utils.get_temporal_results(output_directory, group="all", country_codes=selected_country_codes)
+    # Resample the results to 1H so optimizations with a lower resolution are still viewable
+    temporal_results = temporal_results.resample('1H').mean().ffill()
 
     # Select the relevant columns
     columns = st.sidebar.multiselect("Columns", temporal_results.columns, format_func=utils.format_column_name)
