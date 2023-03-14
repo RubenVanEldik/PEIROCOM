@@ -7,50 +7,50 @@ ires:
     color:
       name: 'amber'
       value: 200
-    economic_lifetime: 30
-    wacc: 0.044
+    economic_lifetime: 25 # IRENA
+    wacc: 0.0514 # NREL
     conservative:
-      capex: 912
-      fixed_om: 12
+      capex: 754 # NREL
+      fixed_om: 15 # NREL
     moderate:
-      capex: 700
-      fixed_om: 10
+      capex: 620 # NREL
+      fixed_om: 13 # NREL
     advanced:
-      capex: 520
-      fixed_om: 8
+      capex: 467 # NREL
+      fixed_om: 11 # NREL
   onshore:
     name: "onshore wind"
     color:
       name: 'amber'
       value: 300
-    economic_lifetime: 30
-    wacc: 0.05
+    economic_lifetime: 25 # IRENA
+    wacc: 0.0553 # NREL
     conservative:
-      capex: 900
-      fixed_om: 41
+      capex: 906 # NREL
+      fixed_om: 41 # NREL
     moderate:
-      capex: 760
-      fixed_om: 33
+      capex: 765 # NREL
+      fixed_om: 33 # NREL
     advanced:
-      capex: 525
-      fixed_om: 24
+      capex: 528 # NREL
+      fixed_om: 24 # NREL
   offshore:
     name: "offshore wind"
     color:
       name: 'amber'
       value: 400
-    economic_lifetime: 30
-    wacc: 0.052
+    economic_lifetime: 25 # IRENA
+    wacc: 0.0579 # NREL
     conservative:
-      capex: 2817
-      fixed_om: 94
+      capex: 2993 # NREL Class 3
+      fixed_om: 93 # NREL Class 3
     moderate:
-      capex: 1945
-      fixed_om: 71
+      capex: 2274 # NREL Class 3
+      fixed_om: 70 # NREL Class 3
     advanced:
-      capex: 1583
-      fixed_om: 61
-hydropower:
+      capex: 1966 # NREL Class 3
+      fixed_om: 60 # NREL Class 3
+hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (978-92-9260-452-3)
   color:
     name: 'sky'
     value: 600
@@ -60,34 +60,34 @@ hydropower:
       name: 'sky'
       value: 500
     turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
-    economic_lifetime: 60
-    wacc: 0.05
+    economic_lifetime: 30 # IRENA
+    wacc: 0.0559 # NREL
     conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2590 # NREL NPD1
+      fixed_om_power: 64 # NREL NPD1
     moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2486 # NREL NPD1
+      fixed_om_power: 62 # NREL NPD1
     advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2238 # NREL NPD1
+      fixed_om_power: 56 # NREL NPD1
   reservoir:
     name: "reservoir"
     color:
       name: 'sky'
       value: 600
     turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
-    economic_lifetime: 60
-    wacc: 0.05
+    economic_lifetime: 30 # IRENA
+    wacc: 0.0559 # NREL
     conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2590 # NREL NPD1
+      fixed_om_power: 64 # NREL NPD1
     moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2486 # NREL NPD1
+      fixed_om_power: 62 # NREL NPD1
     advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2238 # NREL NPD1
+      fixed_om_power: 56 # NREL NPD1
   pumped_storage_open:
     name: "pumped storage (open)"
     color:
@@ -95,17 +95,17 @@ hydropower:
       value: 700
     turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
     pump_efficiency: 0.9 # 10.1016/j.est.2020.101234
-    economic_lifetime: 60
-    wacc: 0.05
+    economic_lifetime: 30 # IRENA
+    wacc: 0.0559 # NREL
     conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2590 # NREL NPD1
+      fixed_om_power: 64 # NREL NPD1
     moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2486 # NREL NPD1
+      fixed_om_power: 62 # NREL NPD1
     advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2238 # NREL NPD1
+      fixed_om_power: 56 # NREL NPD1
   pumped_storage_closed:
     name: "pumped storage (closed)"
     color:
@@ -113,17 +113,17 @@ hydropower:
       value: 900
     turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
     pump_efficiency: 0.9 # 10.1016/j.est.2020.101234
-    economic_lifetime: 60
-    wacc: 0.05
+    economic_lifetime: 30 # IRENA
+    wacc: 0.0559 # NREL
     conservative:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2656 # NREL Class 3
+      fixed_om_power: 18 # NREL Class 3
     moderate:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2656 # NREL Class 3
+      fixed_om_power: 18 # NREL Class 3
     advanced:
-      capex_power: 2471.098
-      fixed_om_power: 61.83
+      capex_power: 2338 # NREL Class 3
+      fixed_om_power: 18 # NREL Class 3
 storage:
   color:
     name: 'red'
@@ -135,24 +135,24 @@ storage:
       value: 800
     soc_min: 0.2
     soc_max: 1
-    roundtrip_efficiency: 0.85
-    economic_lifetime: 15
+    roundtrip_efficiency: 0.85 # ATB
+    economic_lifetime: 15 # ATB
     wacc: 0.05
     conservative:
-      capex_energy: 143
-      capex_power: 260
-      fixed_om_energy: 3.575
-      fixed_om_power: 6.5
+      capex_energy: 246 # ATB
+      capex_power: 190 # ATB
+      fixed_om_energy: 6.15 # ATB (2.5% CAPEX)
+      fixed_om_power: 4.75 # ATB (2.5% CAPEX)
     moderate:
-      capex_energy: 81
-      capex_power: 243
-      fixed_om_energy: 2.025
-      fixed_om_power: 6.075
+      capex_energy: 118 # ATB
+      capex_power: 199 # ATB
+      fixed_om_energy: 2.95 # ATB (2.5% CAPEX)
+      fixed_om_power: 4.98 # ATB (2.5% CAPEX)
     advanced:
-      capex_energy: 57
-      capex_power: 104
-      fixed_om_energy: 1.425
-      fixed_om_power: 2.6
+      capex_energy: 107 # ATB
+      capex_power: 82 # ATB
+      fixed_om_energy: 2.68 # ATB (2.5% CAPEX)
+      fixed_om_power: 2.05 # ATB (2.5% CAPEX)
 electrolysis:
   color:
     name: 'neutral'
