@@ -157,7 +157,6 @@ def optimize(config, *, status, output_directory):
 
             # Get the specific hydropower assumptions and calculate the interval length
             hydropower_assumptions = utils.get_technologies(technology_type="hydropower")[hydropower_technology]
-            efficiency = hydropower_assumptions["roundtrip_efficiency"] ** 0.5
 
             # Add the relevant capacity to the hydropower_capacity DataFrame, if the capacity is not defined, set the capacity to 0
             hydropower_capacity_current_technology = utils.read_csv(utils.path("input", "scenarios", config["scenario"], "hydropower", hydropower_technology, "capacity.csv"), index_col=0)
@@ -221,6 +220,10 @@ def optimize(config, *, status, output_directory):
             spillage_MW = pd.Series(model.addVars(temporal_hydropower_data.index))
             temporal_results[market_node]["spillage_total_hydropower_MW"] += spillage_MW
 
+            # Get the turbine and pump efficiency
+            turbine_efficiency = hydropower_assumptions.get("turbine_efficiency", 0)
+            pump_efficiency = hydropower_assumptions.get("pump_efficiency", 0)
+
             # Loop over all hours
             reservoir_previous = None
             temporal_reservoir_dict = {}
@@ -238,7 +241,7 @@ def optimize(config, *, status, output_directory):
 
                 # Add the reservoir level constraint with regard to the previous timestamp
                 if reservoir_previous:
-                    model.addConstr(reservoir_current == reservoir_previous + (inflow_MW[timestamp] - spillage_MW[timestamp] - turbine_flow[timestamp] / efficiency + pump_flow[timestamp] * efficiency) * interval_length)
+                    model.addConstr(reservoir_current == reservoir_previous + (inflow_MW[timestamp] - spillage_MW[timestamp] - turbine_flow[timestamp] / turbine_efficiency + pump_flow[timestamp] * pump_efficiency) * interval_length)
 
                 # Add the current reservoir level to temporal_reservoir_dict
                 temporal_reservoir_dict[timestamp] = reservoir_current

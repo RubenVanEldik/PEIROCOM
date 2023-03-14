@@ -59,7 +59,7 @@ hydropower:
     color:
       name: 'sky'
       value: 500
-    roundtrip_efficiency: 0.85
+    turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
     economic_lifetime: 60
     wacc: 0.05
     conservative:
@@ -76,7 +76,7 @@ hydropower:
     color:
       name: 'sky'
       value: 600
-    roundtrip_efficiency: 0.85
+    turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
     economic_lifetime: 60
     wacc: 0.05
     conservative:
@@ -93,7 +93,8 @@ hydropower:
     color:
       name: 'sky'
       value: 700
-    roundtrip_efficiency: 0.85
+    turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
+    pump_efficiency: 0.9 # 10.1016/j.est.2020.101234
     economic_lifetime: 60
     wacc: 0.05
     conservative:
@@ -110,7 +111,8 @@ hydropower:
     color:
       name: 'sky'
       value: 900
-    roundtrip_efficiency: 0.85
+    turbine_efficiency: 0.914 # 10.1016/j.est.2020.101234
+    pump_efficiency: 0.9 # 10.1016/j.est.2020.101234
     economic_lifetime: 60
     wacc: 0.05
     conservative:
