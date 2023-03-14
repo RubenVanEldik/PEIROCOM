@@ -80,6 +80,8 @@ def average_year(output_directory):
         # Show the monthly labels as minor ticks, so they are between the day ticks
         subplot.set_xticks([15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 350], ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], minor=True)
         subplot.tick_params(axis="x", which="minor", bottom=False, top=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
+        # Set the y-ticks to important clock times
+        subplot.set_yticks([0, 6, 12, 18])
 
     # Show the plot
     plot.display()
