@@ -230,14 +230,15 @@ def optimize(config, *, status, output_directory):
             for timestamp in temporal_demand_electricity.index:
                 # Create the reservoir level variable
                 current_reservoir_soc = temporal_hydropower_data.loc[timestamp, "reservoir_soc"]
+                current_min_reservoir_soc = temporal_hydropower_data.loc[timestamp, "min_reservoir_soc"]
+                current_max_reservoir_soc = temporal_hydropower_data.loc[timestamp, "max_reservoir_soc"]
                 if np.isnan(current_reservoir_soc):
-                    current_min_reservoir_soc = temporal_hydropower_data.loc[timestamp, "min_reservoir_soc"]
-                    current_max_reservoir_soc = temporal_hydropower_data.loc[timestamp, "max_reservoir_soc"]
                     min_reservoir_soc = 0 if np.isnan(current_min_reservoir_soc) else current_min_reservoir_soc
                     max_reservoir_soc = 1 if np.isnan(current_max_reservoir_soc) else current_max_reservoir_soc
                     reservoir_current = model.addVar(lb=min_reservoir_soc, ub=max_reservoir_soc) * reservoir_capacity
                 else:
-                    reservoir_current = current_reservoir_soc * reservoir_capacity
+                    # The min-max transformation has to be transformed since Norway has a lower current_reservoir_soc than current_min_reservoir_soc in 2011
+                    reservoir_current = min(max(current_reservoir_soc, current_min_reservoir_soc), current_max_reservoir_soc) * reservoir_capacity
 
                 # Add the reservoir level constraint with regard to the previous timestamp
                 if reservoir_previous:
