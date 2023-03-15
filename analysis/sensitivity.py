@@ -212,7 +212,7 @@ def sensitivity(output_directory):
         sensitivity_plot.axs.set_xlabel("Technology scenario")
         sensitivity_plot.axs.set_xticks([-1, 0, 1], ["Conservative", "Moderate", "Advanced"])
     elif sensitivity_config["analysis_type"] == "hydrogen_demand":
-        sensitivity_plot.axs.set_xlabel("Hydrogen demand (%)")
+        sensitivity_plot.axs.set_xlabel("Hydrogen demand ($\%_{electricity\ demand}$)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "hydropower_capacity":
         sensitivity_plot.axs.set_xlabel(r"Hydropower capacity ($\%_{current}$)")
