@@ -89,7 +89,7 @@ def run():
         # Select the market node
         input_path = utils.path("input", "scenarios", scenario, "ires")
         market_nodes = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
-        market_node = st.sidebar.selectbox("market node", market_nodes)
+        market_node = st.sidebar.selectbox("Market node", market_nodes)
 
         st.header(f"IRES capacity factors {market_node}")
 
@@ -111,9 +111,9 @@ def run():
         # Select the market node
         input_path = utils.path("input", "scenarios", scenario, "hydropower", hydropower_technology)
         market_nodes = [filename.stem for filename in input_path.iterdir() if filename.suffix == ".csv"]
-        market_node = st.sidebar.selectbox("market node", market_nodes)
+        market_node = st.sidebar.selectbox("Market node", market_nodes)
 
-        st.header(f"market node {market_node}")
+        st.header(f"Market node {market_node}")
 
         # Read and show the capacity data
         capacity = utils.read_csv(input_path / "capacity.csv", index_col=0).loc[market_node]
