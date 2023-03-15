@@ -96,12 +96,22 @@ with st.sidebar.expander("Technologies"):
         if technology_type == "electrolysis" and len(config["technologies"][technology_type]):
             config["relative_hydrogen_demand"] = technology_type_tab.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")
 
+# Set the self-sufficiency options
+with st.sidebar.expander("Self-sufficiency"):
+    config["self_sufficiency"] = {}
+    # Add the self-sufficiency for electricity
+    min_self_sufficiency_electricity, max_self_sufficiency_electricity = st.slider("Self-sufficiency range electricity", value=(0.8, 1.5), max_value=2.0, step=0.05)
+    config["self_sufficiency"]["min_electricity"] = min_self_sufficiency_electricity
+    config["self_sufficiency"]["max_electricity"] = max_self_sufficiency_electricity
+    # Add the self-sufficiency for hydrogen
+    if len(config["technologies"][technology_type]):
+        min_self_sufficiency_hydrogen, max_self_sufficiency_hydrogen = st.slider("Self-sufficiency range hydrogen", value=(0.8, 1.5), max_value=2.0, step=0.05)
+        config["self_sufficiency"]["min_hydrogen"] = min_self_sufficiency_hydrogen
+        config["self_sufficiency"]["max_hydrogen"] = max_self_sufficiency_hydrogen
+
 # Set the interconnection options
 with st.sidebar.expander("Interconnections"):
     config["interconnections"] = {"efficiency": {}}
-    min_self_sufficiency, max_self_sufficiency = st.slider("Self-sufficiency range", value=(0.8, 1.5), max_value=2.0, step=0.05)
-    config["interconnections"]["min_self_sufficiency"] = min_self_sufficiency
-    config["interconnections"]["max_self_sufficiency"] = max_self_sufficiency
     config["interconnections"]["relative_capacity"] = st.slider("Relative interconnection capacity", value=1.0, max_value=1.5, step=0.05)
     config["interconnections"]["optimize_individual_interconnections"] = st.checkbox("Optimize individual interconnections")
     col1, col2 = st.columns(2)

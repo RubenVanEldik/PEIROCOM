@@ -400,6 +400,30 @@ def optimize(config, *, status, output_directory):
         temporal_results[market_node].insert(temporal_results[market_node].columns.get_loc("generation_ires_MW"), "curtailed_MW", curtailed_MW)
 
     """
+    Step 5: Define the hydrogen constraint
+    """
+    if include_hydrogen_production:
+        # Create the hydrogen constraint per year
+        for year in range(config["climate_years"]["start"], config["climate_years"]["end"] + 1):
+            sum_hydrogen_demand = 0
+            sum_hydrogen_production = 0
+
+            for market_node in market_nodes:
+                # Calculate the summed results of this market node for this year
+                summed_results_year = temporal_results[market_node][temporal_results[market_node].index.year == year].sum()
+
+                # Add the hydrogen demand to the total
+                sum_hydrogen_demand += config["relative_hydrogen_demand"] * summed_results_year.demand_electricity_MW
+
+                # Add the hydrogen production to the total per production technology
+                for electrolysis_technology in config["technologies"]["electrolysis"]:
+                    electrolyzer_efficiency = utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"]
+                    sum_hydrogen_production += electrolyzer_efficiency * summed_results_year[f"demand_{electrolysis_technology}_MW"]
+
+            # Ensure that enough hydrogen is produced in the year
+            model.addConstr(sum_hydrogen_production == sum_hydrogen_demand)
+
+    """
     Step 5: Define interconnection capacity constraint if the individual interconnections are optimized
     """
     if optimize_individual_interconnections:
@@ -409,7 +433,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
 
     """
-    Step 6: Define the self-sufficiency and hydrogen constraints per country
+    Step 6: Define the self-sufficiency constraints per country
     """
     for country_code in config["country_codes"]:
         country_flag = utils.get_country_property(country_code, "flag")
@@ -444,13 +468,15 @@ def optimize(config, *, status, output_directory):
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand_total > 0:
-            self_sufficiency = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
-            model.addConstr(self_sufficiency >= config["interconnections"]["min_self_sufficiency"])
-            model.addConstr(self_sufficiency <= config["interconnections"]["max_self_sufficiency"])
+            self_sufficiency_electricity = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
+            model.addConstr(self_sufficiency_electricity >= config["self_sufficiency"]["min_electricity"])
+            model.addConstr(self_sufficiency_electricity <= config["self_sufficiency"]["max_electricity"])
 
         # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
         if include_hydrogen_production:
-            model.addConstr(sum_hydrogen_production == sum_hydrogen_demand)
+            self_sufficiency_hydrogen = sum_hydrogen_production / sum_hydrogen_demand
+            model.addConstr(self_sufficiency_hydrogen >= config["self_sufficiency"]["min_hydrogen"])
+            model.addConstr(self_sufficiency_hydrogen <= config["self_sufficiency"]["max_hydrogen"])
 
     """
     Step 7: Define the storage costs constraint
