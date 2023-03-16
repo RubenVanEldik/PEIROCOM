@@ -14,14 +14,12 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
-    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    temporal_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW")
-    temporal_export = utils.merge_dataframes_on_column(temporal_results, "net_export_MW")
-    temporal_net_demand = temporal_demand + temporal_export
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
+    annual_electricity_demand = (mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW) * 8760
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_net_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, annual_electricity_demand, config=config, breakdown_level=breakdown_level)
 
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
@@ -36,8 +34,8 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
-    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    temporal_demand = utils.merge_dataframes_on_column(temporal_results, "generation_ires_MW") + utils.merge_dataframes_on_column(temporal_results, "generation_total_hydropower_MW")
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
+    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW) * 8760
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Set the storage capacity to zero
@@ -45,7 +43,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
         storage_capacity[market_node] = 0 * storage_capacity[market_node]
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, temporal_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_demand, config=config, breakdown_level=breakdown_level)
 
 
 def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
@@ -63,7 +61,7 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, None, config=config, breakdown_level=breakdown_level, annual_costs=True)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1, config=config, breakdown_level=breakdown_level)
 
 
 def premium(output_directory, *, country_codes=None, breakdown_level=0):
@@ -89,8 +87,8 @@ def relative_curtailment(output_directory, *, country_codes=None):
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
-    temporal_results = utils.get_temporal_results(output_directory, group="all", country_codes=country_codes)
-    return temporal_results.curtailed_MW.sum() / (temporal_results.generation_ires_MW.sum() + temporal_results.generation_total_hydropower_MW.sum())
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
+    return mean_temporal_results.curtailed_MW / (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW)
 
 
 def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
@@ -167,11 +165,11 @@ def self_sufficiency(output_directory, *, country_codes=None):
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
-    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    mean_demand = utils.merge_dataframes_on_column(temporal_results, "demand_total_MW").mean(axis=1)
-    mean_ires_generation = utils.merge_dataframes_on_column(temporal_results, "generation_ires_MW").mean(axis=1)
-    mean_hydropower_generation = utils.merge_dataframes_on_column(temporal_results, "generation_total_hydropower_MW").mean(axis=1)
-    mean_curtailment = utils.merge_dataframes_on_column(temporal_results, "curtailed_MW").mean(axis=1)
-    mean_storage_flow = utils.merge_dataframes_on_column(temporal_results, "net_storage_flow_total_MW").mean(axis=1)
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
+    mean_demand = mean_temporal_results.demand_total_MW
+    mean_ires_generation = mean_temporal_results.generation_ires_MW
+    mean_hydropower_generation = mean_temporal_results.generation_total_hydropower_MW
+    mean_curtailment = mean_temporal_results.curtailed_MW
+    mean_storage_flow = mean_temporal_results.net_storage_flow_total_MW
 
-    return (mean_ires_generation + mean_hydropower_generation - mean_curtailment - mean_storage_flow).mean() / mean_demand.mean()
+    return (mean_ires_generation + mean_hydropower_generation - mean_curtailment - mean_storage_flow) / mean_demand

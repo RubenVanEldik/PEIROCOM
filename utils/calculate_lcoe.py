@@ -107,30 +107,16 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     return annualized_costs_storage
 
 
-def _calculate_annual_demand(demand_MW):
-    """
-    Calculate the annual electricity demand
-    """
-    assert validate.is_series(demand_MW)
-
-    demand_start_date = demand_MW.index.min()
-    demand_end_date = demand_MW.index.max()
-    share_of_year_modelled = (demand_end_date - demand_start_date) / pd.Timedelta(365, "days")
-    timestep_hours = (demand_MW.index[1] - demand_MW.index[0]).total_seconds() / 3600
-    return demand_MW.sum() * timestep_hours / share_of_year_modelled
-
-
-def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_per_market_node, *, config, breakdown_level=0, annual_costs=False):
+def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, annual_electricity_demand, *, config, breakdown_level=0):
     """
     Calculate the average levelized costs of electricity for all market nodes
     """
     assert validate.is_market_node_dict(ires_capacity)
     assert validate.is_market_node_dict(storage_capacity)
     assert validate.is_market_node_dict(hydropower_capacity)
-    assert validate.is_dataframe(demand_per_market_node, column_validator=validate.is_market_node, required=not annual_costs)
+    assert validate.is_number(annual_electricity_demand)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
-    assert validate.is_bool(annual_costs)
 
     # Get the technology scenario
     technology_scenario = config["technologies"]["scenario"]
@@ -138,17 +124,12 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
     annualized_ires_costs = 0
     annualized_storage_costs = 0
     annualized_hydropower_costs = 0
-    annual_electricity_demand = 0
 
     for market_node in ires_capacity.keys():
         # Add the annualized costs
         annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node], technology_scenario=technology_scenario)
         annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], technology_scenario=technology_scenario)
         annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node], technology_scenario=technology_scenario)
-
-        # Add the annual electricity demand
-        if not annual_costs:
-            annual_electricity_demand += _calculate_annual_demand(demand_per_market_node[market_node])
 
     # Calculate and return the LCOE
     if breakdown_level == 0:
@@ -165,4 +146,4 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, demand_
     total_costs /= eur_usd
 
     # Return the relative or absolute costs
-    return total_costs if annual_costs else total_costs / annual_electricity_demand
+    return total_costs / annual_electricity_demand
