@@ -16,7 +16,7 @@ class Chart:
         self.ncols = ncols
 
         # Create the figure
-        width = (9 if wide else 7) * ncols ** (1 / 2)
+        width = (10 if wide else 7) * ncols ** (1 / 2)
         height = 4 * nrows ** (1 / 2)
         self.fig, self.axs = plt.subplots(nrows, ncols, figsize=(width, height), sharex=sharex, sharey=sharey)
 
