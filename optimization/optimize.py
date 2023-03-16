@@ -667,14 +667,22 @@ def optimize(config, *, status, output_directory):
     for sub_directory in ["ires", "storage", "hydropower", "interconnections"]:
         (output_directory / "capacity" / sub_directory).mkdir()
 
+    # Create a DataFrame for the mean temporal data
+    relevant_columns = utils.find_common_columns(temporal_results)
+    mean_temporal_data = pd.DataFrame(columns=relevant_columns)
+
     # Store the actual values per market node for the temporal results and capacities
     for market_node in market_nodes:
         country_flag = utils.get_country_property(utils.get_country_of_market_node(market_node), "flag")
         status.update(f"{country_flag} Converting and storing the results")
+
         # Convert the temporal results variables
         temporal_results_market_node = utils.convert_variables_recursively(temporal_results[market_node])
         # Store the temporal results to a CSV file
         temporal_results_market_node.to_csv(output_directory / "temporal" / "market_nodes" / f"{market_node}.csv")
+
+        # Add the mean temporal results to the DataFrame
+        mean_temporal_data.loc[market_node] = temporal_results_market_node[relevant_columns].mean()
 
         # Convert and store the IRES capacity
         ires_capacity_market_node = utils.convert_variables_recursively(ires_capacity[market_node])
@@ -686,6 +694,9 @@ def optimize(config, *, status, output_directory):
 
         # Convert and store the storage capacity
         hydropower_capacity[market_node].to_csv(output_directory / "capacity" / "hydropower" / f"{market_node}.csv")
+
+    # Store the mean temporal data
+    mean_temporal_data.to_csv(output_directory / "temporal" / "market_nodes" / "mean.csv")
 
     # Convert and store the electrolysis capacity if hydrogen production is included
     if include_hydrogen_production:
