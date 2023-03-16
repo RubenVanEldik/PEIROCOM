@@ -121,9 +121,9 @@ def electrolyzer_capacity_factor(output_directory, *, country_codes=None, breakd
     assert validate.is_technology(electrolysis_technology)
 
     # Get the capacities and electrolysis demand
-    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)[electrolysis_technology].sum()
-    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    mean_electrolysis_demand = utils.merge_dataframes_on_column(temporal_results, f"demand_{electrolysis_technology}_MW").sum(axis=1).mean()
+    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, group="all", country_codes=country_codes)[electrolysis_technology]
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
+    mean_electrolysis_demand = mean_temporal_results[f"demand_{electrolysis_technology}_MW"]
 
     return mean_electrolysis_demand / electrolysis_capacity
 
