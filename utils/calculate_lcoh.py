@@ -49,12 +49,11 @@ def _calculate_annualized_electrolyzer_costs(electrolysis_technologies, electrol
     return annualized_costs_electrolyzer
 
 
-def _calculate_annual_electricity_demand(demand_MW, electricity_costs):
+def _calculate_annual_electricity_demand(demand_MW):
     """
     Calculate the annual electricity demand
     """
     assert validate.is_dataframe(demand_MW)
-    assert validate.is_number(electricity_costs) or validate.is_gurobi_variable(electricity_costs)
 
     demand_start_date = demand_MW.index.min()
     demand_end_date = demand_MW.index.max()
@@ -90,7 +89,7 @@ def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs,
 
         # Calculate the annual electricity demand and electricity costs for electrolysis
         if electricity_demand is not None:
-            annual_electricity_demand_market_node = _calculate_annual_electricity_demand(electricity_demand[market_node], electricity_costs)
+            annual_electricity_demand_market_node = _calculate_annual_electricity_demand(electricity_demand[market_node])
 
             # Calculate the annual hydrogen production
             for electrolysis_technology in electrolysis_assumptions:
