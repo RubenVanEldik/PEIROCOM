@@ -1,6 +1,6 @@
 # PEIROCOM
 
-**V0.1.15**
+**V0.1.16**
 
 The Pan-European Intermittent Renewable Overbuilding and Curtailment Optimization Model (PEIROCOM) is an optimization model for a fully intermittent renewable Pan-European electricity grid. The model aims to find the least-cost solution for the deployment of solar PV, wind energy and storage. By overbuilding generation capacity to some degree, significant less storage capacity is required, resulting in lower system costs.
 
