@@ -6,11 +6,11 @@ The Pan-European Intermittent Renewable Overbuilding and Curtailment Optimizatio
 
 The demand, IRES, hydropower, and interconnection capacity data are from ENTSO-E's [2021 European Resource Adequacy Assessment (ERAA)](https://www.entsoe.eu/outlooks/eraa/2021/eraa-downloads/). The techno-economic data is from NREL's [Annual Technology Baseline](https://atb.nrel.gov/).
 
-The source code of the model is hosted on [Github](https://github.com/RubenVanEldik/PEIROCOM).
+The source code of the model is hosted on [GitHub](https://github.com/RubenVanEldik/PEIROCOM).
 
 ## Getting started
 
-After copying `.env.example` to `.env` and adding the specified environment variables. The app can be started using using these commands.
+After copying `.env.example` to `.env` and adding the specified environment variables. The app can be started using these commands.
 
 ```shell
 pip install -r requirements.txt
@@ -34,7 +34,7 @@ PEIROCOM consists out of three sections, preprocessing, optimization, and analys
 
 ### Preprocessing
 
-The preprocessor only needs to be run once. It removes some irragularities and converts the hourly ERAA data in Excel to a single CSV file per market node.
+The preprocessor only needs to be run once. It removes some irregularities and converts the hourly ERAA data in Excel to a single CSV file per market node.
 
 ### Optimization
 
@@ -42,7 +42,7 @@ The optimization is the core of PEIROCOM. All input parameters are dynamically d
 
 ### Analysis
 
-After a model is finished it stores all data on the disk. To quickly and effectivily analyse the results of a given run, there are various analysis tools that can be used to parse and analyze the results.
+After a model is finished it stores all data on the disk. To quickly and effectively analyze the results of a given run, there are various analysis tools that can be used to parse and analyze the results.
 
 ## Licensing
 
