@@ -2,7 +2,6 @@ from copy import deepcopy
 
 import streamlit as st
 
-import stats
 import utils
 import validate
 from .optimize import optimize
@@ -65,7 +64,7 @@ def run_sensitivity(config, sensitivity_config):
         # Calculate the optimal storage costs
         st.subheader(f"Sensitivity run 1.000")
         run(config, status=status, output_directory=output_directory / "1.000")
-        annual_storage_costs_optimal = stats.annual_costs(output_directory / "1.000", breakdown_level=1)["storage"]
+        annual_storage_costs_optimal = utils.previous_run.annual_costs(output_directory / "1.000", breakdown_level=1)["storage"]
 
         # Send the notification
         if config["send_notification"]:
@@ -109,7 +108,7 @@ def run_sensitivity(config, sensitivity_config):
                 sensitivity_config["steps"][step_key] = relative_storage_costs
 
                 # Break the while loop if the premium exceeds the maximum premium
-                firm_lcoe = stats.firm_lcoe(output_directory_step)
+                firm_lcoe = utils.previous_run.firm_lcoe(output_directory_step)
                 if firm_lcoe >= sensitivity_config["max_lcoe"]:
                     break
 

@@ -1,7 +1,6 @@
 import numpy as np
 import streamlit as st
 
-import stats
 import utils
 import validate
 
@@ -49,20 +48,20 @@ def statistics(output_directory):
         col1, col2, col3 = st.columns(3)
 
         # LCOE
-        firm_lcoe_selected = stats.firm_lcoe(output_directory, country_codes=selected_country_codes)
-        firm_lcoe_all = stats.firm_lcoe(output_directory)
+        firm_lcoe_selected = utils.previous_run.firm_lcoe(output_directory, country_codes=selected_country_codes)
+        firm_lcoe_all = utils.previous_run.firm_lcoe(output_directory)
         lcoe_delta = f"{(firm_lcoe_selected / firm_lcoe_all) - 1:.0%}" if selected_country_codes else None
         col1.metric("LCOE", f"{int(firm_lcoe_selected)}€/MWh", lcoe_delta, delta_color="inverse")
 
         # Firm kWh premium
-        premium_selected = stats.premium(output_directory, country_codes=selected_country_codes)
-        premium_all = stats.premium(output_directory)
+        premium_selected = utils.previous_run.premium(output_directory, country_codes=selected_country_codes)
+        premium_all = utils.previous_run.premium(output_directory)
         premium_delta = f"{(premium_selected / premium_all) - 1:.0%}" if selected_country_codes else None
         col2.metric("Firm kWh premium", f"{premium_selected:.2f}", premium_delta, delta_color="inverse")
 
         # Curtailment
-        curtailment_selected = stats.relative_curtailment(output_directory, country_codes=selected_country_codes)
-        curtailment_all = stats.relative_curtailment(output_directory)
+        curtailment_selected = utils.previous_run.relative_curtailment(output_directory, country_codes=selected_country_codes)
+        curtailment_all = utils.previous_run.relative_curtailment(output_directory)
         curtailment_delta = f"{(curtailment_selected / curtailment_all) - 1:.0%}" if selected_country_codes else None
         col3.metric("Curtailment", f"{curtailment_selected:.1%}", curtailment_delta, delta_color="inverse")
 
@@ -73,8 +72,8 @@ def statistics(output_directory):
             electrolysis_technology_name = utils.format_technology(electrolysis_technology)
 
             # LCOH
-            lcoh_selected = stats.lcoh(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
-            lcoh_all = stats.lcoh(output_directory, electrolysis_technology=electrolysis_technology)
+            lcoh_selected = utils.previous_run.lcoh(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
+            lcoh_all = utils.previous_run.lcoh(output_directory, electrolysis_technology=electrolysis_technology)
             lcoh_delta = f"{(lcoh_selected / lcoh_all) - 1:.0%}" if selected_country_codes else None
             if np.isnan(lcoh_selected):
                 col1.metric(f"LCOH ({electrolysis_technology_name})", "—")
@@ -83,8 +82,8 @@ def statistics(output_directory):
                 col1.metric(f"LCOH ({electrolysis_technology_name})", f"{lcoh_selected * hydrogen_mwh_kg:.2f}€/kg", lcoh_delta, delta_color="inverse")
 
             # Electrolyzer capacity factor
-            electrolyzer_capacity_factor_selected = stats.electrolyzer_capacity_factor(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
-            electrolyzer_capacity_factor_all = stats.electrolyzer_capacity_factor(output_directory, electrolysis_technology=electrolysis_technology)
+            electrolyzer_capacity_factor_selected = utils.previous_run.electrolyzer_capacity_factor(output_directory, country_codes=selected_country_codes, electrolysis_technology=electrolysis_technology)
+            electrolyzer_capacity_factor_all = utils.previous_run.electrolyzer_capacity_factor(output_directory, electrolysis_technology=electrolysis_technology)
             electrolyzer_capactity_factor_delta = f"{(electrolyzer_capacity_factor_selected / electrolyzer_capacity_factor_all) - 1:.0%}" if selected_country_codes else None
             if np.isnan(electrolyzer_capacity_factor_selected):
                 col2.metric(f"Capacity factor ({electrolysis_technology_name})", "—")
@@ -98,7 +97,7 @@ def statistics(output_directory):
         show_hourly_generation = st.checkbox("Mean hourly generation")
 
         # Get the capacities
-        ires_capacity = stats.ires_capacity(output_directory, country_codes=selected_country_codes)
+        ires_capacity = utils.previous_run.ires_capacity(output_directory, country_codes=selected_country_codes)
 
         # Create the storage capacity columns
         cols = st.columns(max(len(ires_capacity.index), 3))
@@ -127,7 +126,7 @@ def statistics(output_directory):
             show_relative_hydropower_capacity = st.checkbox("Relative to demand", key="hydropower")
 
             # Get the capacities
-            hydropower_capacity = stats.hydropower_capacity(output_directory, country_codes=selected_country_codes)
+            hydropower_capacity = utils.previous_run.hydropower_capacity(output_directory, country_codes=selected_country_codes)
             turbine_capacity = hydropower_capacity.turbine.sum()
             pump_capacity = hydropower_capacity.pump.sum()
             reservoir_capacity = hydropower_capacity.reservoir.sum()
@@ -153,7 +152,7 @@ def statistics(output_directory):
         storage_capacity_attribute = "power" if show_power_capacity else "energy"
 
         # Get the storage capacities
-        storage_capacity = stats.storage_capacity(output_directory, country_codes=selected_country_codes)[storage_capacity_attribute]
+        storage_capacity = utils.previous_run.storage_capacity(output_directory, country_codes=selected_country_codes)[storage_capacity_attribute]
 
         # Create the storage capacity columns
         cols = st.columns(max(len(storage_capacity.index), 3))

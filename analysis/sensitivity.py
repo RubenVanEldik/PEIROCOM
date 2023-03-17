@@ -4,7 +4,6 @@ import streamlit as st
 
 import chart
 import colors
-import stats
 import utils
 import validate
 
@@ -26,7 +25,7 @@ def _retrieve_statistics(steps, method, output_directory, **kwargs):
 
     def _apply_step(step):
         # Retrieve the statistic for this step
-        step_data = getattr(stats, method)(output_directory / step, **kwargs)
+        step_data = getattr(utils.previous_run, method)(output_directory / step, **kwargs)
         # Update the index
         index[0] += 1
         progress_bar.progress(index[0] / len(steps))
@@ -57,7 +56,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
     # Create a Series with the sensitivity steps as rows
     if sensitivity_config["analysis_type"] == "curtailment":
         # Use the actual curtailment as the index
-        step_index = [stats.relative_curtailment(output_directory / step) for step in sensitivity_config["steps"].keys()]
+        step_index = [utils.previous_run.relative_curtailment(output_directory / step) for step in sensitivity_config["steps"].keys()]
     else:
         step_index = sensitivity_config["steps"].values()
     steps = pd.Series(data=sensitivity_config["steps"].keys(), index=step_index).sort_index()
@@ -169,7 +168,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         sensitivity_plot.axs.set_ylim([0, sensitivity_plot.axs.set_ylim()[1]])
     if statistic_name == "storage_capacity":
         storage_capacity_attribute = st.sidebar.selectbox("Storage capacity attribute", ["energy", "power"], format_func=utils.format_str)
-        data = steps.apply(lambda step: stats.storage_capacity(output_directory / step)[storage_capacity_attribute])
+        data = steps.apply(lambda step: utils.previous_run.storage_capacity(output_directory / step)[storage_capacity_attribute])
         data = data / 10 ** 6 if storage_capacity_attribute == "energy" else data / 10 ** 3
 
         cumulative_data = 0

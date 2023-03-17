@@ -5,7 +5,6 @@ import streamlit as st
 
 import chart
 import colors
-import stats
 import utils
 import validate
 
@@ -29,7 +28,7 @@ def _select_data(output_directory, *, name):
         # Get the type of statistic
         statistic_type_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment", "self_sufficiency"]
         statistic_type = col2.selectbox("Type", statistic_type_options, format_func=utils.format_str, key=name)
-        statistic_method = getattr(stats, statistic_type)
+        statistic_method = getattr(utils.previous_run, statistic_type)
 
         # Calculate the statistics for each country and convert them into a Series
         return pd.Series({country_code: statistic_method(output_directory, country_codes=[country_code]) for country_code in config["country_codes"]})

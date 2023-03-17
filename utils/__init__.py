@@ -1,3 +1,4 @@
+import utils.previous_run as previous_run
 from .cache import cache
 from .calculate_crf import calculate_crf
 from .calculate_distance import calculate_distance
