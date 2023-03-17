@@ -93,6 +93,9 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         else:
             raise ValueError("'statistic_name has to be 'firm_lcoe', 'unconstrained_lcoe', or 'premium'")
 
+        # Remove all technology (types) that have only zeroes throughout the sensitivity analysis
+        data = data.loc[:, (data != 0).any()]
+
         # Plot the data depending on the breakdown level
         if breakdown_level == 0:
             if st.sidebar.checkbox("Fit a curve on the data"):
@@ -238,7 +241,7 @@ def sensitivity(output_directory):
         sensitivity_plot.axs.set_xlabel("Technology scenario")
         sensitivity_plot.axs.set_xticks([-1, 0, 1], ["Conservative", "Moderate", "Advanced"])
     elif sensitivity_config["analysis_type"] == "hydrogen_demand":
-        sensitivity_plot.axs.set_xlabel("Hydrogen demand ($\%_{electricity\ demand}$)")
+        sensitivity_plot.axs.set_xlabel(r"Hydrogen demand ($\%_{electricity\ demand}$)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "hydropower_capacity":
         sensitivity_plot.axs.set_xlabel(r"Hydropower capacity ($\%_{current}$)")
