@@ -143,19 +143,33 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         sensitivity_plot.format_yticklabels("{:,.0%}")
     if statistic_name == "ires_capacity":
         data = _retrieve_statistics(steps, "ires_capacity", output_directory) / 1000
+
+        cumulative_data = 0
         for ires_technology in data:
-            sensitivity_plot.axs.plot(data[ires_technology], color=colors.technology(ires_technology), label=utils.format_technology(ires_technology))
+            cumulative_data += data[ires_technology]
+            sensitivity_plot.axs.fill_between(data[ires_technology].index, cumulative_data - data[ires_technology], cumulative_data, label=utils.format_technology(ires_technology), facecolor=colors.technology(ires_technology))
         sensitivity_plot.axs.set_ylabel("IRES capacity (GW)")
         sensitivity_plot.add_legend()
+
+        # Set the x and y limits to the limits of the data so there is no padding in the area chart
+        sensitivity_plot.axs.set_xlim([round(data.index.min(), 2), round(data.index.max(), 2)])
+        sensitivity_plot.axs.set_ylim([0, sensitivity_plot.axs.set_ylim()[1]])
     if statistic_name == "storage_capacity":
         storage_capacity_attribute = st.sidebar.selectbox("Storage capacity attribute", ["energy", "power"], format_func=utils.format_str)
         data = steps.apply(lambda step: stats.storage_capacity(output_directory / step)[storage_capacity_attribute])
         data = data / 10 ** 6 if storage_capacity_attribute == "energy" else data / 10 ** 3
+
+        cumulative_data = 0
         for storage_technology in data:
-            sensitivity_plot.axs.plot(data[storage_technology], color=colors.technology(storage_technology), label=utils.format_technology(storage_technology))
+            cumulative_data += data[storage_technology]
+            sensitivity_plot.axs.fill_between(data[storage_technology].index, cumulative_data - data[storage_technology], cumulative_data, label=utils.format_technology(storage_technology), facecolor=colors.technology(storage_technology))
         unit = "TWh" if storage_capacity_attribute == "energy" else "GW"
         sensitivity_plot.axs.set_ylabel(f"Storage capacity ({unit})")
         sensitivity_plot.add_legend()
+
+        # Set the x and y limits to the limits of the data so there is no padding in the area chart
+        sensitivity_plot.axs.set_xlim([round(data.index.min(), 2), round(data.index.max(), 2)])
+        sensitivity_plot.axs.set_ylim([0, sensitivity_plot.axs.set_ylim()[1]])
     if statistic_name == "optimization_duration":
         data = steps.apply(lambda step: utils.read_csv(output_directory / step / "model" / "duration.csv", index_col=0).sum(axis=1)) / 3600
         cumulative_data = 0
