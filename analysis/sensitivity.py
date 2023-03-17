@@ -66,7 +66,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
     if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"]:
         # Ask for the breakdown level
         breakdown_level_options = {0: "Off", 1: "Technology types", 2: "Technologies"}
-        breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, format_func=lambda key: breakdown_level_options[key])
+        breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, index=1, format_func=lambda key: breakdown_level_options[key])
 
         # Get the data and set the label
         if statistic_name == "firm_lcoe":
