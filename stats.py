@@ -56,14 +56,27 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
     assert validate.is_breakdown_level(breakdown_level)
 
-    # Get the capacities and demand
+    # Calculate the annual electricity costs
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     config = utils.read_yaml(output_directory / "config.yaml")
+    annual_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=breakdown_level)
 
-    # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=breakdown_level)
+    # Calculate the annual electrolyzer costs
+    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)
+    annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=breakdown_level, annual_costs=True)
+
+    # Add the electrolyzer to the other costs
+    if breakdown_level == 0:
+        annual_costs += annual_electrolyzer_costs
+    if breakdown_level == 1:
+        annual_costs['electrolysis'] = annual_electrolyzer_costs.electrolyzer
+    if breakdown_level == 2:
+        annual_costs = annual_costs.append(annual_electrolyzer_costs.electrolyzer)
+
+    # Return the annual costs
+    return annual_costs
 
 
 def premium(output_directory, *, country_codes=None, breakdown_level=0):

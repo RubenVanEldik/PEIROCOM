@@ -63,7 +63,7 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
     steps = pd.Series(data=sensitivity_config["steps"].keys(), index=step_index).sort_index()
 
     # Add the output for the sensitivity steps to the sensitivity plot
-    if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium"]:
+    if statistic_name in ["firm_lcoe", "unconstrained_lcoe", "premium", "annual_costs"]:
         # Ask for the breakdown level
         breakdown_level_options = {0: "Off", 1: "Technology types", 2: "Technologies"}
         breakdown_level = st.sidebar.selectbox("Breakdown level", breakdown_level_options, index=1, format_func=lambda key: breakdown_level_options[key])
@@ -78,6 +78,19 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
         elif statistic_name == "premium":
             sensitivity_plot.axs.set_ylabel("Firm kWh premium")
             data = _retrieve_statistics(steps, "premium", output_directory, breakdown_level=breakdown_level)
+        elif statistic_name == "annual_costs":
+            data = _retrieve_statistics(steps, "annual_costs", output_directory, breakdown_level=breakdown_level)
+            maximum_annual_costs = data.max() if breakdown_level == 0 else data.sum(axis=1).max()
+            if maximum_annual_costs > 10 ** 12:
+                data /= 10 ** 12
+                unit = "T€"
+            elif maximum_annual_costs > 10 ** 9:
+                data /= 10 ** 9
+                unit = "B€"
+            else:
+                data /= 10 ** 6
+                unit = "M€"
+            sensitivity_plot.axs.set_ylabel(f"Annual costs ({unit})")
         else:
             raise ValueError("'statistic_name has to be 'firm_lcoe', 'unconstrained_lcoe', or 'premium'")
 
@@ -200,7 +213,7 @@ def sensitivity(output_directory):
     sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")
 
     # Select an output variable to run the sensitivity analysis on
-    statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "relative_curtailment", "ires_capacity", "storage_capacity", "optimization_duration"]
+    statistic_options = ["firm_lcoe", "unconstrained_lcoe", "premium", "annual_costs", "relative_curtailment", "ires_capacity", "storage_capacity", "optimization_duration"]
     statistic_name = st.sidebar.selectbox("Output variable", statistic_options, format_func=utils.format_str)
 
     # Plot the data
