@@ -63,7 +63,7 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=breakdown_level)
 
 
 def premium(output_directory, *, country_codes=None, breakdown_level=0):
