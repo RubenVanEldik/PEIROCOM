@@ -73,7 +73,7 @@ def optimize(config, *, status, output_directory):
     ires_capacity = {}
     hydropower_capacity = {}
     storage_capacity = {}
-    electrolysis_capacity = pd.DataFrame()
+    electrolysis_capacity = pd.DataFrame(index=market_nodes)  # The index is required for the case when no electrolysis technologies are defined
 
     for index, market_node in enumerate(market_nodes):
         """
@@ -94,27 +94,26 @@ def optimize(config, *, status, output_directory):
         """
         Step 3B: Define the electrolysis variables
         """
-        if include_hydrogen_production:
-            # Calculate the mean hourly electricity demand for hydrogen production
-            # (This is both the hourly mean and the non-weighted mean of the efficiency; this mean is used as its mathematically impossible to use the real values in the self-sufficiency calculations)
-            mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
-            mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
-            temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
+        # Calculate the mean hourly electricity demand for hydrogen production
+        # (This is both the hourly mean and the non-weighted mean of the efficiency; this mean is used as its mathematically impossible to use the real values in the self-sufficiency calculations)
+        mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
+        mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
+        temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
 
-            for electrolysis_technology in config["technologies"]["electrolysis"]:
-                status.update(f"{country_flag} Adding {utils.format_technology(electrolysis_technology)} electrolysis")
+        for electrolysis_technology in config["technologies"]["electrolysis"]:
+            status.update(f"{country_flag} Adding {utils.format_technology(electrolysis_technology)} electrolysis")
 
-                # Create the variable for the electrolysis production capacity
-                electrolysis_capacity_market_node = model.addVar()
-                electrolysis_capacity.loc[market_node, electrolysis_technology] = electrolysis_capacity_market_node
+            # Create the variable for the electrolysis production capacity
+            electrolysis_capacity_market_node = model.addVar()
+            electrolysis_capacity.loc[market_node, electrolysis_technology] = electrolysis_capacity_market_node
 
-                # Create the temporal electrolysis demand variables
-                temporal_electrolysis_demand = model.addVars(temporal_demand_electricity.index)
-                temporal_results[market_node][f"demand_{electrolysis_technology}_MW"] = pd.Series(temporal_electrolysis_demand)
-                temporal_results[market_node]["demand_total_MW"] += pd.Series(temporal_electrolysis_demand)
+            # Create the temporal electrolysis demand variables
+            temporal_electrolysis_demand = model.addVars(temporal_demand_electricity.index)
+            temporal_results[market_node][f"demand_{electrolysis_technology}_MW"] = pd.Series(temporal_electrolysis_demand)
+            temporal_results[market_node]["demand_total_MW"] += pd.Series(temporal_electrolysis_demand)
 
-                # Ensure that the temporal demand does not exceed the electrolysis capacity
-                model.addConstrs(temporal_electrolysis_demand[timestamp] <= electrolysis_capacity_market_node for timestamp in temporal_demand_electricity.index)
+            # Ensure that the temporal demand does not exceed the electrolysis capacity
+            model.addConstrs(temporal_electrolysis_demand[timestamp] <= electrolysis_capacity_market_node for timestamp in temporal_demand_electricity.index)
 
         """
         Step 3C: Define IRES capacity variables
@@ -697,10 +696,9 @@ def optimize(config, *, status, output_directory):
     # Store the mean temporal data
     mean_temporal_data.to_csv(output_directory / "temporal" / "market_nodes" / "mean.csv")
 
-    # Convert and store the electrolysis capacity if hydrogen production is included
-    if include_hydrogen_production:
-        electrolysis_capacity = utils.convert_variables_recursively(electrolysis_capacity)
-        electrolysis_capacity.to_csv(output_directory / "capacity" / "electrolysis.csv")
+    # Convert and store the electrolysis capacity
+    electrolysis_capacity = utils.convert_variables_recursively(electrolysis_capacity)
+    electrolysis_capacity.to_csv(output_directory / "capacity" / "electrolysis.csv")
 
     # Store the actual values per connection type for the temporal export
     for connection_type in ["hvac", "hvdc"]:
