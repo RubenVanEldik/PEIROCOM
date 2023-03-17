@@ -107,14 +107,14 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     return annualized_costs_storage
 
 
-def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, annual_electricity_demand, *, config, breakdown_level=0):
+def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, *, config, breakdown_level=0):
     """
     Calculate the average levelized costs of electricity for all market nodes
     """
     assert validate.is_market_node_dict(ires_capacity)
     assert validate.is_market_node_dict(storage_capacity)
     assert validate.is_market_node_dict(hydropower_capacity)
-    assert validate.is_number(annual_electricity_demand)
+    assert validate.is_number(mean_electricity_demand)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
 
@@ -146,4 +146,5 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, annual_
     total_costs /= eur_usd
 
     # Return the relative or absolute costs
+    annual_electricity_demand = 8760 * mean_electricity_demand
     return total_costs / annual_electricity_demand

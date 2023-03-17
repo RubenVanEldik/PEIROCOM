@@ -17,11 +17,11 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
-    annual_electricity_demand = (mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW) * 8760
+    mean_electricity_demand = (mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW)
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, annual_electricity_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, config=config, breakdown_level=breakdown_level)
 
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
@@ -37,7 +37,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
-    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW) * 8760
+    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW)
     config = utils.read_yaml(output_directory / "config.yaml")
 
     # Set the storage capacity to zero
