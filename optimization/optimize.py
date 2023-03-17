@@ -485,7 +485,7 @@ def optimize(config, *, status, output_directory):
         status.update("Adding the storage costs constraint")
 
         # Calculate the storage costs
-        annual_storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1, config=config, breakdown_level=1)["storage"]
+        annual_storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_annual_storage_costs = config["fixed_storage"]["annual_costs"]
@@ -500,7 +500,7 @@ def optimize(config, *, status, output_directory):
     status.update("Setting the objective function")
 
     # Calculate the annual electricity costs
-    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1, config=config)
+    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config)
 
     # Calculate the total spillage and give it an artificial cost (this is required because otherwise some curtailment might be accounted as spillage)
     total_spillage_hydropower_MWh = utils.merge_dataframes_on_column(temporal_results, "spillage_total_hydropower_MW").sum().sum() * interval_length
