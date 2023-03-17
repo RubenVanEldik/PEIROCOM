@@ -1,3 +1,5 @@
+import pandas as pd
+
 import utils
 import validate
 
@@ -103,12 +105,12 @@ def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysi
     # Get the capacities and electrolysis demand and electricity costs
     config = utils.read_yaml(output_directory / "config.yaml")
     electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)[[electrolysis_technology]]
-    temporal_results = utils.get_temporal_results(output_directory, country_codes=country_codes)
-    electrolysis_demand = {market_node: temporal_results[market_node][[f"demand_{electrolysis_technology}_MW"]] for market_node in temporal_results}
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
+    annual_electrolysis_demand = pd.Series({electrolysis_technology: mean_temporal_results[f"demand_{electrolysis_technology}_MW"]})
     electricity_costs = firm_lcoe(output_directory, country_codes=country_codes, breakdown_level=breakdown_level)
 
     # Return the LCOE
-    return utils.calculate_lcoh(electrolysis_capacity, electrolysis_demand, electricity_costs, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoh(electrolysis_capacity, annual_electrolysis_demand, electricity_costs, config=config, breakdown_level=breakdown_level)
 
 
 def electrolyzer_capacity_factor(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):

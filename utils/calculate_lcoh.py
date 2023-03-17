@@ -1,5 +1,3 @@
-import re
-
 import pandas as pd
 
 import utils
@@ -49,27 +47,13 @@ def _calculate_annualized_electrolyzer_costs(electrolysis_technologies, electrol
     return annualized_costs_electrolyzer
 
 
-def _calculate_annual_electricity_demand(demand_MW):
-    """
-    Calculate the annual electricity demand
-    """
-    assert validate.is_dataframe(demand_MW)
-
-    demand_start_date = demand_MW.index.min()
-    demand_end_date = demand_MW.index.max()
-    share_of_year_modelled = (demand_end_date - demand_start_date) / pd.Timedelta(365, "days")
-    timestep_hours = (demand_MW.index[1] - demand_MW.index[0]).total_seconds() / 3600
-    annual_demand = demand_MW.sum() * timestep_hours / share_of_year_modelled
-    return annual_demand.rename(index={row: re.match("demand_(.+)_MW", row)[1] for row in annual_demand.index})
-
-
-def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs, *, config, breakdown_level=0, annual_costs=False):
+def calculate_lcoh(electrolysis_capacity, mean_electricity_demand, electricity_costs, *, config, breakdown_level=0, annual_costs=False):
     """
     Calculate the average Levelized Costs of Hydrogen for all market nodes
     """
     assert validate.is_dataframe(electrolysis_capacity)
-    assert validate.is_market_node_dict(electricity_demand, required=not annual_costs)
-    assert validate.is_number(electricity_costs, required=electricity_demand is not None)
+    assert validate.is_series(mean_electricity_demand, required=not annual_costs)
+    assert validate.is_number(electricity_costs, required=mean_electricity_demand is not None)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
     assert validate.is_bool(annual_costs)
@@ -80,25 +64,24 @@ def calculate_lcoh(electrolysis_capacity, electricity_demand, electricity_costs,
     # Get the electrolysis assumptions
     electrolysis_assumptions = utils.get_technologies(technology_type="electrolysis")
 
+    # Calculate the annualized electrolyzer costs
     annualized_electrolyzer_costs = 0
-    annualized_electricity_costs = 0
-    annual_hydrogen_production = 0
     for market_node in electrolysis_capacity.index:
-        # Calculate the annualized electrolyzer costs
         annualized_electrolyzer_costs += _calculate_annualized_electrolyzer_costs(config["technologies"]["electrolysis"], electrolysis_capacity.loc[market_node], technology_scenario=technology_scenario)
 
-        # Calculate the annual electricity demand and electricity costs for electrolysis
-        if electricity_demand is not None:
-            annual_electricity_demand_market_node = _calculate_annual_electricity_demand(electricity_demand[market_node])
+    # Calculate the annual electricity costs and hydrogen production
+    if mean_electricity_demand is not None:
+        annual_electricity_demand = 8760 * mean_electricity_demand
 
-            # Calculate the annual hydrogen production
-            for electrolysis_technology in electrolysis_assumptions:
-                annual_hydrogen_production += annual_electricity_demand_market_node[electrolysis_technology] * electrolysis_assumptions[electrolysis_technology]["efficiency"]
+        # Calculate the annual hydrogen production
+        annual_hydrogen_production = 0
+        for electrolysis_technology in electrolysis_assumptions:
+            annual_hydrogen_production += annual_electricity_demand[electrolysis_technology] * electrolysis_assumptions[electrolysis_technology]["efficiency"]
 
-            # Add the annualized electrolyzer and electricity costs
-            annualized_electricity_costs += annual_electricity_demand_market_node * electricity_costs
-        else:
-            annualized_electricity_costs = pd.Series(0, index=electrolysis_assumptions.keys())
+        # Calculate the annualized electricity costs
+        annualized_electricity_costs = annual_electricity_demand.sum() * electricity_costs
+    else:
+        annualized_electricity_costs = pd.Series(0, index=electrolysis_assumptions.keys())
 
     # Calculate and return the LCOH
     if breakdown_level == 0:
