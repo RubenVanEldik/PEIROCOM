@@ -63,8 +63,8 @@ def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_c
     for technology in hydropower_technologies:
         # Calculate costs for the turbine capacity
         turbine_capacity_kW = hydropower_capacity.loc[technology, "turbine"] * 1000
-        capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex_power", technology_scenario)
-        fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om_power", technology_scenario)
+        capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex", technology_scenario)
+        fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om", technology_scenario)
 
         # Calculate the total annualized costs
         crf = utils.calculate_crf(hydropower_assumptions[technology]["wacc"], hydropower_assumptions[technology]["economic_lifetime"])
