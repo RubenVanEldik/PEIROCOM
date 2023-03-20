@@ -50,6 +50,28 @@ ires:
     advanced:
       capex: 1966 # NREL Class 3
       fixed_om: 60 # NREL Class 3
+dispatchable:
+  color:
+    name: 'purple'
+    value: 600
+  nuclear:
+    name: "nuclear"
+    color:
+      name: 'purple'
+      value: 500
+    efficiency: 0.6
+    fuel_costs: 10
+    economic_lifetime: 30
+    wacc: 0.0559
+    conservative:
+      capex: 7000
+      fixed_om: 64
+    moderate:
+      capex: 4700
+      fixed_om: 62
+    advanced:
+      capex: 4200
+      fixed_om: 56
 hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (978-92-9260-452-3)
   color:
     name: 'sky'

@@ -74,12 +74,9 @@ with st.sidebar.expander("Technologies"):
     config["technologies"]["scenario"] = st.select_slider("Scenario", options=scenario_levels.keys(), value=0, format_func=lambda key: scenario_levels[key])
 
     # Select the technologies
-    technology_types = ["ires", "hydropower", "storage", "electrolysis"]
+    technology_types = ["ires", "dispatchable", "hydropower", "storage", "electrolysis"]
     technology_type_tabs = st.tabs([utils.format_str(technology_type) for technology_type in technology_types])
     for technology_type, technology_type_tab in zip(technology_types, technology_type_tabs):
-        # Initialize the dictionary for the technology
-        config["technologies"][technology_type] = []
-
         # Get all technology options for this technology
         technology_options = utils.get_technologies(technology_type=technology_type).keys()
 
@@ -88,10 +85,23 @@ with st.sidebar.expander("Technologies"):
             technology_type_tab.warning("This technology type does not have any options defined")
             continue
 
-        # Create a checkbox for each technology option
-        for technology in technology_options:
-            if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
-                config["technologies"][technology_type].append(technology)
+        # Create a checkbox and slider for each dispatchable technology option
+        if technology_type == "dispatchable":
+            # Initialize the dictionary for the technology
+            config["technologies"][technology_type] = {}
+
+            col1, col2 = technology_type_tab.columns(2)
+            for technology in technology_options:
+                if col1.checkbox(utils.format_technology(technology), value=True):
+                    config["technologies"][technology_type][technology] = col2.number_input("Relative generation", min_value=0.0, max_value=1.0, value=0.0)
+        else:
+            # Initialize the list for the technology
+            config["technologies"][technology_type] = []
+
+            # Create a checkbox for each technology option
+            for technology in technology_options:
+                if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
+                    config["technologies"][technology_type].append(technology)
 
         if technology_type == "electrolysis" and len(config["technologies"][technology_type]):
             config["relative_hydrogen_demand"] = technology_type_tab.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")

@@ -47,6 +47,32 @@ def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW, *, tec
     return annualized_costs_ires
 
 
+def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatchable_capacity_MW, dispatchable_mean_generation_MW, *, technology_scenario):
+    """
+    Calculate the annualized dispatchable costs
+    """
+    assert validate.is_list_like(dispatchable_technologies)
+    assert validate.is_series(dispatchable_capacity_MW)
+    assert validate.is_series(dispatchable_mean_generation_MW)
+    assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
+
+    # Read the dispatchable assumptions
+    dispatchable_assumptions = utils.get_technologies(technology_type="dispatchable")
+
+    # Calculate the total annual costs
+    annualized_costs_dispatchable = pd.Series([], dtype="float64")
+    for technology in dispatchable_technologies:
+        capacity_kW = dispatchable_capacity_MW[technology] * 1000
+        annual_generation_MWh = dispatchable_mean_generation_MW.sum() * 8760
+        capex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "capex", technology_scenario)
+        fixed_om = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_om", technology_scenario)
+        fuel_costs = annual_generation_MWh / dispatchable_assumptions[technology]["efficiency"] * dispatchable_assumptions[technology]["fuel_costs"]
+        crf = utils.calculate_crf(dispatchable_assumptions[technology]["wacc"], dispatchable_assumptions[technology]["economic_lifetime"])
+        annualized_costs_dispatchable[technology] = crf * capex + fixed_om + fuel_costs
+
+    return annualized_costs_dispatchable
+
+
 def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_capacity, *, technology_scenario):
     """
     Calculate the annualized hydropower costs
@@ -107,11 +133,13 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     return annualized_costs_storage
 
 
-def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, *, config, breakdown_level=0):
+def calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, mean_electricity_demand, *, config, breakdown_level=0):
     """
     Calculate the average levelized costs of electricity for all market nodes
     """
     assert validate.is_market_node_dict(ires_capacity)
+    assert validate.is_dataframe(dispatchable_capacity)
+    assert validate.is_dataframe(mean_dispatchable_generation)
     assert validate.is_market_node_dict(storage_capacity)
     assert validate.is_market_node_dict(hydropower_capacity)
     assert validate.is_number(mean_electricity_demand)
@@ -122,22 +150,24 @@ def calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_el
     technology_scenario = config["technologies"]["scenario"]
 
     annualized_ires_costs = 0
+    annualized_dispatchable_costs = 0
     annualized_storage_costs = 0
     annualized_hydropower_costs = 0
 
     for market_node in ires_capacity.keys():
         # Add the annualized costs
         annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node], technology_scenario=technology_scenario)
+        annualized_dispatchable_costs += _calculate_annualized_dispatchable_costs(config["technologies"]["dispatchable"], dispatchable_capacity.loc[market_node], mean_dispatchable_generation.loc[market_node], technology_scenario=technology_scenario)
         annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], technology_scenario=technology_scenario)
         annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node], technology_scenario=technology_scenario)
 
     # Calculate and return the LCOE
     if breakdown_level == 0:
-        total_costs = annualized_ires_costs.sum() + annualized_storage_costs.sum() + annualized_hydropower_costs.sum()
+        total_costs = annualized_ires_costs.sum() + annualized_dispatchable_costs.sum() + annualized_storage_costs.sum() + annualized_hydropower_costs.sum()
     elif breakdown_level == 1:
-        total_costs = pd.Series({"ires": annualized_ires_costs.sum(), "hydropower": annualized_hydropower_costs.sum(), "storage": annualized_storage_costs.sum()})
+        total_costs = pd.Series({"ires": annualized_ires_costs.sum(), "dispatchable": annualized_dispatchable_costs.sum(), "hydropower": annualized_hydropower_costs.sum(), "storage": annualized_storage_costs.sum()})
     elif breakdown_level == 2:
-        total_costs = pd.concat([annualized_ires_costs, annualized_storage_costs, annualized_hydropower_costs])
+        total_costs = pd.concat([annualized_ires_costs, annualized_dispatchable_costs, annualized_storage_costs, annualized_hydropower_costs])
     else:
         raise ValueError("breakdown_level should be between 0, 1, or 2")
 

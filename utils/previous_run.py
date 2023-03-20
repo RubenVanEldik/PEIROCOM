@@ -13,15 +13,17 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
+    config = utils.read_yaml(output_directory / "config.yaml")
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
+    dispatchable_capacity = utils.get_dispatchable_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
-    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
-    mean_electricity_demand = (mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW)
-    config = utils.read_yaml(output_directory / "config.yaml")
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
+    mean_electricity_demand = (mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW).sum()
+    mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"].keys()]]
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, mean_electricity_demand, config=config, breakdown_level=breakdown_level)
 
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
@@ -33,19 +35,21 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     assert validate.is_breakdown_level(breakdown_level)
 
     # Get the capacities and demand
+    config = utils.read_yaml(output_directory / "config.yaml")
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
+    dispatchable_capacity = utils.get_dispatchable_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
-    mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
-    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW)
-    config = utils.read_yaml(output_directory / "config.yaml")
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
+    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW).sum()
+    mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"].keys()]]
 
     # Set the storage capacity to zero
     for market_node in storage_capacity:
         storage_capacity[market_node] = 0 * storage_capacity[market_node]
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, mean_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, mean_demand, config=config, breakdown_level=breakdown_level)
 
 
 def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
@@ -57,11 +61,14 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     assert validate.is_breakdown_level(breakdown_level)
 
     # Calculate the annual electricity costs
+    config = utils.read_yaml(output_directory / "config.yaml")
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
+    dispatchable_capacity = utils.get_dispatchable_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
-    config = utils.read_yaml(output_directory / "config.yaml")
-    annual_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=breakdown_level)
+    mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
+    mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"].keys()]]
+    annual_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=breakdown_level)
 
     # Calculate the annual electrolyzer costs
     electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)
@@ -103,7 +110,7 @@ def relative_curtailment(output_directory, *, country_codes=None):
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
 
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
-    return mean_temporal_results.curtailed_MW / (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW)
+    return mean_temporal_results.curtailed_MW / (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_dispatchable_MW + mean_temporal_results.generation_total_hydropower_MW)
 
 
 def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
@@ -153,6 +160,16 @@ def ires_capacity(output_directory, *, country_codes=None):
     return utils.get_ires_capacity(output_directory, group="all", country_codes=country_codes)
 
 
+def dispatchable_capacity(output_directory, *, country_codes=None):
+    """
+    Get the grouped dispatchable capacity for a specific output_directory
+    """
+    assert validate.is_directory_path(output_directory)
+    assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
+
+    return utils.get_dispatchable_capacity(output_directory, group="all", country_codes=country_codes)
+
+
 def hydropower_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped hydropower capacity for a specific output_directory
@@ -183,8 +200,9 @@ def self_sufficiency(output_directory, *, country_codes=None):
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
     mean_demand = mean_temporal_results.demand_total_MW
     mean_ires_generation = mean_temporal_results.generation_ires_MW
+    mean_dispatchable_generation = mean_temporal_results.generation_dispatchable_MW
     mean_hydropower_generation = mean_temporal_results.generation_total_hydropower_MW
     mean_curtailment = mean_temporal_results.curtailed_MW
     mean_storage_flow = mean_temporal_results.net_storage_flow_total_MW
 
-    return (mean_ires_generation + mean_hydropower_generation - mean_curtailment - mean_storage_flow) / mean_demand
+    return (mean_ires_generation + mean_dispatchable_generation + mean_hydropower_generation - mean_curtailment - mean_storage_flow) / mean_demand

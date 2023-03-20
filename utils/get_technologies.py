@@ -15,6 +15,8 @@ def get_technologies(*, technology_type=None):
     # Return the requested technologies if a technology type was specified or all if none was specified
     if technology_type == "ires":
         technologies = technology_types.get("ires", {})
+    elif technology_type == "dispatchable":
+        technologies = technology_types.get("dispatchable", {})
     elif technology_type == "hydropower":
         technologies = technology_types.get("hydropower", {})
     elif technology_type == "storage":
@@ -22,7 +24,7 @@ def get_technologies(*, technology_type=None):
     elif technology_type == "electrolysis":
         technologies = technology_types.get("electrolysis", {})
     else:
-        technologies = {**technology_types.get("ires", {}), **technology_types.get("hydropower", {}), **technology_types.get("storage", {}), **technology_types.get("electrolysis", {})}
+        technologies = {**technology_types.get("ires", {}), **technology_types.get("dispatchable", {}), **technology_types.get("hydropower", {}), **technology_types.get("storage", {}), **technology_types.get("electrolysis", {})}
 
     del technologies["color"]
 

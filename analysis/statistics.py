@@ -93,8 +93,8 @@ def statistics(output_directory):
     # Show the IRES capacities
     with st.expander("IRES capacity", expanded=True):
         # Ask if the results should be shown relative to the mean demand
-        show_relative_ires_capacity = st.checkbox("Relative to demand", key="ires")
-        show_hourly_generation = st.checkbox("Mean hourly generation")
+        show_relative_capacity = st.checkbox("Relative to demand", key="relative_to_demand_ires")
+        show_hourly_generation = st.checkbox("Mean hourly generation", key="mean_hourly_ires")
 
         # Get the capacities
         ires_capacity = utils.previous_run.ires_capacity(output_directory, country_codes=selected_country_codes)
@@ -107,18 +107,49 @@ def statistics(output_directory):
             # Set the metric value depending on the checkboxes
             if show_hourly_generation:
                 mean_hourly_generation = utils.merge_dataframes_on_column(temporal_results, f"generation_{technology}_MW").sum(axis=1).mean()
-                if show_relative_ires_capacity:
+                if show_relative_capacity:
                     metric_value = f"{mean_hourly_generation / mean_demand:.1%}"
                 else:
                     metric_value = _format_value_with_unit(mean_hourly_generation * 10 ** 6, unit="W")
             else:
-                if show_relative_ires_capacity:
+                if show_relative_capacity:
                     metric_value = f"{ires_capacity[technology] / mean_demand:.1%}"
                 else:
                     metric_value = _format_value_with_unit(ires_capacity[technology] * 10 ** 6, unit="W")
 
             # Set the metric
             cols[index % 3].metric(utils.format_technology(technology), metric_value)
+
+    # Show the dispatchable capacities
+    if len(config["technologies"]["dispatchable"]) > 0:
+        with st.expander("Dispatchable capacity", expanded=True):
+            # Ask if the results should be shown relative to the mean demand
+            show_relative_capacity = st.checkbox("Relative to demand", key="relative_to_demand_dispatchable")
+            show_hourly_generation = st.checkbox("Mean hourly generation", key="mean_hourly_dispatchable")
+
+            # Get the capacities
+            dispatchable_capacity = utils.previous_run.dispatchable_capacity(output_directory, country_codes=selected_country_codes)
+
+            # Create the storage capacity columns
+            cols = st.columns(max(len(dispatchable_capacity.index), 3))
+
+            # Create the metric for each technology
+            for index, technology in enumerate(dispatchable_capacity.index):
+                # Set the metric value depending on the checkboxes
+                if show_hourly_generation:
+                    mean_hourly_generation = utils.merge_dataframes_on_column(temporal_results, f"generation_{technology}_MW").sum(axis=1).mean()
+                    if show_relative_capacity:
+                        metric_value = f"{mean_hourly_generation / mean_demand:.1%}"
+                    else:
+                        metric_value = _format_value_with_unit(mean_hourly_generation * 10 ** 6, unit="W")
+                else:
+                    if show_relative_capacity:
+                        metric_value = f"{dispatchable_capacity[technology] / mean_demand:.1%}"
+                    else:
+                        metric_value = _format_value_with_unit(dispatchable_capacity[technology] * 10 ** 6, unit="W")
+
+                # Set the metric
+                cols[index % 3].metric(utils.format_technology(technology), metric_value)
 
     if config["technologies"]["hydropower"]:
         with st.expander("Hydropower capacity", expanded=True):

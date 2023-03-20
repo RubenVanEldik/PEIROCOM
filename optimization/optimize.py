@@ -71,9 +71,11 @@ def optimize(config, *, status, output_directory):
     temporal_export = {}
     interconnection_capacity = {}
     ires_capacity = {}
+    dispatchable_capacity = pd.DataFrame(index=market_nodes, columns=config["technologies"]["dispatchable"].keys())
+    dispatchable_generation_mean = pd.DataFrame(index=market_nodes, columns=config["technologies"]["dispatchable"].keys())
     hydropower_capacity = {}
     storage_capacity = {}
-    electrolysis_capacity = pd.DataFrame(index=market_nodes)  # The index is required for the case when no electrolysis technologies are defined
+    electrolysis_capacity = pd.DataFrame(index=market_nodes, columns=config["technologies"]["electrolysis"])  # The index is required for the case when no electrolysis technologies are defined
 
     for index, market_node in enumerate(market_nodes):
         """
@@ -139,6 +141,29 @@ def optimize(config, *, status, output_directory):
                 temporal_ires_generation += temporal_ires[market_node][f"{ires_technology}_{ires_node}_cf"].apply(lambda cf: cf * capacity)
             temporal_results[market_node][f"generation_{ires_technology}_MW"] = temporal_ires_generation
             temporal_results[market_node]["generation_ires_MW"] += temporal_ires_generation
+
+        """
+        Step 3D: Define dispatchable variables
+        """
+        temporal_results[market_node]["generation_dispatchable_MW"] = 0
+
+        for dispatchable_technology in config["technologies"]["dispatchable"]:
+            status.update(f"{country_flag} Adding {utils.format_technology(dispatchable_technology, capitalize=False)} generation")
+
+            # Create the variable for the dispatchable generation capacity
+            dispatchable_capacity_market_node = model.addVar()
+            dispatchable_capacity.loc[market_node, dispatchable_technology] = dispatchable_capacity_market_node
+
+            # Create the temporal dispatchable generation variables
+            temporal_dispatchable_generation = pd.Series(model.addVars(temporal_demand_electricity.index))
+            temporal_results[market_node][f"generation_{dispatchable_technology}_MW"] = temporal_dispatchable_generation
+            temporal_results[market_node]["generation_dispatchable_MW"] += temporal_dispatchable_generation
+
+            # Add the mean generation of this technology
+            dispatchable_generation_mean.loc[market_node, dispatchable_technology] = gp.quicksum(temporal_dispatchable_generation) / len(temporal_dispatchable_generation.index)
+
+            # Ensure that the temporal generation does not exceed the dispatchable capacity
+            model.addConstrs(temporal_dispatchable_generation[timestamp] <= dispatchable_capacity_market_node for timestamp in temporal_demand_electricity.index)
 
         """
         Step 3D: Define the hydropower variables and constraints
@@ -392,10 +417,10 @@ def optimize(config, *, status, output_directory):
                 temporal_results[market_node][column_name] += export_flow
 
         # Add the demand constraint
-        temporal_results[market_node].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_total_MW), axis=1)
+        temporal_results[market_node].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_dispatchable_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_total_MW), axis=1)
 
         # Calculate the curtailed energy per hour
-        curtailed_MW = temporal_results[market_node].generation_ires_MW + temporal_results[market_node].generation_total_hydropower_MW - temporal_results[market_node].demand_total_MW - temporal_results[market_node].net_storage_flow_total_MW - temporal_results[market_node].net_export_MW
+        curtailed_MW = temporal_results[market_node].generation_ires_MW + temporal_results[market_node].generation_dispatchable_MW + temporal_results[market_node].generation_total_hydropower_MW - temporal_results[market_node].demand_total_MW - temporal_results[market_node].net_storage_flow_total_MW - temporal_results[market_node].net_export_MW
         temporal_results[market_node].insert(temporal_results[market_node].columns.get_loc("generation_ires_MW"), "curtailed_MW", curtailed_MW)
 
     """
@@ -432,7 +457,13 @@ def optimize(config, *, status, output_directory):
             model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
 
     """
-    Step 7: Define the self-sufficiency constraints per country
+    Step 7: Define dispatchable generation constraints
+    """
+    for dispatchable_technology, dispatchable_technology_relative_generation in config["technologies"]["dispatchable"].items():
+        model.addConstr(dispatchable_generation_mean[dispatchable_technology].sum() == temporal_demand_assumed.mean().sum() * dispatchable_technology_relative_generation)
+
+    """
+    Step 8: Define the self-sufficiency constraints per country
     """
     for country_code in config["country_codes"]:
         country_flag = utils.get_country_property(country_code, "flag")
@@ -441,6 +472,7 @@ def optimize(config, *, status, output_directory):
         # Set the variables required to calculate the cumulative results in the country
         sum_demand_total = 0
         sum_ires_generation = 0
+        sum_dispatchable_generation = 0
         sum_hydropower_generation = 0
         sum_curtailed = 0
         sum_storage_flow = 0
@@ -453,6 +485,7 @@ def optimize(config, *, status, output_directory):
             sum_demand_total += temporal_demand_assumed[market_node].sum()
             # The Gurobi .quicksum method is significantly faster than Panda's .sum method
             sum_ires_generation += gp.quicksum(temporal_results[market_node].generation_ires_MW)
+            sum_dispatchable_generation += gp.quicksum(temporal_results[market_node].generation_dispatchable_MW)
             sum_hydropower_generation += gp.quicksum(temporal_results[market_node].generation_total_hydropower_MW)
             sum_curtailed += gp.quicksum(temporal_results[market_node].curtailed_MW)
             sum_storage_flow += gp.quicksum(temporal_results[market_node].net_storage_flow_total_MW)
@@ -467,7 +500,7 @@ def optimize(config, *, status, output_directory):
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand_total > 0:
-            self_sufficiency_electricity = (sum_ires_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
+            self_sufficiency_electricity = (sum_ires_generation + sum_dispatchable_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
             model.addConstr(self_sufficiency_electricity >= config["self_sufficiency"]["min_electricity"])
             model.addConstr(self_sufficiency_electricity <= config["self_sufficiency"]["max_electricity"])
 
@@ -478,13 +511,13 @@ def optimize(config, *, status, output_directory):
             model.addConstr(self_sufficiency_hydrogen <= config["self_sufficiency"]["max_hydrogen"])
 
     """
-    Step 8: Define the storage costs constraint
+    Step 9: Define the storage costs constraint
     """
     if config.get("fixed_storage") is not None:
         status.update("Adding the storage costs constraint")
 
         # Calculate the storage costs
-        annual_storage_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=1)["storage"]
+        annual_storage_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, dispatchable_generation_mean, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_annual_storage_costs = config["fixed_storage"]["annual_costs"]
@@ -494,12 +527,12 @@ def optimize(config, *, status, output_directory):
             model.addConstr(annual_storage_costs <= fixed_annual_storage_costs)
 
     """
-    Step 9: Set objective function
+    Step 10: Set objective function
     """
     status.update("Setting the objective function")
 
     # Calculate the annual electricity costs
-    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, storage_capacity, hydropower_capacity, 1 / 8760, config=config)
+    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, dispatchable_generation_mean, storage_capacity, hydropower_capacity, 1 / 8760, config=config)
 
     # Calculate the total spillage and give it an artificial cost (this is required because otherwise some curtailment might be accounted as spillage)
     total_spillage_hydropower_MWh = utils.merge_dataframes_on_column(temporal_results, "spillage_total_hydropower_MW").sum().sum() * interval_length
@@ -521,7 +554,7 @@ def optimize(config, *, status, output_directory):
     duration["initializing"] = (initializing_end - initializing_start).total_seconds()
 
     """
-    Step 10: Solve model
+    Step 11: Solve model
     """
     # Set the status message and create
     status.update("Optimizing")
@@ -617,7 +650,7 @@ def optimize(config, *, status, output_directory):
     duration["optimizing"] = (optimizing_end - optimizing_start).total_seconds()
 
     """
-    Step 11: Check if the model could be solved
+    Step 12: Check if the model could be solved
     """
     if model.status == gp.GRB.OPTIMAL:
         error_message = None
@@ -651,7 +684,7 @@ def optimize(config, *, status, output_directory):
         return error_message
 
     """
-    Step 12: Store the results
+    Step 13: Store the results
     """
     storing_start = datetime.now()
 
@@ -695,6 +728,10 @@ def optimize(config, *, status, output_directory):
 
     # Store the mean temporal data
     mean_temporal_data.to_csv(output_directory / "temporal" / "market_nodes" / "mean.csv")
+
+    # Convert and store the dispatchable capacity
+    dispatchable_capacity = utils.convert_variables_recursively(dispatchable_capacity)
+    dispatchable_capacity.to_csv(output_directory / "capacity" / "dispatchable.csv")
 
     # Convert and store the electrolysis capacity
     electrolysis_capacity = utils.convert_variables_recursively(electrolysis_capacity)
