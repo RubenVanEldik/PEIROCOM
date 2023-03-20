@@ -423,7 +423,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr(sum_hydrogen_production == sum_hydrogen_demand)
 
     """
-    Step 5: Define interconnection capacity constraint if the individual interconnections are optimized
+    Step 6: Define interconnection capacity constraint if the individual interconnections are optimized
     """
     if optimize_individual_interconnections:
         total_current_capacity = sum(interconnection_capacity[connection_type]["current"].sum() for connection_type in ["hvac", "hvdc"])
@@ -432,7 +432,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
 
     """
-    Step 6: Define the self-sufficiency constraints per country
+    Step 7: Define the self-sufficiency constraints per country
     """
     for country_code in config["country_codes"]:
         country_flag = utils.get_country_property(country_code, "flag")
@@ -478,7 +478,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr(self_sufficiency_hydrogen <= config["self_sufficiency"]["max_hydrogen"])
 
     """
-    Step 7: Define the storage costs constraint
+    Step 8: Define the storage costs constraint
     """
     if config.get("fixed_storage") is not None:
         status.update("Adding the storage costs constraint")
@@ -494,7 +494,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr(annual_storage_costs <= fixed_annual_storage_costs)
 
     """
-    Step 8: Set objective function
+    Step 9: Set objective function
     """
     status.update("Setting the objective function")
 
@@ -521,7 +521,7 @@ def optimize(config, *, status, output_directory):
     duration["initializing"] = (initializing_end - initializing_start).total_seconds()
 
     """
-    Step 9: Solve model
+    Step 10: Solve model
     """
     # Set the status message and create
     status.update("Optimizing")
@@ -617,7 +617,7 @@ def optimize(config, *, status, output_directory):
     duration["optimizing"] = (optimizing_end - optimizing_start).total_seconds()
 
     """
-    Step 10: Check if the model could be solved
+    Step 11: Check if the model could be solved
     """
     if model.status == gp.GRB.OPTIMAL:
         error_message = None
@@ -651,7 +651,7 @@ def optimize(config, *, status, output_directory):
         return error_message
 
     """
-    Step 11: Store the results
+    Step 12: Store the results
     """
     storing_start = datetime.now()
 
