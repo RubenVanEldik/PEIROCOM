@@ -139,6 +139,8 @@ def run_sensitivity(config, sensitivity_config):
                 utils.set_nested_key(step_config, "technologies.scenario", step_value)
             elif sensitivity_config["analysis_type"] == "hydrogen_demand":
                 utils.set_nested_key(step_config, "relative_hydrogen_demand", step_value)
+            elif sensitivity_config["analysis_type"] == "dispatchable_generation":
+                utils.set_nested_key(step_config, f"technologies.dispatchable.{sensitivity_config['dispatchable_technology']}", step_value)
             elif sensitivity_config["analysis_type"] == "hydropower_capacity":
                 utils.set_nested_key(step_config, "technologies.relative_hydropower_capacity", step_value)
             elif sensitivity_config["analysis_type"] == "interconnection_capacity":
