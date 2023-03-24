@@ -98,9 +98,10 @@ def optimize(config, *, status, output_directory):
         """
         # Calculate the mean hourly electricity demand for hydrogen production
         # (This is both the hourly mean and the non-weighted mean of the efficiency; this mean is used as its mathematically impossible to use the real values in the self-sufficiency calculations)
-        mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
-        mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
-        temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
+        if include_hydrogen_production:
+            mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
+            mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
+            temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
 
         for electrolysis_technology in config["technologies"]["electrolysis"]:
             status.update(f"{country_flag} Adding {utils.format_technology(electrolysis_technology)} electrolysis")
