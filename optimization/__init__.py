@@ -152,6 +152,8 @@ def run_sensitivity(config, sensitivity_config):
                 utils.set_nested_key(step_config, "interconnections.min_self_sufficiency", step_value)
             elif sensitivity_config["analysis_type"] == "max_self_sufficiency":
                 utils.set_nested_key(step_config, "interconnections.max_self_sufficiency", step_value)
+            elif sensitivity_config["analysis_type"] == "barrier_convergence_tolerance":
+                utils.set_nested_key(step_config, "optimization.barrier_convergence_tolerance", step_value)
 
             # Run the optimization
             error_message = run(step_config, status=status, output_directory=output_directory / step_key)

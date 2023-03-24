@@ -258,6 +258,8 @@ def sensitivity(output_directory):
     elif sensitivity_config["analysis_type"] == "max_self_sufficiency":
         sensitivity_plot.axs.set_xlabel("Maximum self-sufficiency (%)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "barrier_convergence_tolerance":
+        sensitivity_plot.axs.set_xlabel("Barrier convergence tolerance")
 
     # Plot the sensitivity plot
     sensitivity_plot.display()

@@ -131,7 +131,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "dispatchable_generation", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "dispatchable_generation", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency", "barrier_convergence_tolerance"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -195,6 +195,13 @@ with st.sidebar.expander("Sensitivity analysis"):
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
+    elif sensitivity_analysis_type == "barrier_convergence_tolerance":
+        col1, col2 = st.columns(2)
+        sensitivity_start = col1.selectbox("Mininum tolerance", [10 ** i for i in range(-12, 1)])
+        sensitivity_stop = col2.selectbox("Maximum tolerance", [10 ** i for i in range(-12, 1)])
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitivity_steps = np.linspace(start=np.log10(sensitivity_start), stop=np.log10(sensitivity_stop), num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(10 ** step) for step in sensitivity_steps}
 
 # Set the optimization parameters
 with st.sidebar.expander("Optimization parameters"):
