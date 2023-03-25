@@ -59,19 +59,21 @@ dispatchable:
     color:
       name: 'purple'
       value: 500
-    efficiency: 0.6
-    fuel_costs: 10
+    fuel_costs: 7.68 # NREL
     economic_lifetime: 30
-    wacc: 0.0559
+    wacc: 0.059 # NREL
     conservative:
-      capex: 7000
-      fixed_om: 64
+      capex: 6026 # NREL
+      fixed_om: 146 # NREL
+      variable_om: 2.84 # NREL
     moderate:
-      capex: 4700
-      fixed_om: 62
+      capex: 6026 # NREL
+      fixed_om: 146 # NREL
+      variable_om: 2.84 # NREL
     advanced:
-      capex: 4200
-      fixed_om: 56
+      capex: 6026 # NREL
+      fixed_om: 146 # NREL
+      variable_om: 2.84 # NREL
 hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (978-92-9260-452-3)
   color:
     name: 'sky'
