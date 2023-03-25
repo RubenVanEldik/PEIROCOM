@@ -52,12 +52,12 @@ ires:
       fixed_om: 60 # NREL Class 3
 dispatchable:
   color:
-    name: 'purple'
+    name: 'green'
     value: 600
   nuclear:
     name: "nuclear"
     color:
-      name: 'purple'
+      name: 'green'
       value: 500
     fuel_costs: 7.68 # NREL
     economic_lifetime: 30
