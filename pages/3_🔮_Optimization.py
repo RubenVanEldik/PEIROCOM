@@ -73,6 +73,8 @@ with st.sidebar.expander("Technologies"):
     scenario_levels = {-1: "Conservative", 0: "Moderate", 1: "Advanced"}
     config["technologies"]["scenario"] = st.select_slider("Scenario", options=scenario_levels.keys(), value=0, format_func=lambda key: scenario_levels[key])
 
+    hydrogen_container = st.empty()
+
     # Select the technologies
     technology_types = ["ires", "dispatchable", "hydropower", "storage", "electrolysis"]
     technology_type_tabs = st.tabs([utils.format_str(technology_type) for technology_type in technology_types])
@@ -93,8 +95,8 @@ with st.sidebar.expander("Technologies"):
             if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
                 config["technologies"][technology_type].append(technology)
 
-        if technology_type == "electrolysis" and len(config["technologies"][technology_type]):
-            config["relative_hydrogen_demand"] = technology_type_tab.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")
+    if len(config["technologies"][technology_type]):
+        config["relative_hydrogen_demand"] = hydrogen_container.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")
 
 # Set the self-sufficiency options
 with st.sidebar.expander("Self-sufficiency"):
