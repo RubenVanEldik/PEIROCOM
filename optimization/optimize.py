@@ -71,8 +71,8 @@ def optimize(config, *, status, output_directory):
     temporal_export = {}
     interconnection_capacity = {}
     ires_capacity = {}
-    dispatchable_capacity = pd.DataFrame(index=market_nodes, columns=config["technologies"]["dispatchable"].keys())
-    dispatchable_generation_mean = pd.DataFrame(index=market_nodes, columns=config["technologies"]["dispatchable"].keys())
+    dispatchable_capacity = pd.DataFrame(index=market_nodes, columns=config["technologies"]["dispatchable"])
+    dispatchable_generation_mean = pd.DataFrame(index=market_nodes, columns=config["technologies"]["dispatchable"])
     hydropower_capacity = {}
     storage_capacity = {}
     electrolysis_capacity = pd.DataFrame(index=market_nodes, columns=config["technologies"]["electrolysis"])  # The index is required for the case when no electrolysis technologies are defined
@@ -456,12 +456,6 @@ def optimize(config, *, status, output_directory):
         total_extra_capacity = sum(interconnection_capacity[connection_type]["extra"].sum() for connection_type in ["hvac", "hvdc"])
         if total_current_capacity > 0:
             model.addConstr((1 + (total_extra_capacity / total_current_capacity)) == config["interconnections"]["relative_capacity"])
-
-    """
-    Step 7: Define dispatchable generation constraints
-    """
-    for dispatchable_technology, dispatchable_technology_relative_generation in config["technologies"]["dispatchable"].items():
-        model.addConstr(dispatchable_generation_mean[dispatchable_technology].sum() == temporal_demand_assumed.mean().sum() * dispatchable_technology_relative_generation)
 
     """
     Step 8: Define the self-sufficiency constraints per country

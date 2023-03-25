@@ -30,7 +30,7 @@ def get_dispatchable_capacity(output_directory, *, group=None, country_codes=Non
 
     # Return a DataFrame with the dispatchable capacity per country
     if group == "country":
-        dispatchable_capacity_per_country = pd.DataFrame(0, index=country_codes, columns=config["technologies"]["dispatchable"].keys())
+        dispatchable_capacity_per_country = pd.DataFrame(0, index=country_codes, columns=config["technologies"]["dispatchable"])
         for market_node in dispatchable_capacity.index:
             country_code = utils.get_country_of_market_node(market_node)
             dispatchable_capacity_per_country.loc[country_code] += dispatchable_capacity.loc[market_node]
@@ -38,7 +38,7 @@ def get_dispatchable_capacity(output_directory, *, group=None, country_codes=Non
 
     # Return a Series with the total dispatchable capacity per technology
     if group == "all":
-        total_dispatchable_capacity = pd.Series(0, index=config["technologies"]["dispatchable"].keys())
+        total_dispatchable_capacity = pd.Series(0, index=config["technologies"]["dispatchable"])
         for market_node in dispatchable_capacity.index:
             total_dispatchable_capacity += dispatchable_capacity.loc[market_node]
         return total_dispatchable_capacity

@@ -85,23 +85,13 @@ with st.sidebar.expander("Technologies"):
             technology_type_tab.warning("This technology type does not have any options defined")
             continue
 
-        # Create a checkbox and slider for each dispatchable technology option
-        if technology_type == "dispatchable":
-            # Initialize the dictionary for the technology
-            config["technologies"][technology_type] = {}
+        # Initialize the list for the technology
+        config["technologies"][technology_type] = []
 
-            col1, col2 = technology_type_tab.columns(2)
-            for technology in technology_options:
-                if col1.checkbox(utils.format_technology(technology), value=True):
-                    config["technologies"][technology_type][technology] = col2.number_input("Relative generation", min_value=0.0, max_value=1.0, value=0.0)
-        else:
-            # Initialize the list for the technology
-            config["technologies"][technology_type] = []
-
-            # Create a checkbox for each technology option
-            for technology in technology_options:
-                if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
-                    config["technologies"][technology_type].append(technology)
+        # Create a checkbox for each technology option
+        for technology in technology_options:
+            if technology_type_tab.checkbox(utils.format_technology(technology), value=True):
+                config["technologies"][technology_type].append(technology)
 
         if technology_type == "electrolysis" and len(config["technologies"][technology_type]):
             config["relative_hydrogen_demand"] = technology_type_tab.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")
@@ -165,7 +155,7 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "dispatchable_generation":
-        sensitivity_config["dispatchable_technology"] = st.selectbox("Technology", config["technologies"]["dispatchable"].keys(), format_func=utils.format_technology)
+        sensitivity_config["dispatchable_technology"] = st.selectbox("Technology", config["technologies"]["dispatchable"], format_func=utils.format_technology)
         sensitivity_start, sensitivity_stop = st.slider("Dispatchable generation range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
