@@ -26,6 +26,7 @@ def average_week(output_directory):
     # Ask if the import and export should be shown in the chart
     show_import_export = st.sidebar.checkbox("Show import and export")
     show_hydropower = temporal_results.generation_total_hydropower_MW.abs().max() != 0
+    show_nuclear = temporal_results.generation_nuclear_MW.max() != 0
 
     # Set the unit to TW or GW when applicable
     unit = "MW"
@@ -106,6 +107,11 @@ def average_week(output_directory):
         # Generation
         # Create a series with the cumulative generation
         cumulative_generation = pd.Series(0, index=temporal_results_season.index)
+
+        # Add the nuclear generation
+        if show_nuclear:
+            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_nuclear_MW), label="Nuclear", facecolor=colors.get("green", 600))
+            cumulative_generation += temporal_results_season.generation_nuclear_MW
 
         # Add the IRES generation
         subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_ires_MW), label="Intermittent renewables", facecolor=colors.get("amber", 300))
