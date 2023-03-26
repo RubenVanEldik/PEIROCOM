@@ -96,7 +96,7 @@ with st.sidebar.expander("Technologies"):
                 config["technologies"][technology_type].append(technology)
 
     if len(config["technologies"][technology_type]):
-        config["relative_hydrogen_demand"] = hydrogen_container.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=1.0, step=0.05, help="Relative to electricity demand")
+        config["relative_hydrogen_demand"] = hydrogen_container.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=0.0, step=0.05, help="Relative to electricity demand")
 
 # Set the self-sufficiency options
 with st.sidebar.expander("Self-sufficiency"):
