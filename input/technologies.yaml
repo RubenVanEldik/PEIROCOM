@@ -59,7 +59,8 @@ dispatchable:
     color:
       name: 'green'
       value: 500
-    fuel_costs: 7.68 # NREL
+    fuel_costs: 2.504 # NREL
+    efficiency: 0.326 # NREL
     economic_lifetime: 30
     wacc: 0.059 # NREL
     conservative:

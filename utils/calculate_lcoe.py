@@ -67,7 +67,7 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
         capex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "capex", technology_scenario)
         fixed_om = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_om", technology_scenario)
         variable_om = annual_generation_MWh * _calculate_scenario_costs(dispatchable_assumptions[technology], "variable_om", technology_scenario)
-        fuel_costs = annual_generation_MWh * dispatchable_assumptions[technology]["fuel_costs"]
+        fuel_costs = annual_generation_MWh / dispatchable_assumptions[technology]["efficiency"] * dispatchable_assumptions[technology]["fuel_costs"]
         crf = utils.calculate_crf(dispatchable_assumptions[technology]["wacc"], dispatchable_assumptions[technology]["economic_lifetime"])
         annualized_costs_dispatchable[technology] = crf * capex + fixed_om + variable_om + fuel_costs
 
