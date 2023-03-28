@@ -22,7 +22,6 @@ def optimize(config, *, status, output_directory):
     initializing_start = datetime.now()
 
     # Check if the interconnections should be optimized individually
-    include_hydrogen_production = config.get('relative_hydrogen_demand', 0) > 0
     optimize_individual_interconnections = config["interconnections"]["optimize_individual_interconnections"] is True and config["interconnections"]["relative_capacity"] != 1
 
     # Calculate the interval length in hours
@@ -98,10 +97,9 @@ def optimize(config, *, status, output_directory):
         """
         # Calculate the mean hourly electricity demand for hydrogen production
         # (This is both the hourly mean and the non-weighted mean of the efficiency; this mean is used as its mathematically impossible to use the real values in the self-sufficiency calculations)
-        if include_hydrogen_production:
-            mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
-            mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
-            temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
+        mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
+        mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
+        temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
 
         for electrolysis_technology in config["technologies"]["electrolysis"]:
             status.update(f"{country_flag} Adding {utils.format_technology(electrolysis_technology)} electrolysis")
@@ -427,26 +425,25 @@ def optimize(config, *, status, output_directory):
     """
     Step 5: Define the hydrogen constraint
     """
-    if include_hydrogen_production:
-        # Create the hydrogen constraint per year
-        for year in range(config["climate_years"]["start"], config["climate_years"]["end"] + 1):
-            sum_hydrogen_demand = 0
-            sum_hydrogen_production = 0
+    # Create the hydrogen constraint per year
+    for year in range(config["climate_years"]["start"], config["climate_years"]["end"] + 1):
+        sum_hydrogen_demand = 0
+        sum_hydrogen_production = 0
 
-            for market_node in market_nodes:
-                # Calculate the summed results of this market node for this year
-                summed_results_year = temporal_results[market_node][temporal_results[market_node].index.year == year].sum()
+        for market_node in market_nodes:
+            # Calculate the summed results of this market node for this year
+            summed_results_year = temporal_results[market_node][temporal_results[market_node].index.year == year].sum()
 
-                # Add the hydrogen demand to the total
-                sum_hydrogen_demand += config["relative_hydrogen_demand"] * summed_results_year.demand_electricity_MW
+            # Add the hydrogen demand to the total
+            sum_hydrogen_demand += config["relative_hydrogen_demand"] * summed_results_year.demand_electricity_MW
 
-                # Add the hydrogen production to the total per production technology
-                for electrolysis_technology in config["technologies"]["electrolysis"]:
-                    electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
-                    sum_hydrogen_production += electrolyzer_efficiency * summed_results_year[f"demand_{electrolysis_technology}_MW"]
+            # Add the hydrogen production to the total per production technology
+            for electrolysis_technology in config["technologies"]["electrolysis"]:
+                electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
+                sum_hydrogen_production += electrolyzer_efficiency * summed_results_year[f"demand_{electrolysis_technology}_MW"]
 
-            # Ensure that enough hydrogen is produced in the year
-            model.addConstr(sum_hydrogen_production == sum_hydrogen_demand)
+        # Ensure that enough hydrogen is produced in the year
+        model.addConstr(sum_hydrogen_production == sum_hydrogen_demand)
 
     """
     Step 6: Define interconnection capacity constraint if the individual interconnections are optimized
@@ -486,12 +483,11 @@ def optimize(config, *, status, output_directory):
             sum_storage_flow += gp.quicksum(temporal_results[market_node].net_storage_flow_total_MW)
 
             # Calculate the total hydrogen production
-            if include_hydrogen_production:
-                sum_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.sum()
+            sum_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.sum()
 
-                for electrolysis_technology in config["technologies"]["electrolysis"]:
-                    electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
-                    sum_hydrogen_production += gp.quicksum(temporal_results[market_node][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
+            for electrolysis_technology in config["technologies"]["electrolysis"]:
+                electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
+                sum_hydrogen_production += gp.quicksum(temporal_results[market_node][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand_total > 0:
@@ -500,7 +496,7 @@ def optimize(config, *, status, output_directory):
             model.addConstr(self_sufficiency_electricity <= config["self_sufficiency"]["max_electricity"])
 
         # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
-        if include_hydrogen_production:
+        if sum_hydrogen_demand > 0:
             self_sufficiency_hydrogen = sum_hydrogen_production / sum_hydrogen_demand
             model.addConstr(self_sufficiency_hydrogen >= config["self_sufficiency"]["min_hydrogen"])
             model.addConstr(self_sufficiency_hydrogen <= config["self_sufficiency"]["max_hydrogen"])
@@ -535,10 +531,7 @@ def optimize(config, *, status, output_directory):
     total_spillage_costs = total_spillage_hydropower_MWh * artificial_spillage_cost_factor
 
     # Calculate the annual electrolyzer costs (don't include electricity costs as this is already included in the electricity costs calculation above)
-    if include_hydrogen_production:
-        annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=1, annual_costs=True).electrolyzer
-    else:
-        annual_electrolyzer_costs = 0
+    annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=1, annual_costs=True).electrolyzer
 
     # Set the objective to the annual system costs
     annualized_system_costs = annual_electricity_costs + annual_electrolyzer_costs + total_spillage_costs
