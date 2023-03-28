@@ -181,7 +181,7 @@ def optimize(config, *, status, output_directory):
             status.update(f"{country_flag} Adding {utils.format_technology(hydropower_technology, capitalize=False)} hydropower")
 
             # Get the specific hydropower assumptions and calculate the interval length
-            hydropower_assumptions = utils.get_technologies(technology_type="hydropower")[hydropower_technology]
+            hydropower_assumptions = utils.get_technology(hydropower_technology)
 
             # Add the relevant capacity to the hydropower_capacity DataFrame, if the capacity is not defined, set the capacity to 0
             hydropower_capacity_current_technology = utils.read_csv(utils.path("input", "scenarios", config["scenario"], "hydropower", hydropower_technology, "capacity.csv"), index_col=0)
@@ -295,7 +295,7 @@ def optimize(config, *, status, output_directory):
             status.update(f"{country_flag} Adding {utils.format_technology(storage_technology, capitalize=False)} storage")
 
             # Get the specific storage assumptions
-            storage_assumptions = utils.get_technologies(technology_type="storage")[storage_technology]
+            storage_assumptions = utils.get_technology(storage_technology)
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
 
             # Create a variable for the energy and power storage capacity
@@ -442,7 +442,7 @@ def optimize(config, *, status, output_directory):
 
                 # Add the hydrogen production to the total per production technology
                 for electrolysis_technology in config["technologies"]["electrolysis"]:
-                    electrolyzer_efficiency = utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"]
+                    electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
                     sum_hydrogen_production += electrolyzer_efficiency * summed_results_year[f"demand_{electrolysis_technology}_MW"]
 
             # Ensure that enough hydrogen is produced in the year
@@ -490,7 +490,7 @@ def optimize(config, *, status, output_directory):
                 sum_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.sum()
 
                 for electrolysis_technology in config["technologies"]["electrolysis"]:
-                    electrolyzer_efficiency = utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"]
+                    electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
                     sum_hydrogen_production += gp.quicksum(temporal_results[market_node][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
 
         # Add the self-sufficiency constraints if there is any demand in the country

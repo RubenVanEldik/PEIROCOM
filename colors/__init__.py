@@ -75,7 +75,7 @@ def technology(technology_name, *, alpha=0.8):
     assert validate.is_technology(technology_name)
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    technology_color = utils.get_technologies()[technology_name]["color"]
+    technology_color = utils.get_technology(technology_name)["color"]
     return get(technology_color["name"], technology_color["value"], alpha=alpha)
 
 

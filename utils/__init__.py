@@ -33,6 +33,7 @@ from .get_previous_runs import get_previous_runs
 from .get_scenarios import get_scenarios
 from .get_storage_capacity import get_storage_capacity
 from .get_technologies import get_technologies
+from .get_technology import get_technology
 from .get_temporal_results import get_temporal_results
 from .is_demo import is_demo
 from .merge_dataframes_on_column import merge_dataframes_on_column
