@@ -58,8 +58,16 @@ def optimize(config, *, status, output_directory):
     # Remove all market nodes that are not part of the optimization
     market_nodes = utils.get_market_nodes_for_countries(config["country_codes"])
     temporal_demand_electricity = temporal_demand_electricity[market_nodes]
+
     # Create a copy of the fixed demand (later on the mean electrolysis demand will be added to it)
     temporal_demand_assumed = temporal_demand_electricity.copy()
+    # Calculate the mean hourly electricity demand for hydrogen production
+    # (This is both the hourly mean and the non-weighted mean of the efficiency; this mean is used as its mathematically impossible to use the real values in the self-sufficiency calculations)
+    mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_demand_assumed.mean()
+    # Add the required electricity for the hydrogen demand to the assumed demand
+    electrolysis_technologies = config["technologies"]["electrolysis"]
+    mean_electrolysis_efficiency = sum(utils.get_technology(electrolysis_technology)["efficiency"] for electrolysis_technology in electrolysis_technologies) / len(electrolysis_technologies)
+    temporal_demand_assumed += mean_hydrogen_demand / mean_electrolysis_efficiency
 
     """
     Step 3: Initialize each market node
@@ -95,12 +103,6 @@ def optimize(config, *, status, output_directory):
         """
         Step 3B: Define the electrolysis variables
         """
-        # Calculate the mean hourly electricity demand for hydrogen production
-        # (This is both the hourly mean and the non-weighted mean of the efficiency; this mean is used as its mathematically impossible to use the real values in the self-sufficiency calculations)
-        mean_hydrogen_demand = config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.mean()
-        mean_electrolysis_efficiency = sum(utils.get_technologies(technology_type="electrolysis")[electrolysis_technology]["efficiency"] for electrolysis_technology in config["technologies"]["electrolysis"]) / len(config["technologies"]["electrolysis"])
-        temporal_demand_assumed[market_node] += mean_hydrogen_demand / mean_electrolysis_efficiency
-
         for electrolysis_technology in config["technologies"]["electrolysis"]:
             status.update(f"{country_flag} Adding {utils.format_technology(electrolysis_technology)} electrolysis")
 
