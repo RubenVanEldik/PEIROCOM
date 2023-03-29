@@ -429,23 +429,21 @@ def optimize(config, *, status, output_directory):
     """
     # Create the hydrogen constraint per year
     for year in range(config["climate_years"]["start"], config["climate_years"]["end"] + 1):
-        sum_hydrogen_demand = 0
-        sum_hydrogen_production = 0
+        annual_hydrogen_demand = 0
+        annual_hydrogen_production = 0
 
         for market_node in market_nodes:
             # Calculate the summed results of this market node for this year
-            summed_results_year = temporal_results[market_node][temporal_results[market_node].index.year == year].sum()
-
-            # Add the hydrogen demand to the total
-            sum_hydrogen_demand += config["relative_hydrogen_demand"] * summed_results_year.demand_electricity_MW
+            summed_results_year = temporal_results[market_node][temporal_results[market_node].index.year == year].sum() * interval_length
+            annual_hydrogen_demand += mean_hydrogen_demand[market_node] * 8760
 
             # Add the hydrogen production to the total per production technology
             for electrolysis_technology in config["technologies"]["electrolysis"]:
                 electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
-                sum_hydrogen_production += electrolyzer_efficiency * summed_results_year[f"demand_{electrolysis_technology}_MW"]
+                annual_hydrogen_production += electrolyzer_efficiency * summed_results_year[f"demand_{electrolysis_technology}_MW"]
 
         # Ensure that enough hydrogen is produced in the year
-        model.addConstr(sum_hydrogen_production == sum_hydrogen_demand)
+        model.addConstr(annual_hydrogen_production == annual_hydrogen_demand)
 
     """
     Step 6: Define interconnection capacity constraint if the individual interconnections are optimized
@@ -485,7 +483,7 @@ def optimize(config, *, status, output_directory):
             sum_storage_flow += gp.quicksum(temporal_results[market_node].net_storage_flow_total_MW)
 
             # Calculate the total hydrogen production
-            sum_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_results[market_node].demand_electricity_MW.sum()
+            sum_hydrogen_demand += mean_hydrogen_demand[market_node] * len(temporal_demand_assumed.index)
 
             for electrolysis_technology in config["technologies"]["electrolysis"]:
                 electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
