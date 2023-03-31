@@ -206,7 +206,7 @@ with st.sidebar.expander("Optimization parameters"):
     # Select the barrier convergence tolerance and maximum number of iterations
     if config["optimization"]["method"] == 2:
         config["optimization"]["max_barrier_iterations"] = st.number_input("Maximum iterations", value=2000, min_value=1, max_value=10 ** 6)
-        config["optimization"]["barrier_convergence_tolerance"] = st.select_slider("Barrier convergence tolerance", options=[10 ** i for i in range(-12, 1)], value=10 ** -9, disabled=config["optimization"]["method"] != 2)
+        config["optimization"]["barrier_convergence_tolerance"] = st.select_slider("Barrier convergence tolerance", options=[10 ** i for i in range(-12, 1)], value=10 ** -3, disabled=config["optimization"]["method"] != 2)
 
     # Select the thread count
     cpu_count = os.cpu_count()
