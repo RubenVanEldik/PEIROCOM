@@ -491,15 +491,14 @@ def optimize(config, *, status, output_directory):
 
         # Add the self-sufficiency constraints if there is any demand in the country
         if sum_demand_total > 0:
-            self_sufficiency_electricity = (sum_ires_generation + sum_dispatchable_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow) / sum_demand_total
-            model.addConstr(self_sufficiency_electricity >= config["self_sufficiency"]["min_electricity"])
-            model.addConstr(self_sufficiency_electricity <= config["self_sufficiency"]["max_electricity"])
+            electricity_production = sum_ires_generation + sum_dispatchable_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow
+            model.addConstr(electricity_production >= config["self_sufficiency"]["min_electricity"] * sum_demand_total)
+            model.addConstr(electricity_production <= config["self_sufficiency"]["max_electricity"] * sum_demand_total)
 
         # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
         if sum_hydrogen_demand > 0:
-            self_sufficiency_hydrogen = sum_hydrogen_production / sum_hydrogen_demand
-            model.addConstr(self_sufficiency_hydrogen >= config["self_sufficiency"]["min_hydrogen"])
-            model.addConstr(self_sufficiency_hydrogen <= config["self_sufficiency"]["max_hydrogen"])
+            model.addConstr(sum_hydrogen_production >= config["self_sufficiency"]["min_hydrogen"] * sum_hydrogen_demand)
+            model.addConstr(sum_hydrogen_production <= config["self_sufficiency"]["max_hydrogen"] * sum_hydrogen_demand)
 
     """
     Step 9: Define the storage costs constraint
