@@ -420,6 +420,8 @@ def optimize(config, *, status, output_directory):
     """
     # Create the hydrogen constraint per year
     for year in range(config["climate_years"]["start"], config["climate_years"]["end"] + 1):
+        status.update(f"Adding hydrogen constraint for {year}")
+
         annual_hydrogen_demand = 0
         annual_hydrogen_production = 0
 
