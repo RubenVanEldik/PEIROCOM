@@ -41,7 +41,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
-    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_total_hydropower_MW).sum()
+    mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_dispatchable_MW + mean_temporal_results.generation_total_hydropower_MW).sum()
     mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"]]]
 
     # Set the storage capacity to zero
