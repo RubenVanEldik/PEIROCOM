@@ -158,26 +158,26 @@ storage:
     color:
       name: 'red'
       value: 800
-    soc_min: 0.2
+    soc_min: 0.15
     soc_max: 1
     roundtrip_efficiency: 0.85 # ATB
-    economic_lifetime: 15 # ATB
-    wacc: 0.05
+    economic_lifetime: 18 # ATB
+    wacc: 0.055
     conservative:
       capex_energy: 246 # ATB
       capex_power: 190 # ATB
-      fixed_om_energy: 6.15 # ATB (2.5% CAPEX)
-      fixed_om_power: 4.75 # ATB (2.5% CAPEX)
+      fixed_om_energy: 6 # ATB (2.5% CAPEX)
+      fixed_om_power: 5 # ATB (2.5% CAPEX)
     moderate:
       capex_energy: 118 # ATB
       capex_power: 199 # ATB
-      fixed_om_energy: 2.95 # ATB (2.5% CAPEX)
-      fixed_om_power: 4.98 # ATB (2.5% CAPEX)
+      fixed_om_energy: 3 # ATB (2.5% CAPEX)
+      fixed_om_power: 5 # ATB (2.5% CAPEX)
     advanced:
       capex_energy: 107 # ATB
       capex_power: 82 # ATB
-      fixed_om_energy: 2.68 # ATB (2.5% CAPEX)
-      fixed_om_power: 2.05 # ATB (2.5% CAPEX)
+      fixed_om_energy: 3 # ATB (2.5% CAPEX)
+      fixed_om_power: 2 # ATB (2.5% CAPEX)
 electrolysis:
   color:
     name: 'neutral'
