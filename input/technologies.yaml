@@ -88,14 +88,14 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     economic_lifetime: 30 # IRENA
     wacc: 0.0559 # NREL
     conservative:
-      capex: 2590 # NREL NPD1
-      fixed_om: 64 # NREL NPD1
+      capex: 5505 # NREL NPD3
+      fixed_om: 91 # NREL NPD3
     moderate:
-      capex: 2486 # NREL NPD1
-      fixed_om: 62 # NREL NPD1
+      capex: 3013 # NREL NPD3
+      fixed_om: 88 # NREL NPD3
     advanced:
-      capex: 2238 # NREL NPD1
-      fixed_om: 56 # NREL NPD1
+      capex: 2712 # NREL NPD3
+      fixed_om: 79 # NREL NPD3
   reservoir:
     name: "reservoir"
     color:
@@ -105,14 +105,14 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     economic_lifetime: 30 # IRENA
     wacc: 0.0559 # NREL
     conservative:
-      capex: 2590 # NREL NPD1
-      fixed_om: 64 # NREL NPD1
+      capex: 5505 # NREL NPD3
+      fixed_om: 91 # NREL NPD3
     moderate:
-      capex: 2486 # NREL NPD1
-      fixed_om: 62 # NREL NPD1
+      capex: 3013 # NREL NPD3
+      fixed_om: 88 # NREL NPD3
     advanced:
-      capex: 2238 # NREL NPD1
-      fixed_om: 56 # NREL NPD1
+      capex: 2712 # NREL NPD3
+      fixed_om: 79 # NREL NPD3
   pumped_storage_open:
     name: "pumped storage (open)"
     color:
@@ -123,14 +123,14 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     economic_lifetime: 30 # IRENA
     wacc: 0.0559 # NREL
     conservative:
-      capex: 2590 # NREL NPD1
-      fixed_om: 64 # NREL NPD1
+      capex: 5505 # NREL NPD3
+      fixed_om: 91 # NREL NPD3
     moderate:
-      capex: 2486 # NREL NPD1
-      fixed_om: 62 # NREL NPD1
+      capex: 3013 # NREL NPD3
+      fixed_om: 88 # NREL NPD3
     advanced:
-      capex: 2238 # NREL NPD1
-      fixed_om: 56 # NREL NPD1
+      capex: 2712 # NREL NPD3
+      fixed_om: 79 # NREL NPD3
   pumped_storage_closed:
     name: "pumped storage (closed)"
     color:
@@ -141,14 +141,17 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     economic_lifetime: 30 # IRENA
     wacc: 0.0559 # NREL
     conservative:
-      capex: 2656 # NREL Class 3
-      fixed_om: 18 # NREL Class 3
+      capex: 3949 # NREL Class 10
+      fixed_om: 18 # NREL Class 10
+      variable_om: 0.51 # NREL Class 10
     moderate:
-      capex: 2656 # NREL Class 3
-      fixed_om: 18 # NREL Class 3
+      capex: 3949 # NREL Class 10
+      fixed_om: 18 # NREL Class 10
+      variable_om: 0.51 # NREL Class 10
     advanced:
-      capex: 2338 # NREL Class 3
-      fixed_om: 18 # NREL Class 3
+      capex: 3475 # NREL Class 10
+      fixed_om: 18 # NREL Class 10
+      variable_om: 0.51 # NREL Class 10
 storage:
   color:
     name: 'red'
