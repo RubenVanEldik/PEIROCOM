@@ -187,15 +187,15 @@ electrolysis:
     color:
       name: 'neutral'
       value: 900
-    efficiency: 0.82
-    economic_lifetime: 20
-    wacc: 0.044
+    efficiency: 0.78
+    economic_lifetime: 18
+    wacc: 0.055
     conservative:
-      capex: 700
-      fixed_om: 30
+      capex: 236
+      fixed_om: 4
     moderate:
-      capex: 500
-      fixed_om: 20
+      capex: 185
+      fixed_om: 3
     advanced:
-      capex: 300
-      fixed_om: 15
+      capex: 153
+      fixed_om: 2
