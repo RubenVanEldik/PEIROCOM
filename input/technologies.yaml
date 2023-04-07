@@ -7,7 +7,7 @@ ires:
     color:
       name: 'amber'
       value: 200
-    economic_lifetime: 25 # IRENA
+    economic_lifetime: 30 # IRENA
     wacc: 0.0514 # NREL
     conservative:
       capex: 754 # NREL
@@ -23,7 +23,7 @@ ires:
     color:
       name: 'amber'
       value: 300
-    economic_lifetime: 25 # IRENA
+    economic_lifetime: 30 # IRENA
     wacc: 0.0553 # NREL
     conservative:
       capex: 906 # NREL
@@ -39,7 +39,7 @@ ires:
     color:
       name: 'amber'
       value: 400
-    economic_lifetime: 25 # IRENA
+    economic_lifetime: 30 # IRENA
     wacc: 0.0579 # NREL
     conservative:
       capex: 2993 # NREL Class 3
