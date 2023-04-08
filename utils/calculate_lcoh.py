@@ -40,9 +40,9 @@ def _calculate_annualized_electrolyzer_costs(electrolysis_technologies, electrol
     for technology in electrolysis_technologies:
         capacity_kW = electrolyzer_capacity_MW[technology] * 1000
         capex = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "capex", technology_scenario)
-        fixed_om = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "fixed_om", technology_scenario)
+        fixed_opex = capacity_kW * _calculate_scenario_costs(electrolysis_assumptions[technology], "fixed_opex", technology_scenario)
         crf = utils.calculate_crf(electrolysis_assumptions[technology]["wacc"], electrolysis_assumptions[technology]["economic_lifetime"])
-        annualized_costs_electrolyzer[technology] = crf * capex + fixed_om
+        annualized_costs_electrolyzer[technology] = crf * capex + fixed_opex
 
     return annualized_costs_electrolyzer
 

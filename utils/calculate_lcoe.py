@@ -40,9 +40,9 @@ def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW, *, tec
     for technology in ires_technologies:
         capacity_kW = ires_capacity_MW[technology].sum() * 1000
         capex = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "capex", technology_scenario)
-        fixed_om = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "fixed_om", technology_scenario)
+        fixed_opex = capacity_kW * _calculate_scenario_costs(ires_assumptions[technology], "fixed_opex", technology_scenario)
         crf = utils.calculate_crf(ires_assumptions[technology]["wacc"], ires_assumptions[technology]["economic_lifetime"])
-        annualized_costs_ires[technology] = crf * capex + fixed_om
+        annualized_costs_ires[technology] = crf * capex + fixed_opex
 
     return annualized_costs_ires
 
@@ -65,11 +65,11 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
         capacity_kW = dispatchable_capacity_MW[technology] * 1000
         annual_generation_MWh = mean_temporal_data[f"generation_{technology}_MW"] * 8760
         capex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "capex", technology_scenario)
-        fixed_om = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_om", technology_scenario)
+        fixed_opex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_opex", technology_scenario)
         variable_om = annual_generation_MWh * _calculate_scenario_costs(dispatchable_assumptions[technology], "variable_om", technology_scenario)
         fuel_costs = annual_generation_MWh / dispatchable_assumptions[technology]["efficiency"] * dispatchable_assumptions[technology]["fuel_costs"]
         crf = utils.calculate_crf(dispatchable_assumptions[technology]["wacc"], dispatchable_assumptions[technology]["economic_lifetime"])
-        annualized_costs_dispatchable[technology] = crf * capex + fixed_om + variable_om + fuel_costs
+        annualized_costs_dispatchable[technology] = crf * capex + fixed_opex + variable_om + fuel_costs
 
     return annualized_costs_dispatchable
 
@@ -92,13 +92,13 @@ def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_c
         # Calculate costs for the turbine capacity
         turbine_capacity_kW = hydropower_capacity.loc[technology, "turbine"] * 1000
         capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex", technology_scenario)
-        fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om", technology_scenario)
+        fixed_opex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_opex", technology_scenario)
         annual_generation_MWh = mean_temporal_data[f"generation_{technology}_hydropower_MW"] * 8760
         variable_om = annual_generation_MWh * _calculate_scenario_costs(hydropower_assumptions[technology], "variable_om", technology_scenario)
 
         # Calculate the total annualized costs
         crf = utils.calculate_crf(hydropower_assumptions[technology]["wacc"], hydropower_assumptions[technology]["economic_lifetime"])
-        annualized_costs_hydropower[technology] = crf * capex + fixed_om + variable_om
+        annualized_costs_hydropower[technology] = crf * capex + fixed_opex + variable_om
 
     return annualized_costs_hydropower
 
@@ -126,13 +126,13 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
         capex = capex_energy + capex_power
 
         # Calculate fixed O&M
-        fixed_om_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_energy", technology_scenario)
-        fixed_om_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "fixed_om_power", technology_scenario)
-        fixed_om = fixed_om_energy + fixed_om_power
+        fixed_opex_energy = capacity_energy_kWh * _calculate_scenario_costs(storage_assumptions[technology], "fixed_opex_energy", technology_scenario)
+        fixed_opex_power = capacity_power_kW * _calculate_scenario_costs(storage_assumptions[technology], "fixed_opex_power", technology_scenario)
+        fixed_opex = fixed_opex_energy + fixed_opex_power
 
         # Calculate the total annualized costs
         crf = utils.calculate_crf(storage_assumptions[technology]["wacc"], storage_assumptions[technology]["economic_lifetime"])
-        annualized_costs_storage[technology] = crf * capex + fixed_om
+        annualized_costs_storage[technology] = crf * capex + fixed_opex
 
     return annualized_costs_storage
 

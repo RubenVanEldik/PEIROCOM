@@ -11,13 +11,13 @@ ires:
     wacc: 0.0514 # NREL
     conservative:
       capex: 754 # NREL
-      fixed_om: 15 # NREL
+      fixed_opex: 15 # NREL
     moderate:
       capex: 620 # NREL
-      fixed_om: 13 # NREL
+      fixed_opex: 13 # NREL
     advanced:
       capex: 467 # NREL
-      fixed_om: 11 # NREL
+      fixed_opex: 11 # NREL
   onshore:
     name: "onshore wind"
     color:
@@ -27,13 +27,13 @@ ires:
     wacc: 0.0553 # NREL
     conservative:
       capex: 906 # NREL
-      fixed_om: 41 # NREL
+      fixed_opex: 41 # NREL
     moderate:
       capex: 765 # NREL
-      fixed_om: 33 # NREL
+      fixed_opex: 33 # NREL
     advanced:
       capex: 528 # NREL
-      fixed_om: 24 # NREL
+      fixed_opex: 24 # NREL
   offshore:
     name: "offshore wind"
     color:
@@ -43,13 +43,13 @@ ires:
     wacc: 0.0579 # NREL
     conservative:
       capex: 2993 # NREL Class 3
-      fixed_om: 93 # NREL Class 3
+      fixed_opex: 93 # NREL Class 3
     moderate:
       capex: 2274 # NREL Class 3
-      fixed_om: 70 # NREL Class 3
+      fixed_opex: 70 # NREL Class 3
     advanced:
       capex: 1966 # NREL Class 3
-      fixed_om: 60 # NREL Class 3
+      fixed_opex: 60 # NREL Class 3
 dispatchable:
   color:
     name: 'green'
@@ -65,15 +65,15 @@ dispatchable:
     wacc: 0.0593 # NREL
     conservative:
       capex: 6026 # NREL
-      fixed_om: 146 # NREL
+      fixed_opex: 146 # NREL
       variable_om: 2.84 # NREL
     moderate:
       capex: 6026 # NREL
-      fixed_om: 146 # NREL
+      fixed_opex: 146 # NREL
       variable_om: 2.84 # NREL
     advanced:
       capex: 6026 # NREL
-      fixed_om: 146 # NREL
+      fixed_opex: 146 # NREL
       variable_om: 2.84 # NREL
 hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (978-92-9260-452-3)
   color:
@@ -89,15 +89,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     wacc: 0.0559 # NREL
     conservative:
       capex: 5505 # NREL NPD3
-      fixed_om: 91 # NREL NPD3
+      fixed_opex: 91 # NREL NPD3
       variable_om: 0 # NREL NPD3
     moderate:
       capex: 3013 # NREL NPD3
-      fixed_om: 88 # NREL NPD3
+      fixed_opex: 88 # NREL NPD3
       variable_om: 0 # NREL NPD3
     advanced:
       capex: 2712 # NREL NPD3
-      fixed_om: 79 # NREL NPD3
+      fixed_opex: 79 # NREL NPD3
       variable_om: 0 # NREL NPD3
   reservoir:
     name: "reservoir"
@@ -109,15 +109,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     wacc: 0.0559 # NREL
     conservative:
       capex: 5505 # NREL NPD3
-      fixed_om: 91 # NREL NPD3
+      fixed_opex: 91 # NREL NPD3
       variable_om: 0 # NREL NPD3
     moderate:
       capex: 3013 # NREL NPD3
-      fixed_om: 88 # NREL NPD3
+      fixed_opex: 88 # NREL NPD3
       variable_om: 0 # NREL NPD3
     advanced:
       capex: 2712 # NREL NPD3
-      fixed_om: 79 # NREL NPD3
+      fixed_opex: 79 # NREL NPD3
       variable_om: 0 # NREL NPD3
   pumped_storage_open:
     name: "pumped storage (open)"
@@ -130,15 +130,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     wacc: 0.0559 # NREL
     conservative:
       capex: 5505 # NREL NPD3
-      fixed_om: 91 # NREL NPD3
+      fixed_opex: 91 # NREL NPD3
       variable_om: 0 # NREL NPD3
     moderate:
       capex: 3013 # NREL NPD3
-      fixed_om: 88 # NREL NPD3
+      fixed_opex: 88 # NREL NPD3
       variable_om: 0 # NREL NPD3
     advanced:
       capex: 2712 # NREL NPD3
-      fixed_om: 79 # NREL NPD3
+      fixed_opex: 79 # NREL NPD3
       variable_om: 0 # NREL NPD3
   pumped_storage_closed:
     name: "pumped storage (closed)"
@@ -151,15 +151,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     wacc: 0.0559 # NREL
     conservative:
       capex: 3949 # NREL Class 10
-      fixed_om: 18 # NREL Class 10
+      fixed_opex: 18 # NREL Class 10
       variable_om: 0.51 # NREL Class 10
     moderate:
       capex: 3949 # NREL Class 10
-      fixed_om: 18 # NREL Class 10
+      fixed_opex: 18 # NREL Class 10
       variable_om: 0.51 # NREL Class 10
     advanced:
       capex: 3475 # NREL Class 10
-      fixed_om: 18 # NREL Class 10
+      fixed_opex: 18 # NREL Class 10
       variable_om: 0.51 # NREL Class 10
 storage:
   color:
@@ -178,18 +178,18 @@ storage:
     conservative:
       capex_energy: 246 # ATB
       capex_power: 190 # ATB
-      fixed_om_energy: 6 # ATB (2.5% CAPEX)
-      fixed_om_power: 5 # ATB (2.5% CAPEX)
+      fixed_opex_energy: 6 # ATB (2.5% CAPEX)
+      fixed_opex_power: 5 # ATB (2.5% CAPEX)
     moderate:
       capex_energy: 118 # ATB
       capex_power: 199 # ATB
-      fixed_om_energy: 3 # ATB (2.5% CAPEX)
-      fixed_om_power: 5 # ATB (2.5% CAPEX)
+      fixed_opex_energy: 3 # ATB (2.5% CAPEX)
+      fixed_opex_power: 5 # ATB (2.5% CAPEX)
     advanced:
       capex_energy: 107 # ATB
       capex_power: 82 # ATB
-      fixed_om_energy: 3 # ATB (2.5% CAPEX)
-      fixed_om_power: 2 # ATB (2.5% CAPEX)
+      fixed_opex_energy: 3 # ATB (2.5% CAPEX)
+      fixed_opex_power: 2 # ATB (2.5% CAPEX)
 electrolysis:
   color:
     name: 'neutral'
@@ -204,10 +204,10 @@ electrolysis:
     wacc: 0.055
     conservative:
       capex: 236
-      fixed_om: 4
+      fixed_opex: 4
     moderate:
       capex: 185
-      fixed_om: 3
+      fixed_opex: 3
     advanced:
       capex: 153
-      fixed_om: 2
+      fixed_opex: 2
