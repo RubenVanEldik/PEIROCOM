@@ -64,7 +64,6 @@ def optimize(config, *, status, output_directory):
     Step 3: Initialize each market node
     """
     # Create the variables to store the various data per market node
-    temporal_ires = {}
     temporal_results = {}
     temporal_export = {}
     interconnection_capacity = {}
@@ -84,9 +83,9 @@ def optimize(config, *, status, output_directory):
 
         # Get the temporal data and resample to the required resolution
         ires_filepath = utils.path("input", "scenarios", config["scenario"], "ires", f"{market_node}.csv")
-        temporal_ires[market_node] = utils.read_temporal_data(ires_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
+        ires_capacity_factors = utils.read_temporal_data(ires_filepath, start_year=config["climate_years"]["start"], end_year=config["climate_years"]["end"]).resample(config["resolution"]).mean()
         # Remove the leap days from the dataset that could have been introduced by the resample method
-        temporal_ires[market_node] = temporal_ires[market_node][~((temporal_ires[market_node].index.month == 2) & (temporal_ires[market_node].index.day == 29))]
+        ires_capacity_factors = ires_capacity_factors[~((ires_capacity_factors.index.month == 2) & (ires_capacity_factors.index.day == 29))]
         # Create a temporal_results DataFrame with the demand_total_MW and demand_electricity_MW columns
         temporal_results[market_node] = pd.DataFrame(temporal_demand_electricity[market_node].rename("demand_total_MW"))
         temporal_results[market_node]["demand_electricity_MW"] = temporal_results[market_node].demand_total_MW
@@ -120,7 +119,7 @@ def optimize(config, *, status, output_directory):
             status.update(f"{country_flag} Adding {utils.format_technology(ires_technology, capitalize=False)} generation")
 
             # Create a capacity variable for each IRES node
-            ires_nodes = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in temporal_ires[market_node].columns if column.startswith(f"{ires_technology}_")]
+            ires_nodes = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in ires_capacity_factors.columns if column.startswith(f"{ires_technology}_")]
             ires_potential = utils.get_potential_per_ires_node(market_node, ires_technology, config=config)
             current_capacity = utils.get_current_capacity_per_ires_node(market_node, ires_technology, config=config)
             capacities = model.addVars(ires_nodes, lb=current_capacity, ub=ires_potential)
@@ -130,7 +129,7 @@ def optimize(config, *, status, output_directory):
             for ires_node, capacity in capacities.items():
                 ires_capacity[market_node].loc[ires_node, ires_technology] = capacity
                 # Apply is required, otherwise it will throw a ValueError if there are more than a few thousand rows (see https://stackoverflow.com/questions/64801287)
-                temporal_ires_generation += temporal_ires[market_node][f"{ires_technology}_{ires_node}_cf"].apply(lambda cf: cf * capacity)
+                temporal_ires_generation += ires_capacity_factors[f"{ires_technology}_{ires_node}_cf"].apply(lambda cf: cf * capacity)
             temporal_results[market_node][f"generation_{ires_technology}_MW"] = temporal_ires_generation
             temporal_results[market_node]["generation_ires_MW"] += temporal_ires_generation
 
