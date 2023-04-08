@@ -619,7 +619,7 @@ def optimize(config, *, status, output_directory):
 
     # Store the LP model and optimization log
     if config["optimization"]["store_model"]:
-        model.write(f"{output_directory}/model/model.mps")
+        model.write(f"{output_directory}/model/model.lp")
         model.write(f"{output_directory}/model/parameters.prm")
 
     # Store the quality attributes
