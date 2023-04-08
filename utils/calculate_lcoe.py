@@ -66,10 +66,10 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
         annual_generation_MWh = mean_temporal_data[f"generation_{technology}_MW"] * 8760
         capex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "capex", technology_scenario)
         fixed_opex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_opex", technology_scenario)
-        variable_om = annual_generation_MWh * _calculate_scenario_costs(dispatchable_assumptions[technology], "variable_om", technology_scenario)
+        variable_opex = annual_generation_MWh * _calculate_scenario_costs(dispatchable_assumptions[technology], "variable_opex", technology_scenario)
         fuel_costs = annual_generation_MWh / dispatchable_assumptions[technology]["efficiency"] * dispatchable_assumptions[technology]["fuel_costs"]
         crf = utils.calculate_crf(dispatchable_assumptions[technology]["wacc"], dispatchable_assumptions[technology]["economic_lifetime"])
-        annualized_costs_dispatchable[technology] = crf * capex + fixed_opex + variable_om + fuel_costs
+        annualized_costs_dispatchable[technology] = crf * capex + fixed_opex + variable_opex + fuel_costs
 
     return annualized_costs_dispatchable
 
@@ -94,11 +94,11 @@ def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_c
         capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex", technology_scenario)
         fixed_opex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_opex", technology_scenario)
         annual_generation_MWh = mean_temporal_data[f"generation_{technology}_hydropower_MW"] * 8760
-        variable_om = annual_generation_MWh * _calculate_scenario_costs(hydropower_assumptions[technology], "variable_om", technology_scenario)
+        variable_opex = annual_generation_MWh * _calculate_scenario_costs(hydropower_assumptions[technology], "variable_opex", technology_scenario)
 
         # Calculate the total annualized costs
         crf = utils.calculate_crf(hydropower_assumptions[technology]["wacc"], hydropower_assumptions[technology]["economic_lifetime"])
-        annualized_costs_hydropower[technology] = crf * capex + fixed_opex + variable_om
+        annualized_costs_hydropower[technology] = crf * capex + fixed_opex + variable_opex
 
     return annualized_costs_hydropower
 
