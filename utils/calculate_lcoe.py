@@ -134,7 +134,7 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     return annualized_costs_storage
 
 
-def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, *, mean_temporal_data, config, breakdown_level=0):
+def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, *, mean_temporal_data, config, breakdown_level=0, annual_costs=False):
     """
     Calculate the average levelized costs of electricity for all market nodes
     """
@@ -142,10 +142,10 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
     assert validate.is_dataframe(dispatchable_capacity)
     assert validate.is_market_node_dict(storage_capacity)
     assert validate.is_market_node_dict(hydropower_capacity)
-    assert validate.is_number(mean_electricity_demand)
     assert validate.is_dataframe(mean_temporal_data)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
+    assert validate.is_bool(annual_costs)
 
     # Get the technology scenario
     technology_scenario = config["technologies"]["scenario"]
@@ -177,5 +177,6 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
     total_costs /= eur_usd
 
     # Return the relative or absolute costs
+    mean_electricity_demand = 1 if annual_costs else mean_temporal_data.demand_total_MW.sum()
     annual_electricity_demand = 8760 * mean_electricity_demand
     return total_costs / annual_electricity_demand
