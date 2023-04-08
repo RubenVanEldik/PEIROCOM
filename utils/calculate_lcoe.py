@@ -74,12 +74,13 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
     return annualized_costs_dispatchable
 
 
-def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_capacity, *, technology_scenario):
+def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_capacity, mean_temporal_data, *, technology_scenario):
     """
     Calculate the annualized hydropower costs
     """
     assert validate.is_list_like(hydropower_technologies)
     assert validate.is_dataframe(hydropower_capacity)
+    assert validate.is_series(mean_temporal_data)
     assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
     # Read the hydropower assumptions
@@ -92,10 +93,12 @@ def _calculate_annualized_hydropower_costs(hydropower_technologies, hydropower_c
         turbine_capacity_kW = hydropower_capacity.loc[technology, "turbine"] * 1000
         capex = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "capex", technology_scenario)
         fixed_om = turbine_capacity_kW * _calculate_scenario_costs(hydropower_assumptions[technology], "fixed_om", technology_scenario)
+        annual_generation_MWh = mean_temporal_data[f"generation_{technology}_hydropower_MW"] * 8760
+        variable_om = annual_generation_MWh * _calculate_scenario_costs(hydropower_assumptions[technology], "variable_om", technology_scenario)
 
         # Calculate the total annualized costs
         crf = utils.calculate_crf(hydropower_assumptions[technology]["wacc"], hydropower_assumptions[technology]["economic_lifetime"])
-        annualized_costs_hydropower[technology] = crf * capex + fixed_om
+        annualized_costs_hydropower[technology] = crf * capex + fixed_om + variable_om
 
     return annualized_costs_hydropower
 
@@ -159,7 +162,7 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
         # Add the annualized costs
         annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node], technology_scenario=technology_scenario)
         annualized_dispatchable_costs += _calculate_annualized_dispatchable_costs(config["technologies"]["dispatchable"], dispatchable_capacity.loc[market_node], mean_temporal_data.loc[market_node], technology_scenario=technology_scenario)
-        annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], technology_scenario=technology_scenario)
+        annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], mean_temporal_data.loc[market_node], technology_scenario=technology_scenario)
         annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node], technology_scenario=technology_scenario)
 
     # Calculate and return the LCOE
