@@ -90,12 +90,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     conservative:
       capex: 5505 # NREL NPD3
       fixed_om: 91 # NREL NPD3
+      variable_om: 0 # NREL NPD3
     moderate:
       capex: 3013 # NREL NPD3
       fixed_om: 88 # NREL NPD3
+      variable_om: 0 # NREL NPD3
     advanced:
       capex: 2712 # NREL NPD3
       fixed_om: 79 # NREL NPD3
+      variable_om: 0 # NREL NPD3
   reservoir:
     name: "reservoir"
     color:
@@ -107,12 +110,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     conservative:
       capex: 5505 # NREL NPD3
       fixed_om: 91 # NREL NPD3
+      variable_om: 0 # NREL NPD3
     moderate:
       capex: 3013 # NREL NPD3
       fixed_om: 88 # NREL NPD3
+      variable_om: 0 # NREL NPD3
     advanced:
       capex: 2712 # NREL NPD3
       fixed_om: 79 # NREL NPD3
+      variable_om: 0 # NREL NPD3
   pumped_storage_open:
     name: "pumped storage (open)"
     color:
@@ -125,12 +131,15 @@ hydropower: # Costs similar to IRENA Renewable Power Generation Costs in 2021 (9
     conservative:
       capex: 5505 # NREL NPD3
       fixed_om: 91 # NREL NPD3
+      variable_om: 0 # NREL NPD3
     moderate:
       capex: 3013 # NREL NPD3
       fixed_om: 88 # NREL NPD3
+      variable_om: 0 # NREL NPD3
     advanced:
       capex: 2712 # NREL NPD3
       fixed_om: 79 # NREL NPD3
+      variable_om: 0 # NREL NPD3
   pumped_storage_closed:
     name: "pumped storage (closed)"
     color:
