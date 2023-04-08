@@ -26,7 +26,7 @@ def average_week(output_directory):
     # Ask if the import and export should be shown in the chart
     show_import_export = st.sidebar.checkbox("Show import and export")
     show_hydropower = temporal_results.generation_total_hydropower_MW.abs().max() != 0
-    show_nuclear = temporal_results.generation_nuclear_MW.max() != 0
+    show_nuclear = "generation_nuclear_MW" in temporal_results and temporal_results.generation_nuclear_MW.max() != 0
 
     # Set the unit to TW or GW when applicable
     unit = "MW"
