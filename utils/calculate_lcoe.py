@@ -180,6 +180,5 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
     total_costs /= eur_usd
 
     # Return the relative or absolute costs
-    mean_electricity_demand = 1 if annual_costs else mean_temporal_data.demand_total_MW.sum()
-    annual_electricity_demand = 8760 * mean_electricity_demand
+    annual_electricity_demand = 1 if annual_costs else 8760 * mean_temporal_data.demand_total_MW.sum()
     return total_costs / annual_electricity_demand
