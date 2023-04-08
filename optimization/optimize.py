@@ -491,13 +491,24 @@ def optimize(config, *, status, output_directory):
         model.addConstr(sum_hydrogen_production <= config["self_sufficiency"]["max_hydrogen"] * sum_hydrogen_demand)
 
     """
-    Step 9: Define the storage costs constraint
+    Step 9: Create a DataFrame with the mean temporal data
+    """
+    # Create a DataFrame for the mean temporal data
+    relevant_columns = utils.find_common_columns(temporal_results)
+    mean_temporal_data = pd.DataFrame(columns=relevant_columns)
+
+    for market_node in market_nodes:
+        # Add the mean temporal results to the DataFrame (can't use .mean as some columns include Gurobi variables)
+        mean_temporal_data.loc[market_node] = temporal_results[market_node][relevant_columns].sum() / len(temporal_results[market_node].index)
+
+    """
+    Step 10: Define the storage costs constraint
     """
     if config.get("fixed_storage") is not None:
         status.update("Adding the storage costs constraint")
 
         # Calculate the storage costs
-        annual_storage_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, dispatchable_generation_mean, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=1)["storage"]
+        annual_storage_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, 1 / 8760, mean_temporal_data=mean_temporal_data, config=config, breakdown_level=1)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_annual_storage_costs = config["fixed_storage"]["annual_costs"]
@@ -507,12 +518,12 @@ def optimize(config, *, status, output_directory):
             model.addConstr(annual_storage_costs <= fixed_annual_storage_costs)
 
     """
-    Step 10: Set objective function
+    Step 11: Set objective function
     """
     status.update("Setting the objective function")
 
     # Calculate the annual electricity costs
-    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, dispatchable_generation_mean, storage_capacity, hydropower_capacity, 1 / 8760, config=config)
+    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, 1 / 8760, mean_temporal_data=mean_temporal_data, config=config)
 
     # Calculate the total spillage and give it an artificial cost (this is required because otherwise some curtailment might be accounted as spillage)
     total_spillage_hydropower_MWh = utils.merge_dataframes_on_column(temporal_results, "spillage_total_hydropower_MW").sum().sum() * interval_length
@@ -531,7 +542,7 @@ def optimize(config, *, status, output_directory):
     duration["initializing"] = (initializing_end - initializing_start).total_seconds()
 
     """
-    Step 11: Solve model
+    Step 12: Solve model
     """
     # Set the status message and create
     status.update("Optimizing")
@@ -627,7 +638,7 @@ def optimize(config, *, status, output_directory):
     duration["optimizing"] = (optimizing_end - optimizing_start).total_seconds()
 
     """
-    Step 12: Check if the model could be solved
+    Step 13: Check if the model could be solved
     """
     if model.status == gp.GRB.OPTIMAL:
         error_message = None
@@ -661,7 +672,7 @@ def optimize(config, *, status, output_directory):
         return error_message
 
     """
-    Step 13: Store the results
+    Step 14: Store the results
     """
     storing_start = datetime.now()
 
@@ -675,10 +686,6 @@ def optimize(config, *, status, output_directory):
     for sub_directory in ["ires", "storage", "hydropower", "interconnections"]:
         (output_directory / "capacity" / sub_directory).mkdir()
 
-    # Create a DataFrame for the mean temporal data
-    relevant_columns = utils.find_common_columns(temporal_results)
-    mean_temporal_data = pd.DataFrame(columns=relevant_columns)
-
     # Store the actual values per market node for the temporal results and capacities
     for market_node in market_nodes:
         country_flag = utils.get_country_property(utils.get_country_of_market_node(market_node), "flag")
@@ -688,9 +695,6 @@ def optimize(config, *, status, output_directory):
         temporal_results_market_node = utils.convert_variables_recursively(temporal_results[market_node])
         # Store the temporal results to a CSV file
         temporal_results_market_node.to_csv(output_directory / "temporal" / "market_nodes" / f"{market_node}.csv")
-
-        # Add the mean temporal results to the DataFrame
-        mean_temporal_data.loc[market_node] = temporal_results_market_node[relevant_columns].mean()
 
         # Convert and store the IRES capacity
         ires_capacity_market_node = utils.convert_variables_recursively(ires_capacity[market_node])
@@ -704,6 +708,7 @@ def optimize(config, *, status, output_directory):
         hydropower_capacity[market_node].to_csv(output_directory / "capacity" / "hydropower" / f"{market_node}.csv")
 
     # Store the mean temporal data
+    mean_temporal_data = utils.convert_variables_recursively(mean_temporal_data)
     mean_temporal_data.to_csv(output_directory / "temporal" / "market_nodes" / "mean.csv")
 
     # Convert and store the dispatchable capacity

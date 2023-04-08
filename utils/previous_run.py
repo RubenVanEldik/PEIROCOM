@@ -20,10 +20,9 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
     mean_electricity_demand = (mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW).sum()
-    mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"]]]
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, mean_electricity_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level)
 
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
@@ -42,14 +41,13 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
     mean_demand = (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_dispatchable_MW + mean_temporal_results.generation_total_hydropower_MW).sum()
-    mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"]]]
 
     # Set the storage capacity to zero
     for market_node in storage_capacity:
         storage_capacity[market_node] = 0 * storage_capacity[market_node]
 
     # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, mean_demand, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_demand, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level)
 
 
 def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
@@ -67,8 +65,7 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
-    mean_dispatchable_generation = mean_temporal_results[[f"generation_{technology}_MW" for technology in config["technologies"]["dispatchable"]]]
-    annual_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, 1 / 8760, config=config, breakdown_level=breakdown_level)
+    annual_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, 1 / 8760, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level)
 
     # Calculate the annual electrolyzer costs
     electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)

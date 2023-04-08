@@ -47,13 +47,13 @@ def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW, *, tec
     return annualized_costs_ires
 
 
-def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatchable_capacity_MW, dispatchable_mean_generation_MW, *, technology_scenario):
+def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatchable_capacity_MW, mean_temporal_data, *, technology_scenario):
     """
     Calculate the annualized dispatchable costs
     """
     assert validate.is_list_like(dispatchable_technologies)
     assert validate.is_series(dispatchable_capacity_MW)
-    assert validate.is_series(dispatchable_mean_generation_MW)
+    assert validate.is_series(mean_temporal_data)
     assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
 
     # Read the dispatchable assumptions
@@ -63,7 +63,7 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
     annualized_costs_dispatchable = pd.Series([], dtype="float64")
     for technology in dispatchable_technologies:
         capacity_kW = dispatchable_capacity_MW[technology] * 1000
-        annual_generation_MWh = dispatchable_mean_generation_MW[technology] * 8760
+        annual_generation_MWh = mean_temporal_data[f"generation_{technology}_MW"] * 8760
         capex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "capex", technology_scenario)
         fixed_om = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_om", technology_scenario)
         variable_om = annual_generation_MWh * _calculate_scenario_costs(dispatchable_assumptions[technology], "variable_om", technology_scenario)
@@ -134,16 +134,16 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     return annualized_costs_storage
 
 
-def calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_generation, storage_capacity, hydropower_capacity, mean_electricity_demand, *, config, breakdown_level=0):
+def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_electricity_demand, *, mean_temporal_data, config, breakdown_level=0):
     """
     Calculate the average levelized costs of electricity for all market nodes
     """
     assert validate.is_market_node_dict(ires_capacity)
     assert validate.is_dataframe(dispatchable_capacity)
-    assert validate.is_dataframe(mean_dispatchable_generation)
     assert validate.is_market_node_dict(storage_capacity)
     assert validate.is_market_node_dict(hydropower_capacity)
     assert validate.is_number(mean_electricity_demand)
+    assert validate.is_dataframe(mean_temporal_data)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
 
@@ -158,7 +158,7 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, mean_dispatchable_gener
     for market_node in ires_capacity.keys():
         # Add the annualized costs
         annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node], technology_scenario=technology_scenario)
-        annualized_dispatchable_costs += _calculate_annualized_dispatchable_costs(config["technologies"]["dispatchable"], dispatchable_capacity.loc[market_node], mean_dispatchable_generation.loc[market_node], technology_scenario=technology_scenario)
+        annualized_dispatchable_costs += _calculate_annualized_dispatchable_costs(config["technologies"]["dispatchable"], dispatchable_capacity.loc[market_node], mean_temporal_data.loc[market_node], technology_scenario=technology_scenario)
         annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], technology_scenario=technology_scenario)
         annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node], technology_scenario=technology_scenario)
 
