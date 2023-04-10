@@ -454,41 +454,43 @@ def optimize(config, *, status, output_directory):
         status.update(f"{country_flag} Adding self-sufficiency constraint")
 
         # Set the variables required to calculate the cumulative results in the country
-        sum_demand_total = 0
-        sum_ires_generation = 0
-        sum_dispatchable_generation = 0
-        sum_hydropower_generation = 0
-        sum_curtailed = 0
-        sum_storage_flow = 0
-        sum_hydrogen_demand = 0
-        sum_hydrogen_production = 0
+        mean_demand_total = 0
+        mean_ires_generation = 0
+        mean_dispatchable_generation = 0
+        mean_hydropower_generation = 0
+        mean_curtailed = 0
+        mean_storage_flow = 0
+        mean_hydrogen_demand = 0
+        mean_hydrogen_production = 0
 
         # Loop over all market nodes in the country
         for market_node in utils.get_market_nodes_for_countries([country_code]):
-            # Calculate the total demand and non-curtailed generation in this country
             # The Gurobi .quicksum method is significantly faster than Panda's .sum method
-            sum_demand_total += gp.quicksum(temporal_results[market_node].demand_total_MW)
-            sum_ires_generation += gp.quicksum(temporal_results[market_node].generation_ires_MW)
-            sum_dispatchable_generation += gp.quicksum(temporal_results[market_node].generation_dispatchable_MW)
-            sum_hydropower_generation += gp.quicksum(temporal_results[market_node].generation_total_hydropower_MW)
-            sum_curtailed += gp.quicksum(temporal_results[market_node].curtailed_MW)
-            sum_storage_flow += gp.quicksum(temporal_results[market_node].net_storage_flow_total_MW)
+            calculate_mean_of_column = lambda column: gp.quicksum(column) / len(column.index)
+
+            # Calculate the total demand and non-curtailed generation in this country
+            mean_demand_total += calculate_mean_of_column(temporal_results[market_node].demand_total_MW)
+            mean_ires_generation += calculate_mean_of_column(temporal_results[market_node].generation_ires_MW)
+            mean_dispatchable_generation += calculate_mean_of_column(temporal_results[market_node].generation_dispatchable_MW)
+            mean_hydropower_generation += calculate_mean_of_column(temporal_results[market_node].generation_total_hydropower_MW)
+            mean_curtailed += calculate_mean_of_column(temporal_results[market_node].curtailed_MW)
+            mean_storage_flow += calculate_mean_of_column(temporal_results[market_node].net_storage_flow_total_MW)
 
             # Calculate the total hydrogen production
-            sum_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_demand_electricity[market_node].sum()
+            mean_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_demand_electricity[market_node].sum() / len(temporal_results[market_node])
 
             for electrolysis_technology in config["technologies"]["electrolysis"]:
                 electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
-                sum_hydrogen_production += gp.quicksum(temporal_results[market_node][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
+                mean_hydrogen_production += calculate_mean_of_column(temporal_results[market_node][f"demand_{electrolysis_technology}_MW"]) * electrolyzer_efficiency
 
         # Add the self-sufficiency constraints
-        electricity_production = sum_ires_generation + sum_dispatchable_generation + sum_hydropower_generation - sum_curtailed - sum_storage_flow
-        model.addConstr(electricity_production >= config["self_sufficiency"]["min_electricity"] * sum_demand_total)
-        model.addConstr(electricity_production <= config["self_sufficiency"]["max_electricity"] * sum_demand_total)
+        electricity_production = mean_ires_generation + mean_dispatchable_generation + mean_hydropower_generation - mean_curtailed - mean_storage_flow
+        model.addConstr(electricity_production >= config["self_sufficiency"]["min_electricity"] * mean_demand_total)
+        model.addConstr(electricity_production <= config["self_sufficiency"]["max_electricity"] * mean_demand_total)
 
         # Add the hydrogen constraint to ensure that the temporal hydrogen production equals the total hydrogen demand
-        model.addConstr(sum_hydrogen_production >= config["self_sufficiency"]["min_hydrogen"] * sum_hydrogen_demand)
-        model.addConstr(sum_hydrogen_production <= config["self_sufficiency"]["max_hydrogen"] * sum_hydrogen_demand)
+        model.addConstr(mean_hydrogen_production >= config["self_sufficiency"]["min_hydrogen"] * mean_hydrogen_demand)
+        model.addConstr(mean_hydrogen_production <= config["self_sufficiency"]["max_hydrogen"] * mean_hydrogen_demand)
 
     """
     Step 9: Create a DataFrame with the mean temporal data
