@@ -113,9 +113,14 @@ def average_week(output_directory):
             subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_nuclear_MW), label="Nuclear", facecolor=colors.get("green", 600))
             cumulative_generation += temporal_results_season.generation_nuclear_MW
 
-        # Add the IRES generation
-        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_ires_MW), label="Intermittent renewables", facecolor=colors.get("amber", 300))
-        cumulative_generation += temporal_results_season.generation_ires_MW
+        # Add the wind generation
+        wind_generation = temporal_results_season.generation_onshore_MW + temporal_results_season.generation_offshore_MW
+        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + wind_generation), label="Onshore and offshore wind", facecolor=colors.get("amber", 300))
+        cumulative_generation += wind_generation
+
+        # Add the solar PV generation
+        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_pv_MW), label="Solar PV", facecolor=colors.get("amber", 200))
+        cumulative_generation += temporal_results_season.generation_pv_MW
 
         # Add the hydropower turbine power
         if show_hydropower:
