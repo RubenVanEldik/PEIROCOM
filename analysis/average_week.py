@@ -104,7 +104,7 @@ def average_week(output_directory):
 
         # Add the pumped hydropower
         hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
-        _add_area(subplot, cumulative_demand, hydropower_pump_flow, label="Hydropower", color=colors.get("sky", 600))
+        _add_area(subplot, cumulative_demand, hydropower_pump_flow, color=colors.get("sky", 600))
 
         # Add the storage charging
         storage_charging_flow = temporal_results_season.net_storage_flow_total_MW.clip(lower=0)
@@ -136,7 +136,7 @@ def average_week(output_directory):
 
         # Add the hydropower turbine power
         hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
-        _add_area(subplot, cumulative_generation, hydropower_turbine_flow, reversed=True, color=colors.get("sky", 600))
+        _add_area(subplot, cumulative_generation, hydropower_turbine_flow, reversed=True, label="Hydropower", color=colors.get("sky", 600))
 
         # Add the hydrogen turbines
         h2_to_electricity = pd.Series(0, index=temporal_results_season.index)
