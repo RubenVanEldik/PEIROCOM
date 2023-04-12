@@ -138,6 +138,12 @@ def average_week(output_directory):
         hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
         _add_area(subplot, cumulative_generation, hydropower_turbine_flow, reversed=True, color=colors.get("sky", 600))
 
+        # Add the hydrogen turbines
+        h2_to_electricity = pd.Series(0, index=temporal_results_season.index)
+        h2_to_electricity += temporal_results_season.get("generation_h2_ccgt_MW", 0)
+        h2_to_electricity += temporal_results_season.get("generation_h2_gas_turbine_MW", 0)
+        _add_area(subplot, cumulative_generation, h2_to_electricity, reversed=True, label="$\mathregular{H_2}$ turbines", color=colors.get("green", 500))
+
         # Add the storage discharging
         storage_discharging_flow = -temporal_results_season.net_storage_flow_total_MW.clip(upper=0)
         _add_area(subplot, cumulative_generation, storage_discharging_flow, reversed=True, color=colors.get("red", 900))
