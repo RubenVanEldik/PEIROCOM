@@ -36,18 +36,10 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     # Get the capacities and demand
     config = utils.read_yaml(output_directory / "config.yaml")
     ires_capacity = utils.get_ires_capacity(output_directory, country_codes=country_codes)
-    dispatchable_capacity = utils.get_dispatchable_capacity(output_directory, country_codes=country_codes)
-    storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
-    hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
-    mean_temporal_results["demand_total_MW"] = mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_dispatchable_MW + mean_temporal_results.generation_total_hydropower_MW
+    mean_temporal_results["demand_total_MW"] = mean_temporal_results.generation_ires_MW
 
-    # Set the storage capacity to zero
-    for market_node in storage_capacity:
-        storage_capacity[market_node] = 0 * storage_capacity[market_node]
-
-    # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoe(ires_capacity, None, None, None, mean_temporal_data=mean_temporal_results, hydrogen_costs=0, config=config, breakdown_level=breakdown_level)
 
 
 def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
