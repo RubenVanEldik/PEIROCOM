@@ -47,7 +47,7 @@ def _calculate_annualized_ires_costs(ires_technologies, ires_capacity_MW, *, tec
     return annualized_costs_ires
 
 
-def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatchable_capacity_MW, mean_temporal_data, *, technology_scenario):
+def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatchable_capacity_MW, mean_temporal_data, *, hydrogen_costs, technology_scenario):
     """
     Calculate the annualized dispatchable costs
     """
@@ -55,6 +55,7 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
     assert validate.is_series(dispatchable_capacity_MW)
     assert validate.is_series(mean_temporal_data)
     assert validate.is_number(technology_scenario, min_value=-1, max_value=1)
+    assert validate.is_number(hydrogen_costs)
 
     # Read the dispatchable assumptions
     dispatchable_assumptions = utils.get_technologies(technology_type="dispatchable")
@@ -67,7 +68,8 @@ def _calculate_annualized_dispatchable_costs(dispatchable_technologies, dispatch
         capex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "capex", technology_scenario)
         fixed_opex = capacity_kW * _calculate_scenario_costs(dispatchable_assumptions[technology], "fixed_opex", technology_scenario)
         variable_opex = annual_generation_MWh * _calculate_scenario_costs(dispatchable_assumptions[technology], "variable_opex", technology_scenario)
-        fuel_costs = annual_generation_MWh / dispatchable_assumptions[technology]["efficiency"] * dispatchable_assumptions[technology]["fuel_costs"]
+        relative_fuel_costs = hydrogen_costs if dispatchable_assumptions[technology]["fuel_costs"] == "hydrogen" else dispatchable_assumptions[technology]["fuel_costs"]
+        fuel_costs = annual_generation_MWh / dispatchable_assumptions[technology]["efficiency"] * relative_fuel_costs
         crf = utils.calculate_crf(dispatchable_assumptions[technology]["wacc"], dispatchable_assumptions[technology]["economic_lifetime"])
         annualized_costs_dispatchable[technology] = crf * capex + fixed_opex + variable_opex + fuel_costs
 
@@ -137,7 +139,7 @@ def _calculate_annualized_storage_costs(storage_technologies, storage_capacity_M
     return annualized_costs_storage
 
 
-def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, *, mean_temporal_data, config, breakdown_level=0, annual_costs=False):
+def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, *, hydrogen_costs, mean_temporal_data, config, breakdown_level=0, annual_costs=False):
     """
     Calculate the average levelized costs of electricity for all market nodes
     """
@@ -145,6 +147,7 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
     assert validate.is_dataframe(dispatchable_capacity, required=False)
     assert validate.is_market_node_dict(storage_capacity, required=False)
     assert validate.is_market_node_dict(hydropower_capacity, required=False)
+    assert validate.is_number(hydrogen_costs)
     assert validate.is_dataframe(mean_temporal_data)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
@@ -163,7 +166,7 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
         if ires_capacity is not None:
             annualized_ires_costs += _calculate_annualized_ires_costs(config["technologies"]["ires"], ires_capacity[market_node], technology_scenario=technology_scenario)
         if dispatchable_capacity is not None:
-            annualized_dispatchable_costs += _calculate_annualized_dispatchable_costs(config["technologies"]["dispatchable"], dispatchable_capacity.loc[market_node], mean_temporal_data.loc[market_node], technology_scenario=technology_scenario)
+            annualized_dispatchable_costs += _calculate_annualized_dispatchable_costs(config["technologies"]["dispatchable"], dispatchable_capacity.loc[market_node], mean_temporal_data.loc[market_node], hydrogen_costs=hydrogen_costs, technology_scenario=technology_scenario)
         if hydropower_capacity is not None:
             annualized_hydropower_costs += _calculate_annualized_hydropower_costs(config["technologies"]["hydropower"], hydropower_capacity[market_node], mean_temporal_data.loc[market_node], technology_scenario=technology_scenario)
         if storage_capacity is not None:

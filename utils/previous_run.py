@@ -18,12 +18,24 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     dispatchable_capacity = utils.get_dispatchable_capacity(output_directory, country_codes=country_codes)
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
+    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
     mean_temporal_results["demand_total_MW"] = mean_temporal_results.demand_total_MW + mean_temporal_results.net_export_MW
+    mean_electrolysis_demand = pd.Series({electrolysis_technology: mean_temporal_results[f"demand_{electrolysis_technology}_MW"].sum() for electrolysis_technology in electrolysis_capacity.columns})
 
-    # Return the LCOE
-    return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level)
+    # Calculate the real electricity costs recursively (this is required because the LCOE and LCOH are dependent upon each other)
+    previous_electricity_costs = 0
+    while True:
+        # Calculate the hydrogen and electricity costs
+        hydrogen_costs = utils.calculate_lcoh(electrolysis_capacity, mean_electrolysis_demand, electricity_costs=previous_electricity_costs, config=config, breakdown_level=0).mean()
+        electricity_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_results, hydrogen_costs=hydrogen_costs, config=config, breakdown_level=0)
 
+        # Return the electricity costs (with the selected breakdown level) if the improvement is less than 1E-12
+        if abs(previous_electricity_costs / electricity_costs - 1) < 10 ** -12:
+            return utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_results, hydrogen_costs=hydrogen_costs, config=config, breakdown_level=breakdown_level)
+
+        # Update the previous electricity costs
+        previous_electricity_costs = electricity_costs
 
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     """
@@ -57,7 +69,8 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     storage_capacity = utils.get_storage_capacity(output_directory, country_codes=country_codes)
     hydropower_capacity = utils.get_hydropower_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, country_codes=country_codes)
-    annual_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level, annual_costs=True)
+    hydrogen_costs = lcoh(output_directory, country_codes=country_codes)
+    annual_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, hydrogen_costs=hydrogen_costs, mean_temporal_data=mean_temporal_results, config=config, breakdown_level=breakdown_level, annual_costs=True)
 
     # Calculate the annual electrolyzer costs
     electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)

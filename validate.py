@@ -441,7 +441,7 @@ def is_technology(value, *, required=True):
 
     if value in ["pv", "onshore", "offshore"]:
         return True
-    if value in ["nuclear"]:
+    if value in ["nuclear", "h2_ccgt", "h2_gas_turbine"]:
         return True
     if value in ["run_of_river", "reservoir", "pumped_storage_open", "pumped_storage_closed"]:
         return True

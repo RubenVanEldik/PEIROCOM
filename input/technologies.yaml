@@ -54,11 +54,53 @@ dispatchable:
   color:
     name: 'green'
     value: 600
+  h2_ccgt:
+    name: "H2 CCGT"
+    color:
+      name: 'green'
+      value: 500
+    efficiency: 0.6
+    fuel_costs: hydrogen
+    economic_lifetime: 25
+    wacc: 0.055
+    conservative:
+      capex: 760
+      fixed_opex: 11
+      variable_opex: 2.36
+    moderate:
+      capex: 760
+      fixed_opex: 11
+      variable_opex: 2.36
+    advanced:
+      capex: 760
+      fixed_opex: 11
+      variable_opex: 2.36
+  h2_gas_turbine:
+    name: "H2 gas turbine"
+    color:
+      name: 'green'
+      value: 600
+    efficiency: 0.4
+    fuel_costs: hydrogen
+    economic_lifetime: 25
+    wacc: 0.055
+    conservative:
+      capex: 504
+      fixed_opex: 5
+      variable_opex: 7.48
+    moderate:
+      capex: 504
+      fixed_opex: 5
+      variable_opex: 7.48
+    advanced:
+      capex: 504
+      fixed_opex: 5
+      variable_opex: 7.48
   nuclear:
     name: "nuclear"
     color:
       name: 'green'
-      value: 500
+      value: 700
     fuel_costs: 2.51 # NREL
     efficiency: 0.326 # NREL
     economic_lifetime: 60

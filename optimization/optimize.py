@@ -59,6 +59,9 @@ def optimize(config, *, status, output_directory):
     market_nodes = utils.get_market_nodes_for_countries(config["country_codes"])
     temporal_demand_electricity = temporal_demand_electricity[market_nodes]
 
+    # Create a series with the mean hydrogen demand per market node
+    mean_demand_hydrogen = config["relative_hydrogen_demand"] * temporal_demand_electricity.mean()
+
 
     """
     Step 3: Initialize each market node
@@ -105,7 +108,7 @@ def optimize(config, *, status, output_directory):
             temporal_results[market_node][f"demand_{electrolysis_technology}_MW"] = pd.Series(temporal_electrolysis_demand)
             temporal_results[market_node]["demand_total_MW"] += pd.Series(temporal_electrolysis_demand)
 
-            # Ensure that the temporal demand does not exceed the electrolysis capacity
+            # Ensure that the temporal electrolysis demand does not exceed the electrolysis capacity
             model.addConstrs(temporal_electrolysis_demand[timestamp] <= electrolysis_capacity_market_node for timestamp in temporal_demand_electricity.index)
 
         """
@@ -149,6 +152,11 @@ def optimize(config, *, status, output_directory):
             temporal_dispatchable_generation = pd.Series(model.addVars(temporal_demand_electricity.index))
             temporal_results[market_node][f"generation_{dispatchable_technology}_MW"] = temporal_dispatchable_generation
             temporal_results[market_node]["generation_dispatchable_MW"] += temporal_dispatchable_generation
+
+            # If the technology uses hydrogen, add the required hydrogen to mean_demand_hydrogen
+            if utils.get_technology(dispatchable_technology)["fuel_costs"] == "hydrogen":
+                mean_electricity_generation_technology = gp.quicksum(temporal_dispatchable_generation) / len(temporal_dispatchable_generation.index)
+                mean_demand_hydrogen.loc[market_node] += mean_electricity_generation_technology / utils.get_technology(dispatchable_technology)["efficiency"]
 
             # Add the mean generation of this technology
             dispatchable_generation_mean.loc[market_node, dispatchable_technology] = gp.quicksum(temporal_dispatchable_generation) / len(temporal_dispatchable_generation.index)
@@ -427,7 +435,7 @@ def optimize(config, *, status, output_directory):
         for market_node in market_nodes:
             # Calculate the summed results of this market node for this year
             summed_results_year = temporal_results[market_node][temporal_results[market_node].index.year == year].sum() * interval_length
-            annual_hydrogen_demand += config["relative_hydrogen_demand"] * summed_results_year.demand_electricity_MW
+            annual_hydrogen_demand += mean_demand_hydrogen[market_node] * 8760
 
             # Add the hydrogen production to the total per production technology
             for electrolysis_technology in config["technologies"]["electrolysis"]:
@@ -475,9 +483,7 @@ def optimize(config, *, status, output_directory):
             mean_hydropower_generation += calculate_mean_of_column(temporal_results[market_node].generation_total_hydropower_MW)
             mean_curtailed += calculate_mean_of_column(temporal_results[market_node].curtailed_MW)
             mean_storage_flow += calculate_mean_of_column(temporal_results[market_node].net_storage_flow_total_MW)
-
-            # Calculate the total hydrogen production
-            mean_hydrogen_demand += config["relative_hydrogen_demand"] * temporal_demand_electricity[market_node].sum() / len(temporal_results[market_node])
+            mean_hydrogen_demand += mean_demand_hydrogen[market_node]
 
             for electrolysis_technology in config["technologies"]["electrolysis"]:
                 electrolyzer_efficiency = utils.get_technology(electrolysis_technology)["efficiency"]
@@ -510,7 +516,7 @@ def optimize(config, *, status, output_directory):
         status.update("Adding the storage costs constraint")
 
         # Calculate the storage costs
-        annual_storage_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_data, config=config, breakdown_level=1, annual_costs=True)["storage"]
+        annual_storage_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, hydrogen_costs=0, mean_temporal_data=mean_temporal_data, config=config, breakdown_level=1, annual_costs=True)["storage"]
 
         # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
         fixed_annual_storage_costs = config["fixed_storage"]["annual_costs"]
@@ -525,7 +531,7 @@ def optimize(config, *, status, output_directory):
     status.update("Setting the objective function")
 
     # Calculate the annual electricity costs
-    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, mean_temporal_data=mean_temporal_data, config=config, annual_costs=True)
+    annual_electricity_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, hydrogen_costs=0, mean_temporal_data=mean_temporal_data, config=config, annual_costs=True)
 
     # Calculate the total spillage and give it an artificial cost (this is required because otherwise some curtailment might be accounted as spillage)
     total_spillage_hydropower_MWh = utils.merge_dataframes_on_column(temporal_results, "spillage_total_hydropower_MW").sum().sum() * interval_length
