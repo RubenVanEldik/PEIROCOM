@@ -102,7 +102,7 @@ def relative_curtailment(output_directory, *, country_codes=None):
     return mean_temporal_results.curtailed_MW / (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_dispatchable_MW + mean_temporal_results.generation_total_hydropower_MW)
 
 
-def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
+def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology=None):
     """
     Calculate the LCOH for a specific run
     """
@@ -113,13 +113,19 @@ def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysi
 
     # Get the capacities and electrolysis demand and electricity costs
     config = utils.read_yaml(output_directory / "config.yaml")
-    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)[[electrolysis_technology]]
+    electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)
     mean_temporal_results = utils.get_mean_temporal_results(output_directory, group="all", country_codes=country_codes)
-    annual_electrolysis_demand = pd.Series({electrolysis_technology: mean_temporal_results[f"demand_{electrolysis_technology}_MW"]})
     electricity_costs = firm_lcoe(output_directory, country_codes=country_codes, breakdown_level=breakdown_level)
 
+    # Filter the electrolysis capacity is a specific technology was given
+    if electrolysis_technology is not None:
+        electrolysis_capacity = electrolysis_capacity[[electrolysis_technology]]
+
+    # Create a Series with the mean electrolysis demand per technology
+    mean_electrolysis_demand = pd.Series({electrolysis_technology: mean_temporal_results[f"demand_{electrolysis_technology}_MW"].sum() for electrolysis_technology in electrolysis_capacity.columns})
+
     # Return the LCOE
-    return utils.calculate_lcoh(electrolysis_capacity, annual_electrolysis_demand, electricity_costs, config=config, breakdown_level=breakdown_level)
+    return utils.calculate_lcoh(electrolysis_capacity, mean_electrolysis_demand, electricity_costs, config=config, breakdown_level=breakdown_level)
 
 
 def electrolyzer_capacity_factor(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
