@@ -7,6 +7,29 @@ import utils
 import validate
 
 
+def _add_area(subplot, existing_area, new_area, *, reversed=False, label=None, color):
+    """
+    Add an area to the weekly subplot
+    """
+    assert validate.is_series(existing_area)
+    assert validate.is_series(new_area, required=False)
+    assert validate.is_bool(reversed)
+    assert validate.is_string(label, required=False)
+    assert validate.is_color(color)
+
+    # Set the direction
+    direction = -1 if reversed else 1
+
+    if new_area is not None and new_area.abs().max() > 0:
+        # Calculate the lower and upper bound and update the existing area
+        lower_bound = existing_area.copy()
+        upper_bound = existing_area.copy() + new_area * direction
+        existing_area += new_area * direction
+
+        # Add the area to the plot
+        subplot.fill_between(existing_area.index, lower_bound, upper_bound, label=label, facecolor=color)
+
+
 def average_week(output_directory):
     """
     Show a chart with the average week for each season
@@ -25,8 +48,6 @@ def average_week(output_directory):
 
     # Ask if the import and export should be shown in the chart
     show_import_export = st.sidebar.checkbox("Show import and export")
-    show_hydropower = temporal_results.generation_total_hydropower_MW.abs().max() != 0
-    show_nuclear = "generation_nuclear_MW" in temporal_results and temporal_results.generation_nuclear_MW.max() != 0
 
     # Set the unit to TW or GW when applicable
     unit = "MW"
@@ -75,69 +96,56 @@ def average_week(output_directory):
         cumulative_demand = pd.Series(0, index=temporal_results_season.index)
 
         # Add the fixed demand
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + temporal_results_season.demand_electricity_MW, label="Demand", facecolor=colors.get("amber", 500))
-        cumulative_demand += temporal_results_season.demand_electricity_MW
+        _add_area(subplot, cumulative_demand, temporal_results_season.demand_electricity_MW, label="Demand", color=colors.get("amber", 500))
 
         # Add the electrolysis demand
         electrolysis_demand = temporal_results_season.demand_total_MW - temporal_results_season.demand_electricity_MW
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + electrolysis_demand, label="Electrolysis", facecolor=colors.get("amber", 600))
-        cumulative_demand += electrolysis_demand
+        _add_area(subplot, cumulative_demand, electrolysis_demand, label="Electrolysis", color=colors.get("amber", 600))
 
         # Add the pumped hydropower
-        if show_hydropower:
-            hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
-            subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + hydropower_pump_flow, label="Hydropower", facecolor=colors.get("sky", 600))
-            cumulative_demand += hydropower_pump_flow
+        hydropower_pump_flow = -temporal_results_season.generation_total_hydropower_MW.clip(upper=0)
+        _add_area(subplot, cumulative_demand, hydropower_pump_flow, label="Hydropower", color=colors.get("sky", 600))
 
         # Add the storage charging
         storage_charging_flow = temporal_results_season.net_storage_flow_total_MW.clip(lower=0)
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + storage_charging_flow, label="Storage", facecolor=colors.get("red", 800))
-        cumulative_demand += storage_charging_flow
+        _add_area(subplot, cumulative_demand, storage_charging_flow, label="Storage", color=colors.get("red", 800))
 
         # Add the net export
         if show_import_export:
             net_export = temporal_results_season.net_export_MW.clip(lower=0)
-            subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + net_export, label="Import/export", facecolor=colors.get("gray", 400))
-            cumulative_demand += net_export
+            _add_area(subplot, cumulative_demand, net_export, label="Import/export", color=colors.get("gray", 400))
 
         # Add the curtailment
-        subplot.fill_between(cumulative_demand.index, cumulative_demand, cumulative_demand + temporal_results_season.curtailed_MW, label="Curtailed", facecolor=colors.get("gray", 200))
-        cumulative_demand += temporal_results_season.curtailed_MW
+        _add_area(subplot, cumulative_demand, temporal_results_season.curtailed_MW, label="Curtailed", color=colors.get("gray", 200))
 
         # Generation
         # Create a series with the cumulative generation
         cumulative_generation = pd.Series(0, index=temporal_results_season.index)
 
         # Add the nuclear generation
-        if show_nuclear:
-            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_nuclear_MW), label="Nuclear", facecolor=colors.get("green", 600))
-            cumulative_generation += temporal_results_season.generation_nuclear_MW
+        _add_area(subplot, cumulative_generation, temporal_results_season.get("generation_nuclear_MW"), reversed=True, label="Nuclear", color=colors.get("green", 700))
 
         # Add the wind generation
-        wind_generation = temporal_results_season.generation_onshore_MW + temporal_results_season.generation_offshore_MW
-        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + wind_generation), label="Onshore and offshore wind", facecolor=colors.get("amber", 300))
-        cumulative_generation += wind_generation
+        wind_generation = pd.Series(0, index=temporal_results_season.index)
+        wind_generation += temporal_results_season.get("generation_onshore_MW", default=0)
+        wind_generation += temporal_results_season.get("generation_offshore_MW", default=0)
+        _add_area(subplot, cumulative_generation, wind_generation, reversed=True, label="Onshore and offshore wind", color=colors.get("amber", 300))
 
         # Add the solar PV generation
-        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + temporal_results_season.generation_pv_MW), label="Solar PV", facecolor=colors.get("amber", 200))
-        cumulative_generation += temporal_results_season.generation_pv_MW
+        _add_area(subplot, cumulative_generation, temporal_results_season.get("generation_pv_MW"), reversed=True, label="Solar PV", color=colors.get("amber", 200))
 
         # Add the hydropower turbine power
-        if show_hydropower:
-            hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
-            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + hydropower_turbine_flow), facecolor=colors.get("sky", 600))
-            cumulative_generation += hydropower_turbine_flow
+        hydropower_turbine_flow = temporal_results_season.generation_total_hydropower_MW.clip(lower=0)
+        _add_area(subplot, cumulative_generation, hydropower_turbine_flow, reversed=True, color=colors.get("sky", 600))
 
         # Add the storage discharging
         storage_discharging_flow = -temporal_results_season.net_storage_flow_total_MW.clip(upper=0)
-        subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + storage_discharging_flow), facecolor=colors.get("red", 900))
-        cumulative_generation += storage_discharging_flow
+        _add_area(subplot, cumulative_generation, storage_discharging_flow, reversed=True, color=colors.get("red", 900))
 
         # Add the import
         if show_import_export:
             net_import = -temporal_results_season.net_export_MW.clip(upper=0)
-            subplot.fill_between(cumulative_generation.index, -cumulative_generation, -(cumulative_generation + net_import), facecolor=colors.get("gray", 400))
-            cumulative_generation += net_import
+            _add_area(subplot, cumulative_generation, net_import, reversed=True, color=colors.get("gray", 400))
 
     # Show the plot
     week_plot.add_legend()
