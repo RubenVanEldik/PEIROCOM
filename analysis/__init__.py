@@ -1,4 +1,3 @@
-from .average_week import average_week
 from .average_year import average_year
 from .correlation import correlation
 from .countries import countries
@@ -8,3 +7,4 @@ from .optimization_log import optimization_log
 from .sensitivity import sensitivity
 from .statistics import statistics
 from .temporal_results import temporal_results
+from .typical_week import typical_week

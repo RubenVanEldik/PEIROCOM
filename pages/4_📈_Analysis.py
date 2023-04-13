@@ -36,7 +36,7 @@ def run():
             return
 
     # Set the analysis type options
-    analysis_type_options = ["statistics", "temporal_results", "countries", "average_week", 'average_year', "correlation", "duration_curve", "interconnection_capacity"]
+    analysis_type_options = ["statistics", "temporal_results", "countries", "typical_week", 'average_year', "correlation", "duration_curve", "interconnection_capacity"]
     if is_sensitivity_analysis:
         # Get the config for the first step
         sensitivity_config = utils.read_yaml(output_directory / "sensitivity.yaml")

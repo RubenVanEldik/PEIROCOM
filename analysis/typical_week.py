@@ -30,13 +30,13 @@ def _add_area(subplot, existing_area, new_area, *, reversed=False, label=None, c
         subplot.fill_between(existing_area.index, lower_bound, upper_bound, label=label, facecolor=color)
 
 
-def average_week(output_directory):
+def typical_week(output_directory):
     """
-    Show a chart with the average week for each season
+    Show a chart with the typical week for each season
     """
     assert validate.is_directory_path(output_directory)
 
-    st.title("📅 Average week")
+    st.title("📅 Typical week")
 
     # Ask for which countries the statistics should be shown
     st.sidebar.header("Options")
@@ -65,14 +65,26 @@ def average_week(output_directory):
     season_dates = {"winter": list(range(1, 79)) + list(range(355, 366)), "spring": list(range(79, 172)), "summer": list(range(172, 266)), "autumn": list(range(266, 355))}
     season_data = {}
     for index, season in enumerate(season_dates.keys()):
-        # Get a subset of the temporal results
+        # Get the data for the current season
         temporal_results_season = temporal_results[temporal_results.index.dayofyear.isin(season_dates[season])]
+        # Calculate the mean per hour
+        temporal_results_season_mean = temporal_results_season.groupby([temporal_results_season.index.weekday, temporal_results_season.index.hour]).mean()
+        temporal_results_season_errors = temporal_results_season.apply(lambda x: x - temporal_results_season_mean.loc[(x.name.weekday(), x.name.hour)], axis=1).pow(2)
 
-        # Get the results of an average week
-        average_week_data = temporal_results_season.groupby([temporal_results_season.index.weekday, temporal_results_season.index.hour]).mean()
-        average_week_data["hour_of_week"] = average_week_data.index.to_series().apply(lambda x: 24 * x[0] + x[1])
-        average_week_data = average_week_data.set_index("hour_of_week")
-        season_data[season] = average_week_data
+        typical_week_data = pd.DataFrame(index=range(7 * 24), columns=temporal_results_season.columns, dtype="float64")
+        for weekday in range(7):
+            # Find the best day
+            temporal_results_season_errors_weekday = temporal_results_season_errors[temporal_results_season_errors.index.weekday == weekday]
+            temporal_results_rmse = temporal_results_season_errors_weekday.pow(2).groupby(temporal_results_season_errors_weekday.index.dayofyear).mean().pow(0.5)
+            best_day = (temporal_results_rmse.demand_electricity_MW + temporal_results_rmse.generation_ires_MW + temporal_results_rmse.curtailed_MW).idxmin()
+
+            # Add the best day to the typical week
+            best_day_data = temporal_results_season[temporal_results_season.index.dayofyear == best_day]
+            best_day_data.index = 24 * best_day_data.index.weekday + best_day_data.index.hour
+            typical_week_data.loc[best_day_data.index] = best_day_data
+        
+        # Add the typical week data to the season data dictionary
+        season_data[season] = typical_week_data
 
         # Set the title and format the ticks and labels of the subplot
         subplot = week_plot.axs[index]
@@ -93,64 +105,64 @@ def average_week(output_directory):
 
         # Demand
         # Create a series with the cumulative demand
-        cumulative_demand = pd.Series(0, index=average_week_data.index)
+        cumulative_demand = pd.Series(0, index=typical_week_data.index)
 
         # Add the fixed demand
-        _add_area(subplot, cumulative_demand, average_week_data.demand_electricity_MW, label="Demand", color=colors.get("amber", 500))
+        _add_area(subplot, cumulative_demand, typical_week_data.demand_electricity_MW, label="Demand", color=colors.get("amber", 500))
 
         # Add the electrolysis demand
-        electrolysis_demand = average_week_data.demand_total_MW - average_week_data.demand_electricity_MW
+        electrolysis_demand = typical_week_data.demand_total_MW - typical_week_data.demand_electricity_MW
         _add_area(subplot, cumulative_demand, electrolysis_demand, label="Electrolysis", color=colors.get("amber", 600))
 
         # Add the pumped hydropower
-        hydropower_pump_flow = -average_week_data.generation_total_hydropower_MW.clip(upper=0)
+        hydropower_pump_flow = -typical_week_data.generation_total_hydropower_MW.clip(upper=0)
         _add_area(subplot, cumulative_demand, hydropower_pump_flow, color=colors.get("sky", 600))
 
         # Add the storage charging
-        storage_charging_flow = average_week_data.net_storage_flow_total_MW.clip(lower=0)
+        storage_charging_flow = typical_week_data.net_storage_flow_total_MW.clip(lower=0)
         _add_area(subplot, cumulative_demand, storage_charging_flow, label="Storage", color=colors.get("red", 800))
 
         # Add the net export
         if show_import_export:
-            net_export = average_week_data.net_export_MW.clip(lower=0)
+            net_export = typical_week_data.net_export_MW.clip(lower=0)
             _add_area(subplot, cumulative_demand, net_export, label="Import/export", color=colors.get("gray", 400))
 
         # Add the curtailment
-        _add_area(subplot, cumulative_demand, average_week_data.curtailed_MW, label="Curtailed", color=colors.get("gray", 200))
+        _add_area(subplot, cumulative_demand, typical_week_data.curtailed_MW, label="Curtailed", color=colors.get("gray", 200))
 
         # Generation
         # Create a series with the cumulative generation
-        cumulative_generation = pd.Series(0, index=average_week_data.index)
+        cumulative_generation = pd.Series(0, index=typical_week_data.index)
 
         # Add the nuclear generation
-        _add_area(subplot, cumulative_generation, average_week_data.get("generation_nuclear_MW"), reversed=True, label="Nuclear", color=colors.get("green", 700))
+        _add_area(subplot, cumulative_generation, typical_week_data.get("generation_nuclear_MW"), reversed=True, label="Nuclear", color=colors.get("green", 700))
 
         # Add the wind generation
-        wind_generation = pd.Series(0, index=average_week_data.index)
-        wind_generation += average_week_data.get("generation_onshore_MW", default=0)
-        wind_generation += average_week_data.get("generation_offshore_MW", default=0)
+        wind_generation = pd.Series(0, index=typical_week_data.index)
+        wind_generation += typical_week_data.get("generation_onshore_MW", default=0)
+        wind_generation += typical_week_data.get("generation_offshore_MW", default=0)
         _add_area(subplot, cumulative_generation, wind_generation, reversed=True, label="Onshore and offshore wind", color=colors.get("amber", 300))
 
         # Add the solar PV generation
-        _add_area(subplot, cumulative_generation, average_week_data.get("generation_pv_MW"), reversed=True, label="Solar PV", color=colors.get("amber", 200))
+        _add_area(subplot, cumulative_generation, typical_week_data.get("generation_pv_MW"), reversed=True, label="Solar PV", color=colors.get("amber", 200))
 
         # Add the hydropower turbine power
-        hydropower_turbine_flow = average_week_data.generation_total_hydropower_MW.clip(lower=0)
+        hydropower_turbine_flow = typical_week_data.generation_total_hydropower_MW.clip(lower=0)
         _add_area(subplot, cumulative_generation, hydropower_turbine_flow, reversed=True, label="Hydropower", color=colors.get("sky", 600))
 
         # Add the hydrogen turbines
-        h2_to_electricity = pd.Series(0, index=average_week_data.index)
-        h2_to_electricity += average_week_data.get("generation_h2_ccgt_MW", 0)
-        h2_to_electricity += average_week_data.get("generation_h2_gas_turbine_MW", 0)
+        h2_to_electricity = pd.Series(0, index=typical_week_data.index)
+        h2_to_electricity += typical_week_data.get("generation_h2_ccgt_MW", 0)
+        h2_to_electricity += typical_week_data.get("generation_h2_gas_turbine_MW", 0)
         _add_area(subplot, cumulative_generation, h2_to_electricity, reversed=True, label="$\mathregular{H_2}$ turbines", color=colors.get("green", 500))
 
         # Add the storage discharging
-        storage_discharging_flow = -average_week_data.net_storage_flow_total_MW.clip(upper=0)
+        storage_discharging_flow = -typical_week_data.net_storage_flow_total_MW.clip(upper=0)
         _add_area(subplot, cumulative_generation, storage_discharging_flow, reversed=True, color=colors.get("red", 900))
 
         # Add the import
         if show_import_export:
-            net_import = -average_week_data.net_export_MW.clip(upper=0)
+            net_import = -typical_week_data.net_export_MW.clip(upper=0)
             _add_area(subplot, cumulative_generation, net_import, reversed=True, color=colors.get("gray", 400))
 
     # Show the plot
