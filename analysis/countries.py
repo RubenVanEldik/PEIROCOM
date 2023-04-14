@@ -61,7 +61,7 @@ def _select_data(output_directory, *, name):
         selected_parameter = col2.selectbox("Parameter", country_parameters, format_func=lambda key: utils.format_str(key.replace("capacity.", "").replace(".", " ")), key=name)
 
         # Return a Series with the potential per country for the selected technology
-        data = pd.Series({country["nuts2"]: utils.get_nested_key(country, selected_parameter) for country in country_info if country["nuts2"] in config["country_codes"]})
+        data = pd.Series({country["nuts2"]: utils.get_nested_key(country, selected_parameter, default=0) for country in country_info if country["nuts2"] in config["country_codes"]})
         data[data == 0] = None
         return data
 
