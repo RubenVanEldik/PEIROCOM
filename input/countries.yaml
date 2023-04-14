@@ -13,7 +13,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 16368.52499
+      onshore: 11587
       offshore: 0
 - name: Austria
   nuts2: AT
@@ -30,7 +30,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 111695.2452
+      onshore: 46379
 - name: Bosnia and Herzegovina
   nuts2: BA
   alpha3: BIH
@@ -46,7 +46,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 92454.61278
+      onshore: 43838
 - name: Belgium
   nuts2: BE
   alpha3: BEL
@@ -62,7 +62,7 @@
       offshore: 2254
       nuclear: 5943
     potential:
-      onshore: 13548.88149
+      onshore: 13996
       offshore: 4720
 - name: Bulgaria
   nuts2: BG
@@ -79,7 +79,7 @@
       offshore: 0
       nuclear: 2080
     potential:
-      onshore: 8487.873066
+      onshore: 68938
       offshore: 0
 - name: Switzerland
   nuts2: CH
@@ -96,7 +96,7 @@
       offshore: 0
       nuclear: 2970
     potential:
-      onshore: 13684.3703
+      onshore: 6466
 - name: Cyprus
   nuts2: CY
   alpha3: CYP
@@ -111,7 +111,8 @@
       onshore: 0
       offshore: 0
       nuclear: 0
-    potential: { }
+    potential:
+      onshore: 17469
 - name: Czechia
   nuts2: CZ
   alpha3: CZE
@@ -127,7 +128,7 @@
       offshore: 0
       nuclear: 4040
     potential:
-      onshore: 40886.12328
+      onshore: 99344
 - name: Germany
   nuts2: DE
   alpha3: DEU
@@ -143,7 +144,7 @@
       offshore: 7787
       nuclear: 0 # Set to zero as they are currently being phased out
     potential:
-      onshore: 117392.8253
+      onshore: 291339
       offshore: 40980
 - name: Denmark
   nuts2: DK
@@ -160,7 +161,7 @@
       offshore: 2305
       nuclear: 0
     potential:
-      onshore: 150548.3151
+      onshore: 138622
       offshore: 172350
 - name: Estonia
   nuts2: EE
@@ -177,7 +178,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 144673.9717
+      onshore: 84571
       offshore: 81810
 - name: Spain
   nuts2: ES
@@ -195,7 +196,7 @@
       offshore: 0
       nuclear: 7117
     potential:
-      onshore: 391316.1594
+      onshore: 582768
       offshore: 25710
 - name: Finland
   nuts2: FI
@@ -212,7 +213,7 @@
       offshore: 0
       nuclear: 2794
     potential:
-      onshore: 777503.8953
+      onshore: 588983
       offshore: 46920
 - name: France
   nuts2: FR
@@ -231,7 +232,7 @@
         FR00: 61370
         FR15: 0
     potential:
-      onshore: 1079711.951
+      onshore: 692234
       offshore: 177110
 - name: Greece
   nuts2: GR
@@ -248,7 +249,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 72093.18945
+      onshore: 183631
       offshore: 9500
 - name: Croatia
   nuts2: HR
@@ -265,7 +266,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 34181.50698
+      onshore: 70516
       offshore: 0
 - name: Hungary
   nuts2: HU
@@ -282,7 +283,7 @@
       offshore: 0
       nuclear: 1916
     potential:
-      onshore: 17033.15274
+      onshore: 56904
 - name: Ireland
   nuts2: IE
   alpha3: IRL
@@ -298,7 +299,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 317525.7372
+      onshore: 111722
       offshore: 648740
 - name: Italy
   nuts2: IT
@@ -315,7 +316,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 109494.4076
+      onshore: 284582
       offshore: 0
 - name: Lithuania
   nuts2: LT
@@ -332,7 +333,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 221926.6599
+      onshore: 136133
       offshore: 14090
 - name: Luxembourg
   nuts2: LU
@@ -349,7 +350,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 167
+      onshore: 2431
 - name: Latvia
   nuts2: LV
   alpha3: LVA
@@ -365,7 +366,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 155110.0796
+      onshore: 122307
       offshore: 85160
 - name: Montenegro
   nuts2: ME
@@ -382,7 +383,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 28013.26503
+      onshore: 16641
       offshore: 0
 - name: North Macedonia
   nuts2: MK
@@ -399,7 +400,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 5757.915653
+      onshore: 4489
 - name: Malta
   nuts2: MT
   alpha3: MLT
@@ -414,7 +415,8 @@
       onshore: 0
       offshore: 0
       nuclear: 0
-    potential: { }
+    potential:
+      onshore: 0
 - name: Netherlands
   nuts2: NL
   alpha3: NLD
@@ -430,7 +432,7 @@
       offshore: 3757
       nuclear: 486
     potential:
-      onshore: 78847.25957
+      onshore: 49565
       offshore: 77070
 - name: Norway
   nuts2: "NO" # Strings are required, otherwise the YAML parser will parse it as a boolean False value
@@ -447,7 +449,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 747165.9611
+      onshore: 531319
       offshore: 641030
 - name: Poland
   nuts2: PL
@@ -464,7 +466,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 419543.8884
+      onshore: 579216
       offshore: 79680
 - name: Portugal
   nuts2: PT
@@ -481,7 +483,7 @@
       offshore: 25
       nuclear: 0
     potential:
-      onshore: 59674.41051
+      onshore: 142928
       offshore: 2830
 - name: Romania
   nuts2: RO
@@ -498,7 +500,7 @@
       offshore: 0
       nuclear: 1300
     potential:
-      onshore: 38135.22537
+      onshore: 115574
       offshore: 0
 - name: Serbia
   nuts2: RS
@@ -515,7 +517,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 23653.77034
+      onshore: 41108
 - name: Sweden
   nuts2: SE
   alpha3: SWE
@@ -531,7 +533,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 841925.3066
+      onshore: 741455
       offshore: 166650
 - name: Slovenia
   nuts2: SI
@@ -548,7 +550,7 @@
       offshore: 0
       nuclear: 696
     potential:
-      onshore: 4580.086726
+      onshore: 3515
       offshore: 0
 - name: Slovakia
   nuts2: SK
@@ -565,7 +567,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 17375.51911
+      onshore: 31491
 - name: Turkey
   nuts2: TR
   alpha3: TUR
@@ -581,7 +583,7 @@
       offshore: 0
       nuclear: 0
     potential:
-      onshore: 468071.8363
+      onshore: 1032075
       offshore: 460
 - name: Ukraine
   nuts2: UA
@@ -615,5 +617,5 @@
         UK00: 8256
         UKNI: 0
     potential:
-      onshore: 689995.2295
+      onshore: 466325
       offshore: 1028930
