@@ -1,7 +1,7 @@
 import validate
 
 
-def get_nested_key(dictionary, key_string):
+def get_nested_key(dictionary, key_string, *, default=None):
     """
     Return the value of a nested key, specified as a dot separated string
     """
@@ -15,7 +15,10 @@ def get_nested_key(dictionary, key_string):
     # For each key in key_string set here to its value
     for key in keys:
         if here.get(key) is None:
-            raise ValueError(f"Can not find '{key}' in '{key_string}'")
+            # Throw an error if there is no default, otherwise return the default
+            if default is None:
+                raise ValueError(f"Can not find '{key}' in '{key_string}'")
+            return default
         here = here[key]
 
     # Return the final nested value
