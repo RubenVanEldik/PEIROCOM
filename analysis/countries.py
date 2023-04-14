@@ -123,7 +123,7 @@ def countries(output_directory):
             if validate.is_dataframe(denominator):
                 denominator = denominator.sum(axis=1)
 
-            data = numerator.divide(list(denominator), axis=0)
+            data = numerator.divide(denominator, axis=0)
         else:
             data = None
 
