@@ -123,7 +123,7 @@ def optimize(config, *, status, output_directory):
 
             # Create a capacity variable for each IRES node
             ires_nodes = [re.match(f"{ires_technology}_(.+)_cf", column).group(1) for column in ires_capacity_factors.columns if column.startswith(f"{ires_technology}_")]
-            ires_potential = utils.get_potential_per_ires_node(market_node, ires_technology, config=config)
+            ires_potential = utils.get_potential_per_ires_node(market_node, ires_technology, mean_demand=temporal_demand_electricity.mean(), config=config)
             current_capacity = utils.get_current_capacity_per_ires_node(market_node, ires_technology, config=config)
             capacities = model.addVars(ires_nodes, lb=current_capacity, ub=ires_potential)
 
