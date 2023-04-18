@@ -51,10 +51,11 @@ def typical_week(output_directory):
 
     # Set the unit to TW or GW when applicable
     unit = "MW"
-    if temporal_results.demand_total_MW.max() > 10 ** 6:
+    max_cumulative_value = (temporal_results.demand_total_MW + temporal_results.curtailed_MW + temporal_results.net_storage_flow_total_MW.clip(lower=0)).max()
+    if max_cumulative_value > 10 ** 6:
         temporal_results /= 10 ** 6
         unit = "TW"
-    elif temporal_results.demand_total_MW.max() > 10 ** 3:
+    elif max_cumulative_value > 10 ** 3:
         temporal_results /= 10 ** 3
         unit = "GW"
 
