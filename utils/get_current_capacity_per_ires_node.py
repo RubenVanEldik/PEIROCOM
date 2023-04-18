@@ -18,6 +18,16 @@ def get_current_capacity_per_ires_node(market_node, ires_technology, *, config):
     if current_capacity is None:
         return 0
 
+    # If the current_capacity is a dictionary, calculate the number of IRES nodes in this bidding zone
+    if isinstance(current_capacity, dict):
+        ires_data = utils.read_temporal_data(utils.path("input", "scenarios", config["scenario"], "ires", f"{market_node}.csv"))
+        ires_node_count = len([column for column in ires_data.columns if column.startswith(f"{ires_technology}_")])
+
+        if ires_node_count == 0:
+            return 0
+
+        return current_capacity[market_node] / ires_node_count
+
     # Calculate the number of IRES nodes in the country
     ires_node_count = 0
     for market_node_in_country in utils.get_country_property(country_code, "market_nodes"):
