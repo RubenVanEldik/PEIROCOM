@@ -25,7 +25,11 @@ def run():
 
         # Split the current and potential columns again and add the results to the original countries_df DataFrame
         for column_name in ["current", "potential"]:
+            # Create a DataFrame of this column
             column_df = pd.DataFrame(capacity_df[column_name].values.tolist())
+            # Sum any cells that are dictionaries
+            column_df = column_df.applymap(lambda cell: sum(cell.values()) if isinstance(cell, dict) else cell)
+
             # Add the sub columns to the DataFrame
             for sub_column_name in column_df.columns:
                 countries_df.insert(column_index, f"{column_name}_{sub_column_name}", column_df[sub_column_name])
