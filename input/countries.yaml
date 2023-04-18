@@ -8,8 +8,8 @@
   land_area: 27400
   capacity:
     current:
-      pv: 0
-      onshore: 0
+      pv: 300
+      onshore: 70
       offshore: 0
       nuclear: 0
     potential:
@@ -25,8 +25,8 @@
   land_area: 82520
   capacity:
     current:
-      pv: 2500
-      onshore: 3500
+      pv: 5000
+      onshore: 5000
       offshore: 0
       nuclear: 0
     potential:
@@ -41,8 +41,8 @@
   land_area: 51200
   capacity:
     current:
-      pv: 0
-      onshore: 135
+      pv: 207
+      onshore: 362
       offshore: 0
       nuclear: 0
     potential:
@@ -57,10 +57,10 @@
   land_area: 30280
   capacity:
     current:
-      pv: 4788
-      onshore: 2787
-      offshore: 2254
-      nuclear: 5943
+      pv: 8355
+      onshore: 3555
+      offshore: 2253
+      nuclear: 3929
     potential:
       onshore: 13996
       offshore: 4720
@@ -74,8 +74,8 @@
   land_area: 108560
   capacity:
     current:
-      pv: 1313
-      onshore: 705
+      pv: 1785
+      onshore: 749
       offshore: 0
       nuclear: 2080
     potential:
@@ -91,10 +91,10 @@
   land_area: 39516.03
   capacity:
     current:
-      pv: 0
-      onshore: 0
+      pv: 6475
+      onshore: 215
       offshore: 0
-      nuclear: 2970
+      nuclear: 2930
     potential:
       onshore: 6466
 - name: Cyprus
@@ -107,8 +107,8 @@
   land_area: 9240
   capacity:
     current:
-      pv: 0
-      onshore: 0
+      pv: 740
+      onshore: 198
       offshore: 0
       nuclear: 0
     potential:
@@ -123,10 +123,10 @@
   land_area: 77198.53
   capacity:
     current:
-      pv: 2053
-      onshore: 339
+      pv: 4268
+      onshore: 534
       offshore: 0
-      nuclear: 4040
+      nuclear: 4047
     potential:
       onshore: 99344
 - name: Germany
@@ -139,10 +139,10 @@
   land_area: 349390
   capacity:
     current:
-      pv: 56347
-      onshore: 55560
-      offshore: 7787
-      nuclear: 0 # Set to zero as they are currently being phased out
+      pv: 94395
+      onshore: 67040
+      offshore: 11134
+      nuclear: 0
     potential:
       onshore: 291339
       offshore: 40980
@@ -156,9 +156,15 @@
   land_area: 40000
   capacity:
     current:
-      pv: 1536
-      onshore: 4644
-      offshore: 2305
+      pv:
+        DKE1: 1952
+        DKW1: 3664
+      onshore:
+        DKE1: 834
+        DKW1: 4338
+      offshore:
+        DKE1: 583
+        DKW1: 1692
       nuclear: 0
     potential:
       onshore: 138622
@@ -173,7 +179,7 @@
   land_area: 42750
   capacity:
     current:
-      pv: 370
+      pv: 623
       onshore: 326
       offshore: 0
       nuclear: 0
@@ -191,8 +197,8 @@
   land_area: 499556.645
   capacity:
     current:
-      pv: 14640
-      onshore: 27735
+      pv: 21063
+      onshore: 33916
       offshore: 0
       nuclear: 7117
     potential:
@@ -208,10 +214,10 @@
   land_area: 303940
   capacity:
     current:
-      pv: 7
-      onshore: 3184
-      offshore: 0
-      nuclear: 2794
+      pv: 848
+      onshore: 8611
+      offshore: 42
+      nuclear: 4394
     potential:
       onshore: 588983
       offshore: 46920
@@ -225,11 +231,17 @@
   land_area: 547557
   capacity:
     current:
-      pv: 14298
-      onshore: 0
-      offshore: 10
+      pv:
+        FR00: 18185
+        FR15: 0
+      onshore:
+        FR00: 24059
+        FR15: 0
+      offshore:
+        FR00: 1924
+        FR15: 0
       nuclear:
-        FR00: 61370
+        FR00: 61761
         FR15: 0
     potential:
       onshore: 692234
@@ -244,8 +256,12 @@
   land_area: 128900
   capacity:
     current:
-      pv: 3820
-      onshore: 4150
+      pv:
+        GR00: 6781
+        GR03: 225
+      onshore:
+        GR00: 5841
+        GR03: 265
       offshore: 0
       nuclear: 0
     potential:
@@ -261,8 +277,8 @@
   land_area: 55960
   capacity:
     current:
-      pv: 96
-      onshore: 925
+      pv: 453
+      onshore: 2272
       offshore: 0
       nuclear: 0
     potential:
@@ -278,10 +294,10 @@
   land_area: 91260
   capacity:
     current:
-      pv: 2210
-      onshore: 323
+      pv: 6460
+      onshore: 334
       offshore: 0
-      nuclear: 1916
+      nuclear: 1900
     potential:
       onshore: 56904
 - name: Ireland
@@ -294,9 +310,9 @@
   land_area: 68890
   capacity:
     current:
-      pv: 0
-      onshore: 1919
-      offshore: 0
+      pv: 358
+      onshore: 5246
+      offshore: 25
       nuclear: 0
     potential:
       onshore: 111722
@@ -311,9 +327,30 @@
   land_area: 295717
   capacity:
     current:
-      pv: 5137
-      onshore: 10658
-      offshore: 0
+      pv:
+        ITCA: 897
+        ITCN: 2907
+        ITCS: 5447
+        ITN1: 19426
+        ITS1: 4517
+        ITSA: 1494
+        ITSI: 4329
+      onshore:
+        ITCA: 1464
+        ITCN: 285
+        ITCS: 2585
+        ITN1: 213
+        ITS1: 6059
+        ITSA: 1464
+        ITSI: 2410
+      offshore:
+        ITCA: 0
+        ITCN: 43
+        ITCS: 96
+        ITN1: 64
+        ITS1: 329
+        ITSA: 150
+        ITSI: 126
       nuclear: 0
     potential:
       onshore: 284582
@@ -328,8 +365,8 @@
   land_area: 62620
   capacity:
     current:
-      pv: 259
-      onshore: 671
+      pv: 1000
+      onshore: 1828
       offshore: 0
       nuclear: 0
     potential:
@@ -345,8 +382,14 @@
   land_area: 2574.46
   capacity:
     current:
-      pv: 258
-      onshore: 167
+      pv:
+        LUB1: 0
+        LUF1: 0
+        LUG1: 300
+      onshore:
+        LUB1: 0
+        LUF1: 0
+        LUG1: 276
       offshore: 0
       nuclear: 0
     potential:
@@ -361,8 +404,8 @@
   land_area: 62230
   capacity:
     current:
-      pv: 14
-      onshore: 87
+      pv: 19
+      onshore: 122
       offshore: 0
       nuclear: 0
     potential:
@@ -378,8 +421,8 @@
   land_area: 13450
   capacity:
     current:
-      pv: 0
-      onshore: 118
+      pv: 20
+      onshore: 168
       offshore: 0
       nuclear: 0
     potential:
@@ -395,8 +438,8 @@
   land_area: 25220
   capacity:
     current:
-      pv: 22
-      onshore: 37
+      pv: 220
+      onshore: 180
       offshore: 0
       nuclear: 0
     potential:
@@ -411,7 +454,7 @@
   land_area: 320
   capacity:
     current:
-      pv: 0
+      pv: 237
       onshore: 0
       offshore: 0
       nuclear: 0
@@ -427,9 +470,9 @@
   land_area: 33670
   capacity:
     current:
-      pv: 16074
-      onshore: 7303
-      offshore: 3757
+      pv: 30753
+      onshore: 9418
+      offshore: 5857
       nuclear: 486
     potential:
       onshore: 49565
@@ -444,9 +487,18 @@
   land_area: 364285
   capacity:
     current:
-      pv: 0
-      onshore: 5105
-      offshore: 0
+      pv:
+        NOM1: 270
+        NON1: 0
+        NOS0: 864
+      onshore:
+        NOM1: 3027
+        NON1: 1762
+        NOS0: 2551
+      offshore:
+        NOM1: 0
+        NON1: 0
+        NOS0: 4
       nuclear: 0
     potential:
       onshore: 531319
@@ -461,8 +513,8 @@
   land_area: 306130
   capacity:
     current:
-      pv: 6036
-      onshore: 7886
+      pv: 12512
+      onshore: 10252
       offshore: 0
       nuclear: 0
     potential:
@@ -478,9 +530,9 @@
   land_area: 91605.6
   capacity:
     current:
-      pv: 1032
-      onshore: 5328
-      offshore: 25
+      pv: 6407
+      onshore: 6351
+      offshore: 88
       nuclear: 0
     potential:
       onshore: 142928
@@ -495,8 +547,8 @@
   land_area: 230080
   capacity:
     current:
-      pv: 1160
-      onshore: 2957
+      pv: 3393
+      onshore: 4334
       offshore: 0
       nuclear: 1300
     potential:
@@ -512,8 +564,8 @@
   land_area: 87460
   capacity:
     current:
-      pv: 3
-      onshore: 533
+      pv: 3141
+      onshore: 3955
       offshore: 0
       nuclear: 0
     potential:
@@ -528,10 +580,26 @@
   land_area: 407283.532
   capacity:
     current:
-      pv: 0
-      onshore: 12100
-      offshore: 0
-      nuclear: 0
+      pv:
+        SE01: 27
+        SE02: 148
+        SE03: 2157
+        SE04: 941
+      onshore:
+        SE01: 3177
+        SE02: 7182
+        SE03: 3559
+        SE04: 1974
+      offshore:
+        SE01: 0
+        SE02: 51
+        SE03: 50
+        SE04: 252
+      nuclear:
+        SE01: 0
+        SE02: 0
+        SE03: 6835
+        SE04: 0
     potential:
       onshore: 741455
       offshore: 166650
@@ -545,10 +613,10 @@
   land_area: 20136.4
   capacity:
     current:
-      pv: 286
-      onshore: 2
+      pv: 951
+      onshore: 66
       offshore: 0
-      nuclear: 696
+      nuclear: 703
     potential:
       onshore: 3515
       offshore: 0
@@ -562,10 +630,10 @@
   land_area: 48080
   capacity:
     current:
-      pv: 0
-      onshore: 0
+      pv: 861
+      onshore: 247
       offshore: 0
-      nuclear: 0
+      nuclear: 2752
     potential:
       onshore: 31491
 - name: Turkey
@@ -578,10 +646,10 @@
   land_area: 769630
   capacity:
     current:
-      pv: 0
-      onshore: 0
+      pv: 10750
+      onshore: 12917
       offshore: 0
-      nuclear: 0
+      nuclear: 1114
     potential:
       onshore: 1032075
       offshore: 460
@@ -595,10 +663,10 @@
   land_area: 579400
   capacity:
     current:
-      pv: 5363
-      onshore: 1111
+      pv: 6365
+      onshore: 3408
       offshore: 0
-      nuclear: 13835
+      nuclear: 12468
     potential: { }
 - name: United Kingdom
   nuts2: UK
@@ -610,11 +678,17 @@
   land_area: 241930
   capacity:
     current:
-      pv: 13470
-      onshore: 13932
-      offshore: 12160
+      pv:
+        UK00: 19157
+        UKNI: 296
+      onshore:
+        UK00: 17269
+        UKNI: 1516
+      offshore:
+        UK00: 21855
+        UKNI: 0
       nuclear:
-        UK00: 8256
+        UK00: 4289
         UKNI: 0
     potential:
       onshore: 466325
