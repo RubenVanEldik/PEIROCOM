@@ -122,7 +122,7 @@ def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysi
     assert validate.is_directory_path(output_directory)
     assert validate.is_country_code_list(country_codes, code_type="nuts2", required=False)
     assert validate.is_breakdown_level(breakdown_level)
-    assert validate.is_technology(electrolysis_technology)
+    assert validate.is_technology(electrolysis_technology, required=False)
 
     # Get the capacities and electrolysis demand and electricity costs
     config = utils.read_yaml(output_directory / "config.yaml")
