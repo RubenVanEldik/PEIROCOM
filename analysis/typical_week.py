@@ -172,7 +172,7 @@ def typical_week(output_directory):
     # Show the plot
     week_plot.add_legend()
     week_plot.display()
-    week_plot.download_button("average_week.png")
+    week_plot.download_button("typical_week.png")
 
     # Show the table in an expander
     for season in season_data:
