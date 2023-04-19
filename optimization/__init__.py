@@ -61,10 +61,10 @@ def run_sensitivity(config, sensitivity_config):
 
     # Run a specific sensitivity analysis for the curtailment
     if sensitivity_config["analysis_type"] == "curtailment":
-        # Calculate the optimal storage costs
+        # Calculate the optimal IRES costs
         st.subheader(f"Sensitivity run 1.000")
         run(config, status=status, output_directory=output_directory / "1.000")
-        annual_storage_costs_optimal = utils.previous_run.annual_costs(output_directory / "1.000", breakdown_level=1)["storage"]
+        annual_ires_costs_optimal = utils.previous_run.annual_costs(output_directory / "1.000", breakdown_level=1)["ires"]
 
         # Send the notification
         if config["send_notification"]:
@@ -73,21 +73,21 @@ def run_sensitivity(config, sensitivity_config):
         # Add the steps dictionary to the sensitivity config
         sensitivity_config["steps"] = {"1.000": 1.0}
 
-        # Run the sensitivity analysis incrementally for storage cost values both larger and smaller than the optimal
+        # Run the sensitivity analysis incrementally for ires cost values both larger and smaller than the optimal
         for step_factor in [1 / sensitivity_config["step_factor"], sensitivity_config["step_factor"]]:
-            # Set the first relative_storage_costs to the step factor
-            relative_storage_costs = step_factor
+            # Set the first relative_ires_costs to the step factor
+            relative_ires_costs = step_factor
 
             while True:
-                step_key = f"{relative_storage_costs:.3f}"
+                step_key = f"{relative_ires_costs:.3f}"
                 st.subheader(f"Sensitivity run {step_key}")
 
-                # Set the total storage costs for this step
+                # Set the total IRES costs for this step
                 step_config = deepcopy(config)
-                annual_storage_costs_step = float(relative_storage_costs * annual_storage_costs_optimal)
-                utils.set_nested_key(step_config, "fixed_storage.annual_costs", annual_storage_costs_step)
-                fixed_storage_costs_direction = "gte" if step_factor > 1 else "lte" if step_factor < 1 else None
-                utils.set_nested_key(step_config, "fixed_storage.direction", fixed_storage_costs_direction)
+                annual_ires_costs_step = float(relative_ires_costs * annual_ires_costs_optimal)
+                utils.set_nested_key(step_config, "fixed_ires.annual_costs", annual_ires_costs_step)
+                fixed_ires_costs_direction = "gte" if step_factor > 1 else "lte" if step_factor < 1 else None
+                utils.set_nested_key(step_config, "fixed_ires.direction", fixed_ires_costs_direction)
 
                 # Run the optimization
                 output_directory_step = output_directory / step_key
@@ -101,23 +101,19 @@ def run_sensitivity(config, sensitivity_config):
                 if error_message == "The model was infeasible":
                     break
                 elif error_message is not None:
-                    relative_storage_costs *= step_factor
+                    relative_ires_costs *= step_factor
                     continue
 
                 # Add the step to the sensitivity config
-                sensitivity_config["steps"][step_key] = relative_storage_costs
+                sensitivity_config["steps"][step_key] = relative_ires_costs
 
                 # Break the while loop if the premium exceeds the maximum premium
                 firm_lcoe = utils.previous_run.firm_lcoe(output_directory_step)
                 if firm_lcoe >= sensitivity_config["max_lcoe"]:
                     break
 
-                # Add a break to the lowest relative storage costs (due to hydropower sometimes almost no storage costs are required)
-                if relative_storage_costs < 0.05:
-                    break
-
-                # Update the relative storage capacity for the next pass
-                relative_storage_costs *= step_factor
+                # Update the relative IRES capacity for the next pass
+                relative_ires_costs *= step_factor
 
     # Otherwise run the general sensitivity analysis
     else:

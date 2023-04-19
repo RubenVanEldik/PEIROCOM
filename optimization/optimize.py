@@ -510,20 +510,20 @@ def optimize(config, *, status, output_directory):
         mean_temporal_data.loc[market_node] = temporal_results[market_node][relevant_columns].sum() / len(temporal_results[market_node].index)
 
     """
-    Step 10: Define the storage costs constraint
+    Step 10: Define the fixed IRES costs constraint
     """
-    if config.get("fixed_storage") is not None:
-        status.update("Adding the storage costs constraint")
+    if config.get("fixed_ires") is not None:
+        status.update("Adding the fixed IRES costs constraint")
 
-        # Calculate the storage costs
-        annual_storage_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, hydrogen_costs=0, mean_temporal_data=mean_temporal_data, config=config, breakdown_level=1, annual_costs=True)["storage"]
+        # Calculate the IRES costs
+        annual_ires_costs = utils.calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydropower_capacity, hydrogen_costs=0, mean_temporal_data=mean_temporal_data, config=config, breakdown_level=1, annual_costs=True)["ires"]
 
-        # Add a constraint so the storage costs are either smaller or larger than the fixed storage costs
-        fixed_annual_storage_costs = config["fixed_storage"]["annual_costs"]
-        if config["fixed_storage"]["direction"] == "gte":
-            model.addConstr(annual_storage_costs >= fixed_annual_storage_costs)
-        elif config["fixed_storage"]["direction"] == "lte":
-            model.addConstr(annual_storage_costs <= fixed_annual_storage_costs)
+        # Add a constraint so the IRES costs are either smaller or larger than the fixed IRES costs
+        fixed_annual_ires_costs = config["fixed_ires"]["annual_costs"]
+        if config["fixed_ires"]["direction"] == "gte":
+            model.addConstr(annual_ires_costs >= fixed_annual_ires_costs)
+        elif config["fixed_ires"]["direction"] == "lte":
+            model.addConstr(annual_ires_costs <= fixed_annual_ires_costs)
 
     """
     Step 11: Set objective function
