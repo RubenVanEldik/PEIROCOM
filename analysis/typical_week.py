@@ -43,6 +43,11 @@ def typical_week(output_directory):
     config = utils.read_yaml(output_directory / "config.yaml")
     selected_country_codes = st.sidebar.multiselect("Countries", config["country_codes"], format_func=lambda country_code: utils.get_country_property(country_code, "name"))
 
+    # Only show a message if the resolution is not 1 hour
+    if config["resolution"] != "1H":
+        st.warning("This analysis is only available for runs with a 1 hour resolution")
+        return
+
     # Get temporal results for all countries
     temporal_results = utils.get_temporal_results(output_directory, group="all", country_codes=selected_country_codes)
 
