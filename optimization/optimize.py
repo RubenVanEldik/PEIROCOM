@@ -720,14 +720,17 @@ def optimize(config, *, status, output_directory):
         hydropower_capacity[market_node].to_csv(output_directory / "capacity" / "hydropower" / f"{market_node}.csv")
 
     # Store the mean temporal data
+    status.update("Converting and storing the mean temporal results")
     mean_temporal_data = utils.convert_variables_recursively(mean_temporal_data)
     mean_temporal_data.to_csv(output_directory / "temporal" / "market_nodes" / "mean.csv")
 
     # Convert and store the dispatchable capacity
+    status.update("Converting and storing the dispatchable capacity")
     dispatchable_capacity = utils.convert_variables_recursively(dispatchable_capacity)
     dispatchable_capacity.to_csv(output_directory / "capacity" / "dispatchable.csv")
 
     # Convert and store the electrolysis capacity
+    status.update("Converting and storing the electrolysis capacity")
     electrolysis_capacity = utils.convert_variables_recursively(electrolysis_capacity)
     electrolysis_capacity.to_csv(output_directory / "capacity" / "electrolysis.csv")
 
