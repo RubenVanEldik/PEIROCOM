@@ -304,6 +304,10 @@ def optimize(config, *, status, output_directory):
             storage_capacity[market_node].loc[storage_technology, "energy"] = energy_capacity
             storage_capacity[market_node].loc[storage_technology, "power"] = power_capacity
 
+            # Add the energy/power ratio constraints
+            model.addConstr(energy_capacity >= storage_assumptions["min_energy_power_ratio"] * power_capacity)
+            model.addConstr(energy_capacity <= storage_assumptions["max_energy_power_ratio"] * power_capacity)
+
             # Create the inflow and outflow variables
             inflow = pd.Series(model.addVars(temporal_demand_electricity.index))
             outflow = pd.Series(model.addVars(temporal_demand_electricity.index))
