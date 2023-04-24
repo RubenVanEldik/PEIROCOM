@@ -214,7 +214,7 @@ storage:
       value: 800
     soc_min: 0.15
     soc_max: 1
-    roundtrip_efficiency: 0.85 # ATB
+    roundtrip_efficiency: 0.96 # IRENA Electricity Storage and Renewables
     economic_lifetime: 18 # ATB
     wacc: 0.055
     conservative:
