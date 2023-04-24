@@ -297,8 +297,12 @@ def optimize(config, *, status, output_directory):
             efficiency = storage_assumptions["roundtrip_efficiency"] ** 0.5
 
             # Create a variable for the energy and power storage capacity
-            storage_capacity[market_node].loc[storage_technology, "energy"] = model.addVar()
-            storage_capacity[market_node].loc[storage_technology, "power"] = model.addVar()
+            energy_capacity = model.addVar()
+            power_capacity = model.addVar()
+
+            # Add the energy and power capacity to the storage DataFrame
+            storage_capacity[market_node].loc[storage_technology, "energy"] = energy_capacity
+            storage_capacity[market_node].loc[storage_technology, "power"] = power_capacity
 
             # Create the inflow and outflow variables
             inflow = pd.Series(model.addVars(temporal_demand_electricity.index))
@@ -308,10 +312,6 @@ def optimize(config, *, status, output_directory):
             net_flow = inflow - outflow
             temporal_results[market_node][f"net_storage_flow_{storage_technology}_MW"] = net_flow
             temporal_results[market_node]["net_storage_flow_total_MW"] += net_flow
-
-            # Unpack the energy and power capacities for this storage technology
-            energy_capacity = storage_capacity[market_node].loc[storage_technology, "energy"]
-            power_capacity = storage_capacity[market_node].loc[storage_technology, "power"]
 
             # Create a variable for each hour for the amount of stored energy
             temporal_energy_stored = pd.Series(model.addVars(temporal_demand_electricity.index))
