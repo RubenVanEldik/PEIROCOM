@@ -225,7 +225,7 @@
   nuts2: FR
   alpha3: FRA
   flag: 🇫🇷
-  market_nodes: [ FR00, FR15 ]
+  market_nodes: [ FR00 ]
   included_geographic_units: [ FXX ]
   population: 67499343
   land_area: 547557
@@ -376,7 +376,7 @@
   nuts2: LU
   alpha3: LUX
   flag: 🇱🇺
-  market_nodes: [ LUB1, LUF1, LUG1 ]
+  market_nodes: [ LUG1 ]
   included_geographic_units: [ LUX ]
   population: 639070
   land_area: 2574.46
@@ -657,7 +657,7 @@
   nuts2: UA
   alpha3: UKR
   flag: 🇺🇦
-  market_nodes: [ UA01 ]
+  market_nodes: [ UA00, UA01 ]
   included_geographic_units: [ UKR ]
   population: 43814581
   land_area: 579400
