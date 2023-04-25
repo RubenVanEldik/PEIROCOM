@@ -530,6 +530,21 @@ def optimize(config, *, status, output_directory):
             model.addConstr(annual_ires_costs <= fixed_annual_ires_costs)
 
     """
+    Step 6: Define the dispatchable capacity constraint
+    """
+    if config.get("fixed_dispatchable_capacity") is not None:
+        # Get the technology and share
+        fixed_technology = config["fixed_dispatchable_capacity"]["technology"]
+        fixed_share = config["fixed_dispatchable_capacity"]["share"]
+
+        # Calculate the mean demand and capacity
+        cumulative_mean_demand = gp.quicksum(mean_temporal_data["demand_electricity_MW"])
+        cumulative_capacity = gp.quicksum(dispatchable_capacity[fixed_technology])
+
+        # Add the constraint
+        model.addConstr(cumulative_capacity == fixed_share * cumulative_mean_demand)
+
+    """
     Step 11: Set objective function
     """
     status.update("Setting the objective function")

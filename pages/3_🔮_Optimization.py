@@ -158,7 +158,7 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "dispatchable_generation":
         sensitivity_config["dispatchable_technology"] = st.selectbox("Technology", config["technologies"]["dispatchable"], format_func=utils.format_technology)
-        sensitivity_start, sensitivity_stop = st.slider("Dispatchable generation range", value=(0.0, 1.0), min_value=0.0, max_value=1.0, step=0.05)
+        sensitivity_start, sensitivity_stop = st.slider("Dispatchable generation range", value=(0.0, 1.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
