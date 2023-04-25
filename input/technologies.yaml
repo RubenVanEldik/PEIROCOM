@@ -212,7 +212,7 @@ storage:
     color:
       name: 'red'
       value: 800
-    soc_min: 0.15
+    soc_min: 0
     soc_max: 1
     min_energy_power_ratio: 0.25 # IRENA Electricity Storage and Renewables (probably)
     max_energy_power_ratio: 5 # IRENA Electricity Storage and Renewables (probably)
