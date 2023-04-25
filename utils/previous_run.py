@@ -1,9 +1,10 @@
 import pandas as pd
 
+from .cache import cache # Can't use utils as utils is only partially intiialized and will thus throw an AttributeError
 import utils
 import validate
 
-
+@cache
 def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     """
     Calculate the firm LCOE for a specific run
@@ -37,6 +38,8 @@ def firm_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
         # Update the previous electricity costs
         previous_electricity_costs = electricity_costs
 
+
+@cache
 def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=0):
     """
     Calculate the unconstrained_lcoe LCOE for a specific run
@@ -54,6 +57,7 @@ def unconstrained_lcoe(output_directory, *, country_codes=None, breakdown_level=
     return utils.calculate_lcoe(ires_capacity, None, None, None, mean_temporal_data=mean_temporal_results, hydrogen_costs=0, config=config, breakdown_level=breakdown_level)
 
 
+@cache
 def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     """
     Calculate the annual costs for a specific run
@@ -88,6 +92,7 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
     return annual_costs
 
 
+@cache
 def premium(output_directory, *, country_codes=None, breakdown_level=0):
     """
     Calculate the firm kWh premium
@@ -104,6 +109,7 @@ def premium(output_directory, *, country_codes=None, breakdown_level=0):
     return firm_lcoe_result / unconstrained_lcoe_result
 
 
+@cache
 def relative_curtailment(output_directory, *, country_codes=None):
     """
     Calculate the relative curtailment
@@ -115,6 +121,7 @@ def relative_curtailment(output_directory, *, country_codes=None):
     return mean_temporal_results.curtailed_MW / (mean_temporal_results.generation_ires_MW + mean_temporal_results.generation_dispatchable_MW + mean_temporal_results.generation_total_hydropower_MW)
 
 
+@cache
 def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology=None):
     """
     Calculate the LCOH for a specific run
@@ -141,6 +148,7 @@ def lcoh(output_directory, *, country_codes=None, breakdown_level=0, electrolysi
     return utils.calculate_lcoh(electrolysis_capacity, mean_electrolysis_demand, electricity_costs, config=config, breakdown_level=breakdown_level)
 
 
+@cache
 def electrolyzer_capacity_factor(output_directory, *, country_codes=None, breakdown_level=0, electrolysis_technology):
     """
     Calculate the electrolyzer capacity factor for a specific run
@@ -158,6 +166,7 @@ def electrolyzer_capacity_factor(output_directory, *, country_codes=None, breakd
     return mean_electrolysis_demand / electrolysis_capacity
 
 
+@cache
 def ires_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped IRES capacity for a specific output_directory
@@ -168,6 +177,7 @@ def ires_capacity(output_directory, *, country_codes=None):
     return utils.get_ires_capacity(output_directory, group="all", country_codes=country_codes)
 
 
+@cache
 def dispatchable_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped dispatchable capacity for a specific output_directory
@@ -178,6 +188,7 @@ def dispatchable_capacity(output_directory, *, country_codes=None):
     return utils.get_dispatchable_capacity(output_directory, group="all", country_codes=country_codes)
 
 
+@cache
 def hydropower_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped hydropower capacity for a specific output_directory
@@ -188,6 +199,7 @@ def hydropower_capacity(output_directory, *, country_codes=None):
     return utils.get_hydropower_capacity(output_directory, group="all", country_codes=country_codes)
 
 
+@cache
 def storage_capacity(output_directory, *, country_codes=None):
     """
     Get the grouped storage capacity for a specific output_directory
@@ -198,6 +210,7 @@ def storage_capacity(output_directory, *, country_codes=None):
     return utils.get_storage_capacity(output_directory, group="all", country_codes=country_codes)
 
 
+@cache
 def self_sufficiency(output_directory, *, country_codes=None):
     """
     Return the self-sufficiency factor for the selected countries
