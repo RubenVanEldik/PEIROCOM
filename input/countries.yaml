@@ -231,18 +231,10 @@
   land_area: 547557
   capacity:
     current:
-      pv:
-        FR00: 18185
-        FR15: 0
-      onshore:
-        FR00: 24059
-        FR15: 0
-      offshore:
-        FR00: 1924
-        FR15: 0
-      nuclear:
-        FR00: 61761
-        FR15: 0
+      pv: 18185
+      onshore: 24059
+      offshore: 1924
+      nuclear: 61761
     potential:
       onshore: 120791
       offshore: 397190
@@ -663,10 +655,18 @@
   land_area: 579400
   capacity:
     current:
-      pv: 6365
-      onshore: 3408
-      offshore: 0
-      nuclear: 12468
+      pv:
+        UA00: 6365
+        UA01: 0
+      onshore:
+        UA00: 3408
+        UA01: 0
+      offshore:
+        UA00: 0
+        UA01: 0
+      nuclear:
+        UA00: 12468
+        UA01: 0
     potential: { }
 - name: United Kingdom
   nuts2: UK
