@@ -132,7 +132,7 @@ def typical_week(output_directory):
             _add_area(subplot, cumulative_demand, net_export, label="Import/export", color=colors.get("gray", 400))
 
         # Add the curtailment
-        _add_area(subplot, cumulative_demand, typical_week_data.curtailed_MW, label="Curtailed", color=colors.get("gray", 200))
+        _add_area(subplot, cumulative_demand, typical_week_data.curtailed_MW, label="Curtailed", color=colors.get("gray", 300))
 
         # Generation
         # Create a series with the cumulative generation
