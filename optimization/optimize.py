@@ -60,7 +60,7 @@ def optimize(config, *, status, output_directory):
     temporal_demand_electricity = temporal_demand_electricity[market_nodes]
 
     # Create a series with the mean hydrogen demand per market node
-    mean_demand_hydrogen = config["relative_hydrogen_demand"] * temporal_demand_electricity.mean()
+    mean_demand_hydrogen = config.get("relative_hydrogen_demand", 0) * temporal_demand_electricity.mean()
 
 
     """
