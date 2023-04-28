@@ -61,8 +61,10 @@ def calculate_lcoh(electrolysis_capacity, mean_electricity_demand, electricity_c
     # Get the technology scenario
     technology_scenario = config["technologies"]["scenario"]
 
-    # Get the electrolysis assumptions
+    # Get the relevant electrolysis assumptions
     electrolysis_assumptions = utils.get_technologies(technology_type="electrolysis")
+    relevant_electrolysis_assumptions = {electrolysis_technology: electrolysis_assumptions[electrolysis_technology] for electrolysis_technology in electrolysis_assumptions if electrolysis_technology in config["technologies"]["electrolysis"]}
+
 
     # Calculate the annualized electrolyzer costs
     annualized_electrolyzer_costs = 0
@@ -75,13 +77,13 @@ def calculate_lcoh(electrolysis_capacity, mean_electricity_demand, electricity_c
 
         # Calculate the annual hydrogen production
         annual_hydrogen_production = 0
-        for electrolysis_technology in electrolysis_assumptions:
-            annual_hydrogen_production += annual_electricity_demand[electrolysis_technology] * electrolysis_assumptions[electrolysis_technology]["efficiency"]
+        for electrolysis_technology in relevant_electrolysis_assumptions:
+            annual_hydrogen_production += annual_electricity_demand[electrolysis_technology] * relevant_electrolysis_assumptions[electrolysis_technology]["efficiency"]
 
         # Calculate the annualized electricity costs
         annualized_electricity_costs = annual_electricity_demand.sum() * electricity_costs
     else:
-        annualized_electricity_costs = pd.Series(0, index=electrolysis_assumptions.keys())
+        annualized_electricity_costs = pd.Series(0, index=relevant_electrolysis_assumptions.keys())
 
     # Calculate and return the LCOH
     if breakdown_level == 0:
