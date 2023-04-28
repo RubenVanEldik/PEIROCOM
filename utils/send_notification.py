@@ -1,4 +1,5 @@
-import pushover
+import http
+import urllib
 
 import utils
 import validate
@@ -6,9 +7,6 @@ import validate
 # Initialize the Pushover client if the keys are available
 user_key = utils.get_env("PUSHOVER_USER_KEY")
 api_token = utils.get_env("PUSHOVER_API_TOKEN")
-if user_key and api_token:
-    client = pushover.Client(user_key, api_token=api_token)
-
 
 def send_notification(message):
     """
@@ -16,9 +14,16 @@ def send_notification(message):
     """
     assert validate.is_string(message)
 
-    # Send the message if the client has been initialized
-    if "client" in globals():
+    # Send the message if the user key and API token are found
+    if user_key and api_token:
+        # Define the headers and body
+        headers = {"Content-type": "application/x-www-form-urlencoded"}
+        body = urllib.parse.urlencode({"token": api_token, "user": user_key, "message": message})
+
         try:
-            client.send_message(message, title="Thesis model")
+            # Send the request
+            pushover_connection = http.client.HTTPSConnection("api.pushover.net:443")
+            pushover_connection.request("POST", "/1/messages.json", body, headers)
+            pushover_connection.getresponse()
         except ConnectionError:
             print("Could not send the notification due to an connection error")
