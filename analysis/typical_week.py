@@ -99,13 +99,13 @@ def typical_week(output_directory):
         subplot.set_xticks(range(0, 24 * 7, 24))
         subplot.tick_params(axis="x", which="major", labelbottom=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
         # Show the weekday labels as minor ticks, so they are between the day ticks
-        subplot.set_xticks(range(12, 24 * 7, 24), ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], minor=True)
+        subplot.set_xticks(range(12, 24 * 7, 24), ["Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."], minor=True)
         subplot.tick_params(axis="x", which="minor", bottom=False, top=False)  # changes apply to the x-axis  # both major and minor ticks are affected  # ticks along the bottom edge are off  # ticks along the top edge are off
         # Show the tick labels on the y-axis as absolute
         subplot.set_yticklabels([f"{abs(x):.0f}" if abs(x) >= 100 else f"{abs(x):.1f}" if abs(x) >= 10 else f"{abs(x):.2f}" for x in subplot.get_yticks()])
-        subplot.text(-0.075, 0.25, "From", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
-        subplot.text(-0.077, 0.75, "To", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
-        subplot.text(-0.11, 0.5, f"({unit})", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.10, 0.25, "From", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.10, 0.75, "To", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
+        subplot.text(-0.14, 0.5, f"({unit})", transform=subplot.transAxes, horizontalalignment="center", verticalalignment="center", rotation=90)
 
         # Demand
         # Create a series with the cumulative demand
