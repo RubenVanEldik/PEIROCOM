@@ -145,7 +145,15 @@ def optimize(config, *, status, output_directory):
             status.update(f"{country_flag} Adding {utils.format_technology(dispatchable_technology, capitalize=False)} generation")
 
             # Create the variable for the dispatchable generation capacity
-            dispatchable_capacity_market_node = model.addVar()
+            current_dispatchable_capacity = utils.get_current_capacity_per_market_node(market_node, dispatchable_technology, config=config)
+            if dispatchable_technology == "nuclear" and config["nuclear_capacity_constraint"] == "fixed":
+                dispatchable_capacity_market_node = current_dispatchable_capacity
+            elif dispatchable_technology == "nuclear" and config["nuclear_capacity_constraint"] == "capped":
+                dispatchable_capacity_market_node = model.addVar(ub=current_dispatchable_capacity)
+            else:
+                dispatchable_capacity_market_node = model.addVar()
+
+            # Add the dispatchable capacity to the DataFrame
             dispatchable_capacity.loc[market_node, dispatchable_technology] = dispatchable_capacity_market_node
 
             # Create the temporal dispatchable generation variables
