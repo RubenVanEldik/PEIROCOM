@@ -17,6 +17,7 @@ from .format_technology import format_technology
 from .get_country_of_market_node import get_country_of_market_node
 from .get_country_property import get_country_property
 from .get_current_capacity_per_ires_node import get_current_capacity_per_ires_node
+from .get_current_capacity_per_market_node import get_current_capacity_per_market_node
 from .get_dispatchable_capacity import get_dispatchable_capacity
 from .get_electrolysis_capacity import get_electrolysis_capacity
 from .get_env import get_env
