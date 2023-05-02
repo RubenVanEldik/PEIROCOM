@@ -85,9 +85,9 @@ class Chart:
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white
-        st.pyplot(self.fig, dpi=400, bbox_inches="tight", transparent=True)
+        st.pyplot(self.fig, dpi=200, bbox_inches="tight", transparent=True)
 
     def download_button(self, file_name):
         buf = io.BytesIO()
-        plt.savefig(buf, dpi=800, bbox_inches="tight", transparent=True)
+        plt.savefig(buf, dpi=400, bbox_inches="tight", transparent=True)
         st.sidebar.download_button("💾 Download figure", buf, file_name=file_name, mime="image/png")
