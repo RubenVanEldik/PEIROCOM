@@ -94,7 +94,8 @@ def _plot(output_directory, sensitivity_config, sensitivity_plot, statistic_name
             raise ValueError("'statistic_name has to be 'firm_lcoe', 'unconstrained_lcoe', or 'premium'")
 
         # Remove all technology (types) that have only zeroes throughout the sensitivity analysis
-        data = data.loc[:, (data != 0).any()]
+        if isinstance(data, pd.DataFrame):
+            data = data.loc[:, (data != 0).any()]
 
         # Plot the data depending on the breakdown level
         if breakdown_level == 0:
