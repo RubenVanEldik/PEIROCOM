@@ -15,6 +15,7 @@ class Chart:
         # Store the number of rows and columns of the figure
         self.nrows = nrows
         self.ncols = ncols
+        self.wide = wide
 
         # Create the figure
         width = 6 * 522 / 252 if wide else 6 # 522/252 is the textwidth/columnwidth ratio in the Elsevier template
@@ -82,7 +83,7 @@ class Chart:
         else:
             legend_ax = self.axs
 
-        legend_ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=3, frameon=False, framealpha=0)
+        legend_ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=4 if self.wide else 3, frameon=False, framealpha=0)
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white
