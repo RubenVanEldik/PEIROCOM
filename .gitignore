@@ -6,7 +6,7 @@ todo.txt
 
 # ENV variables
 .env
-gurobi.lic
+gurobi*.lic
 
 # Virtual environment
 env/
