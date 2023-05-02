@@ -83,7 +83,9 @@ class Chart:
         else:
             legend_ax = self.axs
 
-        legend_ax.legend(bbox_to_anchor=(0.5, 1), loc="lower center", ncol=4 if self.wide else 3, frameon=False, framealpha=0)
+        # Get all legend items from the different subplots and display them
+        legend_items = {label: handle for ax in self.all_axs for handle, label in zip(*ax.get_legend_handles_labels())}
+        legend_ax.legend(legend_items.values(), legend_items.keys(), bbox_to_anchor=(0.5, 1), loc="lower center", ncol=4 if self.wide else 3, frameon=False, framealpha=0)
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white
