@@ -1,4 +1,5 @@
 import io
+import math
 
 import streamlit as st
 from matplotlib import pyplot as plt
@@ -28,7 +29,7 @@ class Chart:
         if nrows > 1 and ncols > 1:
             for axs in self.axs:
                 self.all_axs.extend(axs)
-        if nrows > 1 or ncols > 1:
+        elif nrows > 1 or ncols > 1:
             self.all_axs.extend(self.axs)
         else:
             self.all_axs.append(self.axs)
@@ -73,7 +74,7 @@ class Chart:
 
     def add_legend(self):
         if self.nrows > 1 and self.ncols > 1:
-            legend_ax = self.axs[round(self.ncols / 2), 0]
+            legend_ax = self.axs[0, math.floor(self.ncols / 2)]
         elif self.nrows > 1:
             legend_ax = self.axs[0]
         elif self.ncols > 1:
