@@ -74,18 +74,19 @@ def typical_week(output_directory):
         # Get the data for the current season
         temporal_results_season = temporal_results[temporal_results.index.dayofyear.isin(season_dates[season])]
         # Filter out all weeks that are not completely in this season
-        week_numbers = temporal_results_season.index.week.value_counts()
-        complete_weeks = week_numbers[week_numbers == 7 * 24].index.to_list()
-        temporal_results_season = temporal_results_season[temporal_results_season.index.week.isin(complete_weeks)]
+        week_numbers = pd.DataFrame({"year": temporal_results_season.index.year, "week": temporal_results_season.index.week})
+        complete_weeks = week_numbers[week_numbers.groupby(['year', 'week']).cumcount() == 167].drop_duplicates()
+        complete_weeks_in_year = complete_weeks["year"].astype(str) + "_" + complete_weeks["week"].astype(str)
+        temporal_results_season = temporal_results_season[(temporal_results_season.index.year.astype(str) + "_" + temporal_results_season.index.week.astype(str)).isin(complete_weeks_in_year)]
         # Calculate the mean per hour
         temporal_results_season_mean = temporal_results_season.groupby([temporal_results_season.index.weekday, temporal_results_season.index.hour]).mean()
         temporal_results_season_errors = temporal_results_season.apply(lambda x: x - temporal_results_season_mean.loc[(x.name.weekday(), x.name.hour)], axis=1).pow(2)
         # Get the RMSE for each week
-        temporal_results_rmse = temporal_results_season_errors.pow(2).groupby(temporal_results_season_errors.index.week).mean().pow(0.5)
+        temporal_results_rmse = temporal_results_season_errors.pow(2).groupby([temporal_results_season_errors.index.year, temporal_results_season_errors.index.week]).mean().pow(0.5)
         # Get the week number of the most typical week
-        best_week = (temporal_results_rmse.demand_electricity_MW + temporal_results_rmse.generation_ires_MW + temporal_results_rmse.curtailed_MW).idxmin()
+        best_year, best_week = (temporal_results_rmse.demand_electricity_MW + temporal_results_rmse.generation_ires_MW + temporal_results_rmse.curtailed_MW).idxmin()
         # Select the typical week
-        typical_week_data = temporal_results_season[temporal_results_season.index.week == best_week]
+        typical_week_data = temporal_results_season[(temporal_results_season.index.year == best_year) & (temporal_results_season.index.week == best_week)]
         typical_week_data.index = 24 * typical_week_data.index.weekday + typical_week_data.index.hour
         # Add the typical week data to the season data dictionary
         season_data[season] = typical_week_data
