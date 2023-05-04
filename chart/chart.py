@@ -74,18 +74,9 @@ class Chart:
             ax.set_yticklabels([label.format(tick) for tick in ax.get_yticks()])
 
     def add_legend(self):
-        if self.nrows > 1 and self.ncols > 1:
-            legend_ax = self.axs[0, math.floor(self.ncols / 2)]
-        elif self.nrows > 1:
-            legend_ax = self.axs[0]
-        elif self.ncols > 1:
-            legend_ax = self.axs[round(self.ncols / 2)]
-        else:
-            legend_ax = self.axs
-
         # Get all legend items from the different subplots and display them
         legend_items = {label: handle for ax in self.all_axs for handle, label in zip(*ax.get_legend_handles_labels())}
-        legend_ax.legend(legend_items.values(), legend_items.keys(), bbox_to_anchor=(0.5, 1), loc="lower center", ncol=4 if self.wide else 3, frameon=False, framealpha=0)
+        self.fig.legend(legend_items.values(), legend_items.keys(), bbox_to_anchor=(0.5, 1), loc="lower center", ncol=4 if self.wide else 3, frameon=False, framealpha=0)
 
     def display(self):
         # Transparent is required for Streamlit because the background is not white
