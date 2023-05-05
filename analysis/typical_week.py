@@ -43,11 +43,6 @@ def typical_week(output_directory):
     config = utils.read_yaml(output_directory / "config.yaml")
     selected_country_codes = st.sidebar.multiselect("Countries", config["country_codes"], format_func=lambda country_code: utils.get_country_property(country_code, "name"))
 
-    # Only show a message if the resolution is not 1 hour
-    if config["resolution"] != "1H":
-        st.warning("This analysis is only available for runs with a 1 hour resolution")
-        return
-
     # Get temporal results for all countries
     temporal_results = utils.get_temporal_results(output_directory, group="all", country_codes=selected_country_codes)
 
@@ -75,7 +70,8 @@ def typical_week(output_directory):
         temporal_results_season = temporal_results[temporal_results.index.dayofyear.isin(season_dates[season])]
         # Filter out all weeks that are not completely in this season
         week_numbers = pd.DataFrame({"year": temporal_results_season.index.year, "week": temporal_results_season.index.week})
-        complete_weeks = week_numbers[week_numbers.groupby(['year', 'week']).cumcount() == 167].drop_duplicates()
+        steps_in_week = (7 * 24 * 3600 / pd.Timedelta(config["resolution"]).total_seconds() - 1)
+        complete_weeks = week_numbers[week_numbers.groupby(['year', 'week']).cumcount() == steps_in_week].drop_duplicates()
         complete_weeks_in_year = complete_weeks["year"].astype(str) + "_" + complete_weeks["week"].astype(str)
         temporal_results_season = temporal_results_season[(temporal_results_season.index.year.astype(str) + "_" + temporal_results_season.index.week.astype(str)).isin(complete_weeks_in_year)]
         # Calculate the mean per hour
