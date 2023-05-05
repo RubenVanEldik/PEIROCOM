@@ -75,7 +75,7 @@ with st.sidebar.expander("Technologies"):
 
     hydrogen_container = st.empty()
 
-    config["nuclear_capacity_constraint"] = st.selectbox("Nuclear capacity", ["unbound", "capped", "fixed"], format_func=utils.format_str)
+    config["nuclear_capacity_constraint"] = st.selectbox("Nuclear capacity", ["unconstrained", "capped", "fixed"], format_func=utils.format_str)
     # Select the technologies
     technology_types = ["ires", "dispatchable", "hydropower", "storage", "electrolysis"]
     technology_type_tabs = st.tabs([utils.format_str(technology_type) for technology_type in technology_types])
