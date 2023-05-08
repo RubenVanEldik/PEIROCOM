@@ -76,7 +76,7 @@ dispatchable:
       fixed_opex: 11
       variable_opex: 2.36
   h2_gas_turbine:
-    name: "H2 gas turbine"
+    name: "H2 OCGT"
     color:
       name: 'green'
       value: 600
