@@ -78,7 +78,8 @@ def annual_costs(output_directory, *, country_codes=None, breakdown_level=0):
 
     # Calculate the annual electrolyzer costs
     electrolysis_capacity = utils.get_electrolysis_capacity(output_directory, country_codes=country_codes)
-    annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=breakdown_level, annual_costs=True)
+    mean_electrolysis_demand = pd.Series({electrolysis_technology: mean_temporal_results[f"demand_{electrolysis_technology}_MW"].sum() for electrolysis_technology in electrolysis_capacity.columns})
+    annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, mean_electrolysis_demand, None, config=config, breakdown_level=breakdown_level, annual_costs=True)
 
     # Add the electrolyzer to the other costs
     if breakdown_level == 0:

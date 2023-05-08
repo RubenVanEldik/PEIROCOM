@@ -571,7 +571,8 @@ def optimize(config, *, status, output_directory):
     total_spillage_costs = total_spillage_hydropower_MWh * artificial_spillage_cost_factor
 
     # Calculate the annual electrolyzer costs (don't include electricity costs as this is already included in the electricity costs calculation above)
-    annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, None, None, config=config, breakdown_level=1, annual_costs=True).electrolyzer
+    mean_electrolysis_demand = pd.Series({electrolysis_technology: gp.quicksum(utils.merge_dataframes_on_column(temporal_results, f"demand_{electrolysis_technology}_MW").sum()) / len(temporal_demand_electricity.index) for electrolysis_technology in electrolysis_capacity.columns})
+    annual_electrolyzer_costs = utils.calculate_lcoh(electrolysis_capacity, mean_electrolysis_demand, None, config=config, breakdown_level=1, annual_costs=True).electrolyzer
 
     # Set the objective to the annual system costs
     annualized_system_costs = annual_electricity_costs + annual_electrolyzer_costs + total_spillage_costs

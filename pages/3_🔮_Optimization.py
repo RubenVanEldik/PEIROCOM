@@ -73,7 +73,7 @@ with st.sidebar.expander("Technologies"):
     scenario_levels = {-1: "Conservative", 0: "Moderate", 1: "Advanced"}
     config["technologies"]["scenario"] = st.select_slider("Scenario", options=scenario_levels.keys(), value=0, format_func=lambda key: scenario_levels[key])
 
-    hydrogen_container = st.empty()
+    hydrogen_container = st.container()
 
     config["nuclear_capacity_constraint"] = st.selectbox("Nuclear capacity", ["unconstrained", "capped", "fixed"], format_func=utils.format_str)
     # Select the technologies
@@ -98,6 +98,7 @@ with st.sidebar.expander("Technologies"):
 
     if len(config["technologies"][technology_type]):
         config["relative_hydrogen_demand"] = hydrogen_container.slider("Relative hydrogen demand", min_value=0.0, max_value=2.0, value=0.0, step=0.05, help="Relative to electricity demand")
+        config["extra_hydrogen_costs_per_kg"] = hydrogen_container.number_input("Extra hydrogen costs (€/kg)", min_value=0.0, max_value=5.0, value=0.0, step=0.05)
 
 # Set the self-sufficiency options
 with st.sidebar.expander("Self-sufficiency"):

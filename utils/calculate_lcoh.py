@@ -52,8 +52,8 @@ def calculate_lcoh(electrolysis_capacity, mean_electricity_demand, electricity_c
     Calculate the average Levelized Costs of Hydrogen for all market nodes
     """
     assert validate.is_dataframe(electrolysis_capacity)
-    assert validate.is_series(mean_electricity_demand, required=not annual_costs)
-    assert validate.is_number(electricity_costs, required=mean_electricity_demand is not None)
+    assert validate.is_series(mean_electricity_demand)
+    assert validate.is_number(electricity_costs, required=not annual_costs)
     assert validate.is_config(config)
     assert validate.is_breakdown_level(breakdown_level)
     assert validate.is_bool(annual_costs)
@@ -72,15 +72,15 @@ def calculate_lcoh(electrolysis_capacity, mean_electricity_demand, electricity_c
         annualized_electrolyzer_costs += _calculate_annualized_electrolyzer_costs(config["technologies"]["electrolysis"], electrolysis_capacity.loc[market_node], technology_scenario=technology_scenario)
 
     # Calculate the annual electricity costs and hydrogen production
-    if mean_electricity_demand is not None:
-        annual_electricity_demand = 8760 * mean_electricity_demand
+    annual_electricity_demand = 8760 * mean_electricity_demand
 
-        # Calculate the annual hydrogen production
-        annual_hydrogen_production = 0
-        for electrolysis_technology in relevant_electrolysis_assumptions:
-            annual_hydrogen_production += annual_electricity_demand[electrolysis_technology] * relevant_electrolysis_assumptions[electrolysis_technology]["efficiency"]
+    # Calculate the annual hydrogen production
+    annual_hydrogen_production = 0
+    for electrolysis_technology in relevant_electrolysis_assumptions:
+        annual_hydrogen_production += annual_electricity_demand[electrolysis_technology] * relevant_electrolysis_assumptions[electrolysis_technology]["efficiency"]
 
-        # Calculate the annualized electricity costs
+    # Calculate the annualized electricity costs
+    if electricity_costs is not None:
         annualized_electricity_costs = annual_electricity_demand.sum() * electricity_costs
     else:
         annualized_electricity_costs = pd.Series(0, index=relevant_electrolysis_assumptions.keys())
@@ -98,6 +98,10 @@ def calculate_lcoh(electrolysis_capacity, mean_electricity_demand, electricity_c
     # Convert the costs from Dollar to Euro
     eur_usd = 1.1290  # Source: https://www.federalreserve.gov/releases/h10/20220110/
     total_costs /= eur_usd
+
+    # Calculate the extra hydrogen costs
+    hydrogen_mwh_kg = 0.033333
+    total_costs += annual_hydrogen_production * config.get("extra_hydrogen_costs_per_kg", 0) / hydrogen_mwh_kg
 
     # Return the relative or absolute costs
     if annual_costs:
