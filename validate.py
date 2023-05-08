@@ -415,7 +415,7 @@ def is_sensitivity_config(value, *, required=True):
     if not isinstance(value, dict):
         return False
 
-    return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "dispatchable_generation", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency", "barrier_convergence_tolerance"]
+    return value["analysis_type"] in ["curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "extra_hydrogen_costs", "dispatchable_generation", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency", "barrier_convergence_tolerance"]
 
 
 def is_series(value, *, required=True):

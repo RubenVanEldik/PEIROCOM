@@ -244,6 +244,9 @@ def sensitivity(output_directory):
     elif sensitivity_config["analysis_type"] == "hydrogen_demand":
         sensitivity_plot.axs.set_xlabel(r"Hydrogen demand ($\%_{electricity\ demand}$)")
         sensitivity_plot.format_xticklabels("{:,.0%}")
+    elif sensitivity_config["analysis_type"] == "extra_hydrogen_costs":
+        sensitivity_plot.axs.set_xlabel(r"Exogeneous hydrogen costs ($€/kg_{h_2}$)")
+        # sensitivity_plot.format_xticklabels("{:,.0%}")
     elif sensitivity_config["analysis_type"] == "hydropower_capacity":
         sensitivity_plot.axs.set_xlabel(r"Hydropower capacity ($\%_{current}$)")
         sensitivity_plot.format_xticklabels("{:,.0%}")

@@ -125,7 +125,7 @@ with st.sidebar.expander("Interconnections"):
 # Set the sensitivity analysis options
 with st.sidebar.expander("Sensitivity analysis"):
     # Enable/disable the sensitivity analysis
-    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "dispatchable_generation", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency", "barrier_convergence_tolerance"]
+    sensitivity_analysis_types = ["-", "curtailment", "climate_years", "technology_scenario", "hydrogen_demand", "extra_hydrogen_costs", "dispatchable_generation", "hydropower_capacity", "interconnection_capacity", "interconnection_efficiency", "min_self_sufficiency", "max_self_sufficiency", "barrier_convergence_tolerance"]
     sensitivity_analysis_type = st.selectbox("Sensitivity type", sensitivity_analysis_types, format_func=utils.format_str, disabled=utils.is_demo, help=demo_disabled_message)
 
     # Initialize the sensitivity_config if an analysis type has been specified
@@ -155,6 +155,11 @@ with st.sidebar.expander("Sensitivity analysis"):
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
     elif sensitivity_analysis_type == "hydrogen_demand":
         sensitivity_start, sensitivity_stop = st.slider("Relative hydrogen demand range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
+        number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
+        sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
+        sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
+    elif sensitivity_analysis_type == "extra_hydrogen_costs":
+        sensitivity_start, sensitivity_stop = st.slider("Extra hydrogen costs range", value=(0.0, 2.0), min_value=0.0, max_value=2.0, step=0.05)
         number_steps = st.slider("Number of steps", value=10, min_value=3, max_value=50)
         sensitivity_steps = np.linspace(start=sensitivity_start, stop=sensitivity_stop, num=number_steps)
         sensitivity_config["steps"] = {f"{step:.3f}": float(step) for step in sensitivity_steps}
