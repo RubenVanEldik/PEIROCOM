@@ -19,7 +19,7 @@ class Chart:
 
         # Create the figure
         width = 6 * 522 / 252 if wide else 6 # 522/252 is the textwidth/columnwidth ratio in the Elsevier template
-        height = 3.5 * nrows ** (5 / 7)
+        height = 3.5 * nrows ** 0.5
         self.fig, self.axs = plt.subplots(nrows, ncols, figsize=(width, height), sharex=sharex, sharey=sharey)
 
         # Make a list with all axis independent of layout
