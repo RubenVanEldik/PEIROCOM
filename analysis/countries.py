@@ -186,7 +186,7 @@ def countries(output_directory):
             if format_percentage:
                 bar_chart.format_yticklabels("{:,.0%}")
 
-            country_names = [utils.get_country_property(country_code, "name") for country_code in data.index]
+            country_names = ["Bosnia and Herz." if country_code == "BA" else utils.get_country_property(country_code, "name") for country_code in data.index]
             bar_chart.axs.set_xticks(bar_chart.axs.get_xticks())  # Required to not get a warning message when using 'set_xticklabels'
             bar_chart.axs.set_xticklabels(country_names, rotation=90)
             padding = bar_width - (1 - bar_width) / 2
