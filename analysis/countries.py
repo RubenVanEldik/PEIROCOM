@@ -168,7 +168,7 @@ def countries(output_directory):
                 data = data.dropna()
 
             # Initialize bar chart
-            bar_chart = chart.Chart(ylabel=label, wide=True)
+            bar_chart = chart.Chart(ylabel=label)
             bar_width = 0.8
 
             data = data.sort_index(key=lambda x: [utils.get_country_property(xx, "name") for xx in x])
