@@ -30,22 +30,22 @@ def get(color_name, value, *, alpha=1, format="hex"):
         return f"rgba({int(hex_color[1:3], 16)}, {int(hex_color[3:5], 16)}, {int(hex_color[5:7], 16)}, {alpha})"
 
 
-def primary(*, alpha=0.8):
+def primary(*, alpha=0.9):
     """
     Get the primary color
     """
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    return get("blue", 700, alpha=alpha)
+    return get("zinc", 600, alpha=alpha)
 
 
-def secondary(*, alpha=0.8):
+def secondary(*, alpha=0.9):
     """
     Get the secondary color
     """
     assert validate.is_number(alpha, min_value=0, max_value=1)
 
-    return get("green", 600, alpha=alpha)
+    return get("zinc", 400, alpha=alpha)
 
 
 def tertiary(*, alpha=0.8):
