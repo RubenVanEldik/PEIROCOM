@@ -22,9 +22,6 @@ class Chart:
         height = 3.5 * nrows ** (5 / 7)
         self.fig, self.axs = plt.subplots(nrows, ncols, figsize=(width, height), sharex=sharex, sharey=sharey)
 
-        # Enable tight_layout
-        self.fig.tight_layout()
-
         # Make a list with all axis independent of layout
         self.all_axs = []
         if nrows > 1 and ncols > 1:
@@ -79,10 +76,16 @@ class Chart:
         self.fig.legend(legend_items.values(), legend_items.keys(), bbox_to_anchor=(0.5, 1), loc="lower center", ncol=4 if self.wide else 3, frameon=False, framealpha=0)
 
     def display(self):
+        # Enable tight_layout
+        self.fig.tight_layout()
+
         # Transparent is required for Streamlit because the background is not white
         st.pyplot(self.fig, dpi=200, bbox_inches="tight", transparent=True)
 
     def download_button(self, file_name):
+        # Enable tight_layout
+        self.fig.tight_layout()
+
         buf = io.BytesIO()
         plt.savefig(buf, dpi=400, bbox_inches="tight", transparent=True)
         st.sidebar.download_button("💾 Download figure", buf, file_name=file_name, mime="image/png")
