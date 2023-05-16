@@ -27,6 +27,10 @@ def get_potential_per_ires_node(market_node, ires_technology, *, mean_demand, co
     ires_data = utils.read_temporal_data(utils.path("input", "scenarios", config["scenario"], "ires", f"{market_node}.csv"))
     ires_nodes_in_market_node_count = len([column for column in ires_data.columns if column.startswith(f"{ires_technology}_")])
 
+    # Return 0 if ires_nodes_in_market_node_count is 0 otherwise a division by 0 error might occur
+    if ires_nodes_in_market_node_count == 0:
+        return 0
+
     # Return the potential of the market node divided by the number of IRES nodes in the market node (with a minimum of the currently installed capacity (only required for Italy))
     current_capacity_ires_node = utils.get_current_capacity_per_ires_node(market_node, ires_technology, config=config)
     potential_capacity_ires_node = ires_potential_market_node / ires_nodes_in_market_node_count
