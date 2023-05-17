@@ -399,6 +399,9 @@ def optimize(config, *, status, output_directory):
                     # Create the variables for the export variables
                     temporal_export[connection_type][temporal_export_limit_column_name] = pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_export_limit))
 
+                # Copy the temporal export DataFrame, so it does not get too fragmented
+                temporal_export[connection_type] = temporal_export[connection_type].copy()
+
     """
     Step 4: Define demand constraints
     """
