@@ -430,8 +430,15 @@ def optimize(config, *, status, output_directory):
                     temporal_results[market_node][column_name] = 0
                 temporal_results[market_node][column_name] += export_flow
 
+        # Calculate the lost load per hour
+        if "voll" in config:
+            lost_load_MW = pd.Series(model.addVars(temporal_export[connection_type].index, ub=temporal_results[market_node].demand_electricity_MW))
+        else:
+            lost_load_MW = pd.Series(0, index=temporal_export[connection_type].index)
+        temporal_results[market_node].insert(temporal_results[market_node].columns.get_loc("generation_ires_MW"), "lost_load_MW", lost_load_MW)
+
         # Add the demand constraint
-        temporal_results[market_node].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_dispatchable_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_total_MW), axis=1)
+        temporal_results[market_node].apply(lambda row: model.addConstr(row.generation_ires_MW + row.generation_dispatchable_MW + row.generation_total_hydropower_MW - row.net_storage_flow_total_MW - row.net_export_MW >= row.demand_total_MW - row.lost_load_MW), axis=1)
 
         # Calculate the curtailed energy per hour
         curtailed_MW = temporal_results[market_node].generation_ires_MW + temporal_results[market_node].generation_dispatchable_MW + temporal_results[market_node].generation_total_hydropower_MW - temporal_results[market_node].demand_total_MW - temporal_results[market_node].net_storage_flow_total_MW - temporal_results[market_node].net_export_MW

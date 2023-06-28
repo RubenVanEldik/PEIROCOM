@@ -101,6 +101,12 @@ with st.sidebar.expander("Technologies"):
         config["extra_hydrogen_costs_per_kg"] = hydrogen_container.number_input("Extra hydrogen costs (€/kg)", min_value=0.0, max_value=5.0, value=0.0, step=0.05)
 
 # Set the self-sufficiency options
+with st.sidebar.expander("Value of lost load"):
+    # Add the self-sufficiency for electricity
+    if st.checkbox("Enable VOLL"):
+        config["voll"] = 1000 * st.number_input("Value of lost load (€/kWh)", value=10, min_value=1, max_value=100)
+
+# Set the self-sufficiency options
 with st.sidebar.expander("Self-sufficiency"):
     config["self_sufficiency"] = {}
     # Add the self-sufficiency for electricity

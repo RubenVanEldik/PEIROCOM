@@ -172,13 +172,19 @@ def calculate_lcoe(ires_capacity, dispatchable_capacity, storage_capacity, hydro
         if storage_capacity is not None:
             annualized_storage_costs += _calculate_annualized_storage_costs(config["technologies"]["storage"], storage_capacity[market_node], technology_scenario=technology_scenario)
 
+    # Calculate the annual value of lost load
+    if "voll" in config:
+        annualized_voll = mean_temporal_data["lost_load_MW"] * 8760 * config["voll"]
+    else:
+        annualized_voll = mean_temporal_data["lost_load_MW"] * 0
+
     # Calculate and return the LCOE
     if breakdown_level == 0:
-        total_costs = annualized_ires_costs.sum() + annualized_dispatchable_costs.sum() + annualized_storage_costs.sum() + annualized_hydropower_costs.sum()
+        total_costs = annualized_ires_costs.sum() + annualized_dispatchable_costs.sum() + annualized_storage_costs.sum() + annualized_hydropower_costs.sum() + annualized_voll.sum()
     elif breakdown_level == 1:
-        total_costs = pd.Series({"ires": annualized_ires_costs.sum(), "dispatchable": annualized_dispatchable_costs.sum(), "hydropower": annualized_hydropower_costs.sum(), "storage": annualized_storage_costs.sum()})
+        total_costs = pd.Series({"ires": annualized_ires_costs.sum(), "dispatchable": annualized_dispatchable_costs.sum(), "hydropower": annualized_hydropower_costs.sum(), "storage": annualized_storage_costs.sum(), "voll": annualized_voll.sum()})
     elif breakdown_level == 2:
-        all_costs = [annualized_ires_costs, annualized_dispatchable_costs, annualized_storage_costs, annualized_hydropower_costs]
+        all_costs = [annualized_ires_costs, annualized_dispatchable_costs, annualized_storage_costs, annualized_hydropower_costs, [annualized_voll.sum()]]
         total_costs = pd.concat([item for item in all_costs if isinstance(item, pd.Series)])
     else:
         raise ValueError("breakdown_level should be between 0, 1, or 2")
